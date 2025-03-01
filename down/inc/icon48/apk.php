@@ -5,7 +5,7 @@
  */
 
 // 检查是否已经存在图标文件，若不存在则进行图标提取
-if (!test_file(H . "files/screens/48/{$post['id']}.png")) {
+if (!test_file(H . "files/screens/48/{$post['id']}.png") && test_file($file)) {
 	// 如果没有图标文件，清除 session 中的图标记录
 	$_SESSION['file_icon'] = null;
 

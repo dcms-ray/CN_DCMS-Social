@@ -121,11 +121,14 @@ if (isset($user) && isset($_GET['play']) && ($_GET['play'] == 1 || $_GET['play']
 $set['title'] = htmlspecialchars($file_id['name']); // 页面标题
 include_once '../../sys/inc/thead.php';
 title();
-if ((user_access('down_komm_del') || $ank['id'] == $user['id']) && isset($_GET['del_post']) && dbresult(dbquery("SELECT COUNT(*) FROM `downnik_komm` WHERE `id` = '" . intval($_GET['del_post']) . "' AND `id_file` = '$file_id[id]'"), 0)) {
+
+// 处理删除评论
+if (isset($user) && isset($_GET['del_post']) && (user_access('down_komm_del') || $ank['id'] == $user['id'] || $user['id'] == dbarray(dbquery("SELECT `id_user` FROM `downnik_komm` WHERE `id` = '" . intval($_GET['del_post']) . "'"))['id_user']) && dbresult(dbquery("SELECT COUNT(*) FROM `downnik_komm` WHERE `id` = '" . intval($_GET['del_post']) . "' AND `id_file` = '$file_id[id]'"), 0)) {
 	dbquery("DELETE FROM `downnik_komm` WHERE `id` = '" . intval($_GET['del_post']) . "' LIMIT 1");
 	$_SESSION['message'] = '评论已成功删除';
 	header("Location: ?id_file=$file_id[id]");
 }
+
 if (isset($user))
 	dbquery("UPDATE `notification` SET `read` = '1' WHERE `type` = 'files_komm' AND `id_user` = '$user[id]' AND `id_object` = '$file_id[id]'");
 if (isset($_POST['msg']) && isset($user)) {
