@@ -147,6 +147,22 @@ WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE
 ORDER BY ul.last_online DESC;
 ```
 
+## 获取在线用户数量的SQL语句
+
+```sql
+SELECT COUNT(DISTINCT ul.id_user) AS online_users
+FROM `user_log` ul
+WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE
+  AND ul.ban = '0'
+  AND ul.last_online = (
+    SELECT MAX(last_online)
+    FROM `user_log` ul2
+    WHERE ul2.id_user = ul.id_user
+      AND ul2.last_online > NOW() - INTERVAL 10 MINUTE
+      AND ul2.ban = '0'
+  )
+```
+
 ## 获取某个用户的最后在线时间的SQL语句
 
 ```sql
