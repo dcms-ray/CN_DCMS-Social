@@ -41,8 +41,13 @@ if (isset($_POST['save'])) {
 		$hashedPassword = password_hash($_POST['pass1'], PASSWORD_DEFAULT);
 		dbquery("UPDATE `user` SET `pass` = '$hashedPassword' WHERE `id` = '$user[id]' LIMIT 1");
 
-		// 设置成功消息并重定向
-		$_SESSION['message'] = '密码更改成功';
+		if (isset($_POST['logout_all_devices']) && $_POST['logout_all_devices'] == 'on') {
+			// 注销所有设备
+			dbquery("UPDATE `user_log` SET `ban` = '1' WHERE `id_user` = {$user['id']};");
+			$_SESSION['message'] = '密码更改成功并从所有设备注销';
+		} else {
+			$_SESSION['message'] = '密码更改成功';
+		}
 		header("Location: ?");
 		exit;
 	}
@@ -78,6 +83,7 @@ echo "<form method='post' action='?{$passgen}'>";
 echo "旧密码:<br /><input type='password' name='pass' value='' /><br />";
 echo "新密码:<br /><input type='password' name='pass1' value='' /><br />";
 echo "确认密码:<br /><input type='password' name='pass2' value='' /><br />";
+echo '<input type="checkbox" name="logout_all_devices" />注销所有设备<br />';
 echo "<input type='submit' name='save' value='修改' />";
 echo "</form>";
 
