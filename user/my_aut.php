@@ -21,15 +21,12 @@ $start = $set['p_str']*$page-$set['p_str'];
 echo '<table class="post">';
 
 if (empty($k_post)) {
-	 echo '<div class="mess">';
-	 echo '没有登录历史';
-	 echo '</div>';
+	echo '<div class="mess">没有登录历史</div>';
 }
 
-$q = dbquery("SELECT * FROM `user_log` WHERE `id_user` = '" . $user['id'] . "' ORDER BY `id` DESC  LIMIT $start, $set[p_str]");
+$q = dbquery("SELECT * FROM `user_log` WHERE `id_user` = '{$user['id']}' ORDER BY `id` DESC  LIMIT {$start}, {$set['p_str']}");
 while ($post = dbassoc($q)) {
 	$ank = user::get_user($user['id']);
-	// Лесенка
 	echo '<div class="' . ($num % 2 ? "nav1" : "nav2") . '">';
 	$num++;
 	echo '<img src="/style/my_menu/logout_16.png" alt="" />';
@@ -43,8 +40,9 @@ while ($post = dbassoc($q)) {
 	echo '</div>';
 }
 echo '</table>';
+
 // 输出页数
-if ($k_page > 1)str("?",$k_page,$page);  
+if ($k_page > 1) str("?", $k_page, $page);  
 echo '<div class="foot">';
 echo '<img src="/style/icons/str.gif" alt="*" /> <a href="/user/info.php">我的页面</a><br />';
 echo '<img src="/style/icons/str.gif" alt="*" /> <a href="/user/my_aut.php">我的菜单</a><br />';
