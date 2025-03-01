@@ -74,9 +74,10 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 				if (isset($_POST['logout_all_devices']) && $_POST['logout_all_devices'] == 'on') {
 					// 退登所有设备
 					dbquery("UPDATE `user_log` SET `ban` = '1' WHERE `id_user` = {$_GET['id']};");
-					msg('您已从所有设备注销');
+					msg('密码更改成功并从所有设备注销');
+				} else {
+					msg('密码更改成功');
 				}
-				msg('密码更改成功');
 				// 标记 token 为已使用
 				markValidatePasswordResetTokenAsUsed($_GET['token']);
 				echo '<div class="foot"><a href="/user/aut.php">登录账号</a></div>';
