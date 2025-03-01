@@ -2,7 +2,7 @@
 echo "<div class='title'>网站菜单</a>";
 echo "</div>";
 
-$q_menu=dbquery("SELECT * FROM `menu` ORDER BY `pos` ASC");
+$q_menu = dbquery("SELECT * FROM `menu` ORDER BY `pos` ASC");
 while ($post_menu = dbassoc($q_menu)) {
 	if ($post_menu['type'] == 'link') {
 		echo "<a href='$post_menu[url]'>";

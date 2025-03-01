@@ -61,7 +61,7 @@ function otkuda($ref) {
 		$mesto = ' 访问 <a href="/index.php">网站主页</a> ';
 		// 默认情况下，说明用户来自其他页面
 	} else {
-		$mesto = ' 从某个地方来到 <a href="/index.php">网站</a> ';
+		$mesto = ' N/A ';
 	}
 	// 返回生成的描述文字
 	return $mesto;

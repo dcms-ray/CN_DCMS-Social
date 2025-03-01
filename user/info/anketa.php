@@ -368,14 +368,16 @@ if ($ank['email'] != NULL && ($ank['set_show_mail'] == 1 || isset($user) && ($us
 } else {
 	echo "<br />";
 }
-if ($ank['ank_n_tel'] != NULL)
+if ($ank['ank_n_tel'] != NULL) {
 	echo "$mobile<span class=\"ank_n\">电话:</span>$a <span class=\"ank_d\">$ank[ank_n_tel]</span><br />";
-else
+} else {
 	echo "$mobile<span class=\"ank_n\">电话:</span>$a<br />";
-if ($ank['ank_skype'] != NULL)
+}
+if ($ank['ank_skype'] != NULL) {
 	echo "$skype<span class=\"ank_n\">Skype:</span>$a <span class=\"ank_d\">$ank[ank_skype]</span><br />";
-else
+} else {
 	echo "$skype<span class=\"ank_n\">Skype:</span>$a<br />";
+}
 echo "</div>";
 //--------------------管理用户----------------------//
 echo "<div class='nav1'>";
@@ -397,7 +399,7 @@ if ($user['level'] > $ank['level']) {
 		echo "<img src='/style/icons/str.gif' alt='*' /> <a href='?id={$ank['id']}'>隐藏</a><br />";
 		echo "</div>";
 		echo "<div class='p_t'>";
-		if ($ank['ip'] != NULL) {
+		if (isset($ank['ip']) && $ank['ip'] != NULL) {
 			if (user_access('user_show_ip') && $ank['ip'] != 0) {
 				echo "<span class=\"ank_n\">IP:</span> <span class=\"ank_d\">{$ank['ip']}</span>";
 				if (user_access('adm_ban_ip'))
@@ -405,11 +407,13 @@ if ($user['level'] > $ank['level']) {
 				echo "<br />";
 			}
 		}
-		if (user_access('user_show_ua') && $ank['ua'] != NULL)
+		if (user_access('user_show_ua') && isset($ank['ua']) && $ank['ua'] != NULL) {
 			echo "<span class=\"ank_n\">UA:</span> <span class=\"ank_d\">$ank[ua]</span><br />";
-		if (user_access('user_show_ip') && opsos($ank['ip']))
+		}
+		if (user_access('user_show_ip') && isset($ank['ip']) && opsos($ank['ip'])) {
 			echo "<span class=\"ank_n\">IP:</span> <span class=\"ank_d\">" . opsos($ank['ip']) . "</span><br />";
-		if ($ank['show_url'] == 1) {
+		}
+		if ($ank['show_url'] == 1 && !empty($ank['url'])) {
 			if (otkuda($ank['url'])) echo "<span class=\"ank_n\">URL:</span> <span class=\"ank_d\"><a href='$ank[url]'>" . otkuda($ank['url']) . "</a></span><br />";
 		}
 		if (user_access('user_collisions') && $user['level'] > $ank['level']) {

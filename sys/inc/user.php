@@ -12,7 +12,6 @@ $user = checkLoginStatus();
 if ($user['status'] == 'true') {
 	$user = $user['data'];
 } else {
-	die(json_encode($user));
 	unset($user);
 }
 
@@ -33,7 +32,13 @@ if (!empty($user)) {
 	} else {
 		$user['level'] = 0;
 	}
-	$timeactiv  =  time() - $user['date_last'];
+	$last_online = dbresult(dbquery("SELECT ul.last_online
+	                                 FROM `user_log` ul
+	                                 WHERE ul.id_user = {$user['id']}
+	                                     AND ul.ban = '0'
+	                                 ORDER BY ul.last_online DESC
+	                                 LIMIT 1"), 0);
+	$timeactiv  =  time() - strtotime($last_online);
 
 	if ($timeactiv < 120) {
 		$newtimeactiv = $user['time'] + $timeactiv;
@@ -84,7 +89,7 @@ if (!empty($user)) {
 		dbquery("INSERT INTO `notification_set` (`id_user`) VALUES ('$user[id]')");
 
 	// 记录 url
-	dbquery("UPDATE `user` SET `url` = '" . my_esc($_SERVER['SCRIPT_NAME']) . "' WHERE `id` = '$user[id]' LIMIT 1");
+	dbquery("UPDATE `user_log` SET `url` = '" . my_esc($_SERVER['SCRIPT_NAME']) . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
 
 	// 对于 Web 主题
 	if ($webbrowser) {
@@ -99,25 +104,26 @@ if (!empty($user)) {
 
 	// 记录用户的 ip
 	dbquery("UPDATE `user_log` SET `ip` = '{$ip}' WHERE `id` = '{$user['login_id']}' LIMIT 1");
-	dbquery("UPDATE `user` SET `ip` = '{$ip}' WHERE `id` = '$user[id]' LIMIT 1");
 
 	// 记录用户的 ua
 	if ($ua) dbquery("UPDATE `user_log` SET `ua` = '" . my_esc($ua) . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
-	if ($ua) dbquery("UPDATE `user` SET `ua` = '" . my_esc($ua) . "' WHERE `id` = '$user[id]' LIMIT 1");
 
 	// 难以理解的会话
-	dbquery("UPDATE `user` SET `sess` = '$sess' WHERE `id` = '$user[id]' LIMIT 1");
+	dbquery("UPDATE `user_log` SET `sess` = '{$sess}' WHERE `id` = '{$user['login_id']}' LIMIT 1");
 
 	// 浏览器类型
 	dbquery("UPDATE `user_log` SET `browser` = '" . ($webbrowser == true ? "web" : "wap") . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
-	dbquery("UPDATE `user` SET `browser` = '" . ($webbrowser == true ? "web" : "wap") . "' WHERE `id` = '$user[id]' LIMIT 1");
+
+	// 更新最后在线时间
+	dbquery("UPDATE `user_log` SET `last_online` = '" . date('Y-m-d H:i:s') . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
 
 	// 检查相似的昵称
 	// 一定时间范围内检查是否有多个用户在相同的IP、相同的用户代理和相似的登录时间（10分钟内）之间产生了碰撞，如果有碰撞，则将这两个用户的信息记录在 user_collision 表中
-	$collision_q = dbquery("SELECT * FROM `user` WHERE `ip` = '$ip' AND `ua` = '" . my_esc($ua) . "' AND `date_last` > '" . (time() - 600) . "' AND `id` <> '$user[id]'");
+	$collision_q = dbquery("SELECT * FROM `user_log` WHERE `last_online` > '" . date("Y-m-d H:i:s", (time() - 600)) . "' AND `ip` = '$ip' AND `ua` = '" . my_esc($ua) . "' AND `id_user` <> '$user[id]'");
 	while ($collision = dbassoc($collision_q)) {
-		if (dbresult(dbquery("SELECT COUNT(*) FROM `user_collision` WHERE `id_user` = '$user[id]' AND `id_user2` = '$collision[id]' OR `id_user2` = '$user[id]' AND `id_user` = '$collision[id]'"), 0) == 0)
-			dbquery("INSERT INTO `user_collision` (`id_user`, `id_user2`, `type`) values('$user[id]', '$collision[id]', 'ip_ua_time')");
+		if (dbresult(dbquery("SELECT COUNT(*) FROM `user_collision` WHERE (`id_user` = '$user[id]' AND `id_user2` = '$collision[id_user]') OR (`id_user2` = '$user[id]' AND `id_user` = '$collision[id_user]')"), 0) == 0) {
+			dbquery("INSERT INTO `user_collision` (`id_user`, `id_user2`, `type`) values('$user[id]', '$collision[id_user]', 'ip_ua_time')");
+		}
 	}
 
 
@@ -141,8 +147,7 @@ if (!empty($user)) {
 	define("REPLY", $go_link);
 } else {
 	// 未登录用户主题
-	if ($webbrowser)
-		$set['set_them'] = $set['set_them2'];
+	if ($webbrowser) $set['set_them'] = $set['set_them2'];
 
 	// 记录未登录用户
 	if ($ip && $ua) {
@@ -174,14 +179,15 @@ if (!isset($user) && $set['guest_select']  ==  '1' && !isset($show_all) && $_SER
 if (isset($user)) {
 	$user_gr = dbassoc(dbquery("SELECT * FROM `user_group` WHERE `id` = {$user['group_access']} LIMIT 1"));
 	$user['group_name'] = $user_gr['name'];
-	if (isset($_GET['sess_abuld']) && $_GET['sess_abuld']  ==  1) // 继续查看标记为 18+ 的文件
-	{
+	if (isset($_GET['sess_abuld']) && $_GET['sess_abuld']  ==  1) {	// 继续查看标记为 18+ 的文件
 		$_SESSION['abuld'] = 1;
 	}
 
-	if (isset($_SESSION['abuld']) && $_SESSION['abuld']  ==  1)
+	if (isset($_SESSION['abuld']) && $_SESSION['abuld']  ==  1) {
 		$user['abuld'] = 1;
+	}
 }
+
 
 /*
 ========================================
@@ -244,13 +250,18 @@ if (isset($user) && isset($_GET['sort']) && ($_GET['sort'] == '0' || $_GET['sort
 }
 
 
-if (isset($user)) $sort = ($user['sort'] == 1 ? ' ASC ' : ' DESC ');
-else $sort = 'DESC';
+if (isset($user)) {
+	$sort = ($user['sort'] == 1 ? ' ASC ' : ' DESC ');
+} else {
+	$sort = 'DESC';
+}
 
-// Страницы 
-if (isset($user) && $user['sort']  ==  1)
+// 页 
+if (isset($user) && $user['sort']  ==  1) {
 	$pageEnd = 'end';
-else $pageEnd = '1';
+} else {
+	$pageEnd = '1';
+}
 
 /*
 ========================================
@@ -295,18 +306,6 @@ if (isset($_GET['response'])) {
 	$respons_msg = NULL;
 }
 
-/*
-========================================
-隐藏新闻
-========================================
-*/
-
-if (isset($user) && isset($_GET['news_read'])) {
-	dbquery("update `user` set `news_read` = '1' where `id` = '$user[id]' limit 1");
-	$_SESSION['message'] = "该消息已成功隐藏"; // Оповещаем
-	header("Location: /?");
-	exit;
-}
 
 /*
 ========================================
@@ -352,17 +351,11 @@ $rBan['foto'] = "照片";
 
 /*
 ========================================
-Сообщение в комментариях
+在评论中发表
 ========================================
 */
 
 $banMess = '[red]这条消息已经随着作者一起被封禁了![/red]';
-
-if (isset($_POST['msg']) && !isset($user)) {
-	echo "您没有登录!";
-	exit;
-}
-
 
 
 /*
@@ -377,19 +370,18 @@ $sMonet[2] = '硬币';
 
 
 // 从文件夹中加载其余插件 "sys/inc/plugins"
-$opdirbase = opendir(H . 'sys/inc/plugins');
-
-while ($filebase = readdir($opdirbase)) {
-	if (preg_match('#\.php$#i', $filebase)) {
-		require_once(check_replace(H . 'sys/inc/plugins/' . $filebase));
+$pluginsOpdirbase = opendir(H . 'sys/inc/plugins');
+while ($pluginsFilebase = readdir($pluginsOpdirbase)) {
+	$pluginsFileInfo = pathinfo($pluginsFilebase);
+	if (isset($pluginsFileInfo['extension']) && strtolower($pluginsFileInfo['extension']) == 'php') {
+		include_once(check_replace(H . 'sys/inc/plugins/' . $pluginsFilebase));
 	}
 }
+unset($pluginsOpdirbase, $pluginsFilebase, $pluginsFileInfo);
 
 
 if ($_SERVER["REQUEST_URI"] == "/" or $_SERVER["REQUEST_URI"] == "/index.php") {
-
 	if (!empty(setget('main', "")) and setget('main', "") != "index" and setget('main', "") != "index.php") {
-
 		header("Location: " . setget('main', ""));
 		exit();
 	}

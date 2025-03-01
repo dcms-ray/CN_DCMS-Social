@@ -17,8 +17,16 @@ class user
 		static $nicks = [];
 		if (empty($nicks[$user])) {
 			$ank = dbassoc(dbquery('SELECT `nick`, `date_last`, `rating`, `browser` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
+			$ank['date_last'] = dbresult(dbquery("SELECT ul.last_online
+			                         FROM `user_log` ul
+			                         WHERE ul.id_user = $user
+			                            AND ul.ban = '0'
+			                         ORDER BY ul.last_online DESC
+			                         LIMIT 1"), 0);
 			$nicks[$user] = $ank;
-		} else $ank = $nicks[$user];
+		} else {
+			$ank = $nicks[$user];
+		}
 	}
 
 	public static function nick($user = 0, $url = 1, $on = 0, $medal = 0) {
@@ -171,6 +179,25 @@ class user
 					// 用户不存在
 					$ank[$user_id] = FALSE;
 				} elseif ($ank[$user_id]['id'] != 0) {
+
+					// 查询获取在user_log表中的用户数据
+					$query = dbquery("SELECT ul.last_online, ul.ip, ul.ua, ul.url
+					                  FROM `user_log` ul
+					                  WHERE ul.id_user = $user_id
+					                    AND ul.ban = '0'
+					                  ORDER BY ul.last_online DESC
+					                  LIMIT 1");
+					if ($row = dbassoc($query)) {
+						// 用户最后在线时间
+						$ank[$user_id]['date_last'] = strtotime($row['last_online']);
+						// 用户最后的IP
+						$ank[$user_id]['ip'] = $row['ip'];
+						// 用户最后的UA
+						$ank[$user_id]['ua'] = $row['ua'];
+						// 用户最后的URL
+						$ank[$user_id]['url'] = $row['url'];
+					}
+
 
 					$tmp_us = dbassoc(dbquery("SELECT `level`,`name` AS `group_name` FROM `user_group` WHERE `id` = '" . $ank[$user_id]['group_access'] . "' LIMIT 1"));
 
