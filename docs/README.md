@@ -103,7 +103,7 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 - [x] 每日签到
 - [ ] 系统礼物发放
 - [ ] 合并论坛附件和下载中心
-- [ ] 将`user`数据表的`ip`、`ua`、`date_last`和`sess`字段迁移到`user_log`数据表
+- [x] 将`user`数据表的`ip`、`ua`、`date_last`和`sess`字段迁移到`user_log`数据表
 - [ ] 远程取消某个设备的登录状态
 - [ ] 修复 user\info\web.php 的图片展示不受相册隐私设置控制
 - [ ] OAuth 支持
