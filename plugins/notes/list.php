@@ -23,12 +23,12 @@ $query_result = dbquery("SELECT id FROM `user` WHERE id = {$notes['id_user']} LI
 if (dbrows($query_result) > 0) {
     $avtor = user::get_user($notes['id_user']);
 }
-if (isset($user))
-	$count = dbresult(dbquery("SELECT COUNT(*) FROM `notes_count` WHERE `id_user` = '" . $user['id'] . "' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0);
+if (isset($user)) $count = dbresult(dbquery("SELECT COUNT(*) FROM `notes_count` WHERE `id_user` = '" . $user['id'] . "' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0);
 // 书签
 $markinfo = dbresult(dbquery("SELECT COUNT(*) FROM `bookmarks` WHERE `id_object` = '" . $notes['id'] . "' AND `type`='notes'"), 0);
-if (isset($user))
-	dbquery("UPDATE `notification` SET `read` = '1' WHERE `type` = 'notes_komm' AND `id_user` = '$user[id]' AND `id_object` = '$notes[id]'");
+if (isset($user)) dbquery("UPDATE `notification` SET `read` = '1' WHERE `type` = 'notes_komm' AND `id_user` = '$user[id]' AND `id_object` = '$notes[id]'");
+
+
 /*
 ================================
 用户举报模块
@@ -323,48 +323,47 @@ if ($k_post == 0) {
 		echo "</div>";
 	}
 	/*-----------------------------------*/
-}
-$q = dbquery("SELECT * FROM `notes_komm` WHERE `id_notes` = '" . intval($_GET['id']) . "' ORDER BY `time` $sort LIMIT $start, $set[p_str]");
-echo "<table class='post'>";
-while ($post = dbassoc($q)) {
-	$ank = dbassoc(dbquery("SELECT * FROM `user` WHERE `id` = $post[id_user] LIMIT 1"));
-	/*-----------代码-----------*/
-	if ($num == 0) {
-		echo '<div class="nav1">';
-		$num = 1;
-	} elseif ($num == 1) {
-		echo '<div class="nav2">';
-		$num = 0;
-	}
-	/*---------------------------*/
-	echo user::nick($post['id_user'], 1, 1, 0);
-	if (isset($user) && $post['id_user'] != $user['id']) echo "<a href='?id={$notes['id']}&amp;response={$post['id_user']}'>[@]</a> ";
-	echo " (" . vremja($post['time']) . ")<br />";
-	$postBan = dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE (`razdel` = 'all' OR `razdel` = 'notes') AND `post` = '1' AND `id_user` = '{$post['id_user']}' AND (`time` > '{$time}' OR `navsegda` = '1')"), 0);
-	if ($postBan == 0) {	// 消息块
-		echo output_text($post['msg']) . "<br />";
-	} else {
-		echo output_text($banMess) . '<br />';
-	}
-	if (isset($user)) {
-		echo '<div style="text-align:right;">';
-		if ($post['id_user'] != $user['id'])
-			echo "<a href=\"?id=$notes[id]&amp;page=$page&amp;spam=$post[id]\"><img src='/style/icons/blicon.gif' alt='*'>举报</a> ";
-		if (isset($user) && (user_access('notes_delete') || $user['id'] == $notes['id_user']))
-			echo '<a href="delete.php?komm=' . $post['id'] . '"><img src="/style/icons/delete.gif" alt="*">删除</a>';
+	$q = dbquery("SELECT * FROM `notes_komm` WHERE `id_notes` = '" . intval($_GET['id']) . "' ORDER BY `time` $sort LIMIT $start, $set[p_str]");
+	echo "<table class='post'>";
+	while ($post = dbassoc($q)) {
+		$ank = dbassoc(dbquery("SELECT * FROM `user` WHERE `id` = $post[id_user] LIMIT 1"));
+
+		if ($num == 0) {
+			echo '<div class="nav1">';
+			$num = 1;
+		} elseif ($num == 1) {
+			echo '<div class="nav2">';
+			$num = 0;
+		}
+
+		echo user::nick($post['id_user'], 1, 1, 0);
+		if (isset($user) && $post['id_user'] != $user['id']) echo "<a href='?id={$notes['id']}&amp;response={$post['id_user']}'>[@]</a> ";
+		echo " (" . vremja($post['time']) . ")<br />";
+		$postBan = dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE (`razdel` = 'all' OR `razdel` = 'notes') AND `post` = '1' AND `id_user` = '{$post['id_user']}' AND (`time` > '{$time}' OR `navsegda` = '1')"), 0);
+		if ($postBan == 0) {	// 消息块
+			echo output_text($post['msg']) . "<br />";
+		} else {
+			echo output_text($banMess) . '<br />';
+		}
+		if (isset($user)) {
+			echo '<div style="text-align:right;">';
+			if ($post['id_user'] != $user['id']) echo "<a href=\"?id=$notes[id]&amp;page=$page&amp;spam=$post[id]\"><img src='/style/icons/blicon.gif' alt='*'>举报</a> ";
+			if (isset($user) && ((user_access('notes_delete') || $user['id'] == $notes['id_user']) || $user['id'] == $post['id_user'])) echo '<a href="delete.php?komm=' . $post['id'] . '"><img src="/style/icons/delete.gif" alt="*">删除</a>';
+			echo "</div>";
+		}
 		echo "</div>";
 	}
-	echo "</div>";
+	echo "</table>";
 }
-echo "</table>";
+
 if ($k_page > 1) str("list.php?id=" . intval($_GET['id']) . '&amp;', $k_page, $page); // 输出页数
+
 if ($notes['private_komm'] == 1 && $user['id'] != $avtor['id'] && $frend != 2  && !user_access('notes_delete')) {
 	msg('只有朋友才能评论');
 	echo "  <div class='foot'>";
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
-	exit;
 }
 if ($notes['private_komm'] == 2 && $user['id'] != $avtor['id'] && !user_access('notes_delete')) {
 	msg('评论区已关闭');
@@ -372,19 +371,19 @@ if ($notes['private_komm'] == 2 && $user['id'] != $avtor['id'] && !user_access('
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
-	exit;
 }
 if (isset($user)) {
 	echo "<form method=\"post\" name='message' action=\"?id=" . intval($_GET['id']) . "&amp;page=$page" . $go_otv . "\">";
-	if ($set['web'] && is_file(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php'))
+	if ($set['web'] && is_file(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
 		include_once H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php';
-	else
+	} else {
 		echo "$tPanel<textarea name=\"msg\">$otvet</textarea><br />";
+	}
 	echo "<input value=\"发送\" type=\"submit\" />";
 	echo "</form>";
 }
-echo "<div class=\"foot\">";
-echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ". (empty($avtor['id']) ? '[已删除]' : user::nick($avtor['id'], 1, 0, 0));
+echo '<div class="foot">';
+echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ". user::nick($avtor['id'], 1, 0, 0);
 echo ' | <b>' . output_text($notes['name']) . '</b>';
 echo "</div>";
 include_once '../../sys/inc/tfoot.php';
