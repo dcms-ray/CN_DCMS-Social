@@ -29,10 +29,10 @@ if (isset($_SESSION['adm_auth']) && $_SESSION['adm_auth'] > $time || isset($_SES
 	echo "<center><span style='font-size:16px;'><strong>DCMS-Social v.{$set['dcms_version']}</strong></span></center>";
 	echo "<center><span style='font-size:14px;'> 官方支持网站 <a href='https://dcms-social.ru'>https://dcms-social.ru</a></span></center>";
 	echo "";
-	if (version_compare($set['dcms_version'], $status_version_data['version']) >= 0) {
-		echo "<center><font color='green'>最新版本</font></center>	";
-	} else {
+	if ($status_version_data['success'] && version_compare($set['dcms_version'], $status_version_data['version']) <= 0) {
 		echo "<center><font color='red'>有个新版本 - " . $status_version_data['version'] . "! <a href='/adm_panel/update.php'>详细信息</a></font></center>	";
+	} else {
+		echo "<center><font color='green'>最新版本</font></center>	";
 	}
 	echo "</div>";
 

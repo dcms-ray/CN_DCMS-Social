@@ -129,3 +129,31 @@
   echo "Latest Stable Version: " . $result['version'] . PHP_EOL;
   echo "ZIP Download URL: " . $result['zip_url'] . PHP_EOL;
   ```
+
+## 获取在线用户的SQL语句
+
+```sql
+SELECT ul.id, ul.id_user, ul.last_online, ul.url
+FROM `user_log` ul
+WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE
+  AND ul.ban = '0'
+  AND ul.last_online = (
+    SELECT MAX(last_online)
+    FROM `user_log` ul2
+    WHERE ul2.id_user = ul.id_user
+      AND ul2.last_online > NOW() - INTERVAL 10 MINUTE
+      AND ul2.ban = '0'
+  )
+ORDER BY ul.last_online DESC;
+```
+
+## 获取某个用户的最后在线时间的SQL语句
+
+```sql
+SELECT ul.last_online
+FROM `user_log` ul
+WHERE ul.id_user = ?  -- 这里 ? 需要替换为查询的用户 ID
+  AND ul.ban = '0'
+ORDER BY ul.last_online DESC
+LIMIT 1;
+```

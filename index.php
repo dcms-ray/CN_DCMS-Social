@@ -1,17 +1,24 @@
 <?php
-include_once 'sys/inc/start.php';
-include_once 'sys/inc/compress.php';
-include_once 'sys/inc/sess.php';
-include_once 'sys/inc/home.php';
-include_once 'sys/inc/settings.php';
-include_once 'sys/inc/db_connect.php';
-include_once 'sys/inc/ipua.php';
-include_once 'sys/inc/fnc.php';
-include_once 'sys/inc/user.php';
-include_once 'sys/inc/icons.php'; // 主菜单图标
-include_once 'sys/inc/thead.php';
+require_once 'sys/inc/start.php';
+require_once 'sys/inc/compress.php';
+require_once 'sys/inc/sess.php';
+require_once 'sys/inc/home.php';
+require_once 'sys/inc/settings.php';
+require_once 'sys/inc/db_connect.php';
+require_once 'sys/inc/ipua.php';
+require_once 'sys/inc/fnc.php';
+require_once 'sys/inc/user.php';
+require_once 'sys/inc/icons.php'; // 主菜单图标
+require_once 'sys/inc/thead.php';
 title();
 err();
+
+// 隐藏新闻
+if (isset($user) && isset($_GET['news_read'])) {
+	dbquery("update `user` set `news_read` = '1' where `id` = '$user[id]' limit 1");
+	msg("该消息已成功隐藏");
+}
+
 if (!$set['web']) {
 	$ol_user = dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `date_last` > ".(time()-600).""), 0);
 	//在线用户数量
@@ -45,13 +52,13 @@ if (!$set['web']) {
 	echo '</div>';
 	
 	// 新闻&事件 
-	include_once 'sys/inc/news_main.php'; 
+	include 'sys/inc/news_main.php'; 
 	// 主菜单
-	include_once 'sys/inc/main_menu.php'; 
-	include_once 'sys/inc/main_notes.php';
+	include 'sys/inc/main_menu.php'; 
+	include 'sys/inc/main_notes.php';
 } else {
 	// 主要网页主题
-	include_once 'style/themes/' . $set['set_them'] . '/index.php'; 
+	include 'style/themes/' . $set['set_them'] . '/index.php'; 
 	
 }
-include_once 'sys/inc/tfoot.php';
+require_once 'sys/inc/tfoot.php';

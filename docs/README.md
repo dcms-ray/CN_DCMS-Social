@@ -97,13 +97,13 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 - [x] 抛弃老旧的`shif()`函数，改为使用`password_hash()`和`password_verify()`来加密用户密码
 - [x] 用更安全的方式保持登录和存储Cookie
 - [ ] 通过短轮询实现在线聊天
-- [ ] 完善登录历史
+- [x] 完善登录历史
 - [ ] 注册答题
 - [x] 完善注册电子邮箱验证
 - [x] 每日签到
 - [ ] 系统礼物发放
 - [ ] 合并论坛附件和下载中心
-- [ ] 将`user`数据表的`browser`、`ip`、`ua`、`time`和`sess`字段迁移到`user_log`数据表
+- [x] 将`user`数据表的`ip`、`ua`、`date_last`和`sess`字段迁移到`user_log`数据表
 - [ ] 远程取消某个设备的登录状态
 - [ ] 修复 user\info\web.php 的图片展示不受相册隐私设置控制
 - [ ] OAuth 支持

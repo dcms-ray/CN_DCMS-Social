@@ -81,7 +81,7 @@ if (!isset($_GET['go'])) {
 		if ($sort == 'balls') echo "<span class=\"ank_n\">积分:</span> <span class=\"ank_d\">$ank[balls]</span><br />";
 		if ($sort == 'pol') echo "<span class=\"ank_n\">性别:</span> <span class=\"ank_d\">" . (($ank['pol'] == 1) ? '男' : '女') . "</span><br />";
 		if ($sort == 'id') echo "<span class=\"ank_n\">注册时间:</span> <span class=\"ank_d\">" . vremja($ank['date_reg']) . "</span><br />";
-		echo "<span class=\"ank_n\">最后登录:</span> <span class=\"ank_d\">" . vremja($ank['date_last']) . "</span><br />";
+		if (isset($ank['date_last'])) echo "<span class=\"ank_n\">最后登录:</span> <span class=\"ank_d\">" . vremja($ank['date_last']) . "</span><br />";
 		if (user_access('user_prof_edit') && $user['level'] > $ank['level']) {
 			echo "<a href='/adm_panel/user.php?id=$ank[id]'>编辑个人资料</a><br />";
 		}
@@ -146,15 +146,11 @@ if (isset($_GET['go']) && $usearch != NULL) {
 		/*---------------------------*/
 		echo user::nick($ank['id'], 1, 1, 0); //输出用户名
 		if ($ank['level'] != 0) echo "<span class=\"status\">$ank[group_name]</span><br />";
-		if ($sort == 'rating')
-			echo "<span class=\"ank_n\">评级:</span> <span class=\"ank_d\">$ank[rating]</span><br />";
-		if ($sort == 'balls')
-			echo "<span class=\"ank_n\">积分</span> <span class=\"ank_d\">$ank[balls]</span><br />";
-		if ($sort == 'pol')
-			echo "<span class=\"ank_n\">性别:</span> <span class=\"ank_d\">" . (($ank['pol'] == 1) ? '男' : '女') . "</span><br />";
-		if ($sort == 'id')
-			echo "<span class=\"ank_n\">注册时间:</span> <span class=\"ank_d\">" . vremja($ank['date_reg']) . "</span><br />";
-		echo "<span class=\"ank_n\">最后登录:</span> <span class=\"ank_d\">" . vremja($ank['date_last']) . "</span><br />";
+		if ($sort == 'rating') echo "<span class=\"ank_n\">评级:</span> <span class=\"ank_d\">$ank[rating]</span><br />";
+		if ($sort == 'balls') echo "<span class=\"ank_n\">积分</span> <span class=\"ank_d\">$ank[balls]</span><br />";
+		if ($sort == 'pol') echo "<span class=\"ank_n\">性别:</span> <span class=\"ank_d\">" . (($ank['pol'] == 1) ? '男' : '女') . "</span><br />";
+		if ($sort == 'id') echo "<span class=\"ank_n\">注册时间:</span> <span class=\"ank_d\">" . vremja($ank['date_reg']) . "</span><br />";
+		if (isset($ank['date_last']))  echo "<span class=\"ank_n\">最后登录:</span> <span class=\"ank_d\">" . vremja($ank['date_last']) . "</span><br />";
 		if (user_access('user_prof_edit') && $user['level'] > $ank['level']) {
 			echo "<a href='/adm_panel/user.php?id=$ank[id]'>编辑个人资料</a><br />";
 		}

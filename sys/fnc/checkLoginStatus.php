@@ -46,10 +46,6 @@ function checkLoginStatus() {
 		}
 
 		// 验证通过，说明用户已经登录
-		// 更新用户的最后登录时间
-		dbquery("UPDATE `user_log` SET `last_online` = '" . date('Y-m-d H:i:s') . "' WHERE `id` = '$log_id' LIMIT 1");
-		dbquery("UPDATE `user` SET `date_last` = '" . time() . "' WHERE `id` = '$user_id' LIMIT 1");
-
 		$user_info = dbassoc(dbquery("SELECT * FROM `user` WHERE `id` = '$user_id' LIMIT 1"));
 		$user_info['login_id'] = $log_id;
 		return [

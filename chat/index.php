@@ -49,7 +49,7 @@ if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `chat_rooms` WH
     $room = dbassoc(dbquery("SELECT * FROM `chat_rooms` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1"));
     if (isset($user)) dbquery("INSERT INTO `chat_who` (`id_user`, `time`,  `room`) values('$user[id]', '$time', '$room[id]')");
     if ($set['time_chat'] != 0) header("Refresh: $set[time_chat]; url=/chat/room/$room[id]/" . rand(1000, 9999) . '/'); // 指定时间自动刷新
-    $set['title'] = '聊天室 - ' . $room['name'] . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `chat_who` WHERE `room` = '$room[id]'"), 0) . ')'; // заголовок страницы
+    $set['title'] = '聊天室 - ' . $room['name'] . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `chat_who` WHERE `room` = '$room[id]'"), 0) . ')'; // 页面标题
     include_once '../sys/inc/thead.php';
     title();
     include 'inc/room.php';
