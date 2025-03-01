@@ -5,7 +5,7 @@ if (isset($user)) {
 
 	/*
 	=================================
-	Почта
+	邮件
 	=================================
 	*/
 	$k_new=dbresult(dbquery("SELECT COUNT(`mail`.`id`) FROM `mail`
@@ -18,11 +18,9 @@ if (isset($user)) {
 	WHERE `mail`.`id_kont` = '$user[id]' AND (`users_konts`.`type` = 'favorite') AND `mail`.`read` = '0'"),0);
 
 	if ($k_new!=0 && $k_new_fav==0){
-		echo "<a href='/user/new_mess.php'><span class='link_title'><img src='/style/themes/web/images/mail.png' alt=''/>  <b class='count'>+$k_new</b>
-			<br/> 邮件 </span></a>";
+		echo "<a href='/user/new_mess.php'><span class='link_title'><img src='/style/themes/web/images/mail.png' alt=''/>  <b class='count'>+$k_new</b><br/> 邮件 </span></a>";
 	} else {
-		echo "<a href='/user/conts.php'><span class='link_title'><img src='/style/themes/web/images/mail.png' alt=''/>
-			<br/>邮件</span></a>";
+		echo "<a href='/user/conts.php'><span class='link_title'><img src='/style/themes/web/images/mail.png' alt=''/><br/>邮件</span></a>";
 	}
 
 	/*
