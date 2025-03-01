@@ -299,8 +299,8 @@ if (isset($_GET['act']) && $_GET['act'] == 'set' && (user_access('forum_them_edi
 }
 
 
-if (user_access('forum_post_ed') && isset($_GET['del'])) // удаление поста
-{
+// 处理删除评论
+if (isset($_GET['del']) && isset($user) && (user_access('forum_post_ed') || $user['id'] == dbarray(dbquery("SELECT `id_user` FROM `forum_p` WHERE `id` = '" . intval($_GET['del']) . "'"))['id_user'] || $user['id'] == $them['id_user'])) {
 	dbquery("DELETE FROM `forum_p` WHERE `id` = '" . intval($_GET['del']) . "' LIMIT 1");
 	$_SESSION['message'] = '已成功删除';
 	header("Location: /forum/$forum[id]/$razdel[id]/$them[id]/?page=" . intval($_GET['page']) . "");
@@ -665,7 +665,7 @@ while ($post = dbassoc($q)) {
 				echo "<a href=\"/forum/$forum[id]/$razdel[id]/$them[id]/?spam=$post[id]&amp;page=$page\" title='垃圾评论'  class='link_s'><img src='/style/icons/blicon.gif' alt='*'>举报</a>";
 			}
 		}
-		if (user_access('forum_post_ed')) {	// 删除帖子
+		if (user_access('forum_post_ed') || $user['id'] == $post['id_user'] || $user['id'] == $them['id_user']) {	// 删除评论
 			echo "<a href=\"/forum/$forum[id]/$razdel[id]/$them[id]/?del=$post[id]&amp;page=$page\" title='删除'  class='link_s'><img src='/style/icons/delete.gif' alt='*'>删除</a>";
 		}
 		echo "&nbsp;";

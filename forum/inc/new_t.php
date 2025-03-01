@@ -26,9 +26,15 @@ if (isset($_POST['name']) && isset($_POST['msg'])) {
 		$q = dbquery("SELECT * FROM `frends` WHERE `user` = '" . $user['id'] . "' AND `i` = '1'");
 		while ($f = dbarray($q)) {
 			$a = user::get_user($f['frend']);
-			$lentaSet = dbarray(dbquery("SELECT * FROM `tape_set` WHERE `id_user` = '" . $a['id'] . "' LIMIT 1")); // Общая настройка ленты
-			if ($f['lenta_forum'] == 1 && $lentaSet['lenta_forum'] == 1)
-				dbquery("INSERT INTO `tape` (`id_user`, `avtor`, `type`, `time`, `id_file`) values('$a[id]', '$user[id]', 'them', '$time', '$them[id]')");
+			$lentaSet = dbarray(dbquery("SELECT * FROM `tape_set` WHERE `id_user` = '" . $a['id'] . "' LIMIT 1")); // 常规功能区设置
+			if ($f['lenta_forum'] == 1 && $lentaSet['lenta_forum'] == 1) {
+				if (dbresult(dbquery("SELECT COUNT(*) FROM `tape` WHERE `id_user` = '$a[id]' AND `type` = 'them' AND `id_file` = '$them[id]' LIMIT 1"), 0) == 0) {
+					dbquery("INSERT INTO `tape` (`id_user`, `avtor`, `type`, `time`, `id_file`, `count`) values('$a[id]', '$user[id]', 'them', '$time', '$them[id]', '1')");
+				} else {
+					$tape = dbarray(dbquery("SELECT * FROM `tape` WHERE `type` = 'them' AND `id_file` = '$them[id]'"));
+					dbquery("UPDATE `tape` SET `count` = '" . ($tape['count'] + 1) . "', `read` = '0', `time` = '$time' WHERE `id_user` = '$a[id]' AND `type` = 'them' AND `id_file` = '$them[id]' LIMIT 1");
+				}
+			}
 		}
 		dbquery("UPDATE `user` SET `rating_tmp` = '" . ($user['rating_tmp'] + 1) . "' WHERE `id` = '$user[id]' LIMIT 1");
 		dbquery("UPDATE `forum_r` SET `time` = '$time' WHERE `id` = '$razdel[id]' LIMIT 1");
