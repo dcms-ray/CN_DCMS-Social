@@ -350,10 +350,10 @@ if ($ank['group_access'] > 1) {
 
 			/*
 			===============================
-			最近添加的照片
+			展示最近添加的照片
 			===============================
 			*/
-			$sql = dbquery("SELECT * FROM `gallery_photo` WHERE `id_user` = '$ank[id]' ORDER BY `id` DESC LIMIT 8");
+			$sql = dbquery("SELECT * FROM `gallery_photo` WHERE `id_user` = '$ank[id]' ORDER BY `id` DESC LIMIT 10");
 			$coll = dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id_user` = '$ank[id]' ORDER BY `id` DESC"), 0);
 			if ($coll > 0) {
 				echo "<div class='slim_header'>";
@@ -362,8 +362,40 @@ if ($ank['group_access'] > 1) {
 				echo " <span class='mm_counter'>" . dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id_user` = '$ank[id]'"), 0) . "</span>";
 				echo "</div>";
 				echo "<div class='nav3'>";
+				
 				while ($photo = dbassoc($sql)) {
-					echo "<a href='/photo/$ank[id]/$photo[id_gallery]/$photo[id]/'><img class='sto500' style='width:103px; height:103px; background-image:url(/photo/photo0/$photo[id].$photo[ras]);' src=''/></a>";
+					// 获取相册信息
+					$gallery = dbassoc(dbquery("SELECT * FROM `gallery` WHERE `id` = '$photo[id_gallery]' AND `id_user` = '$ank[id]' LIMIT 1"));
+					
+					// 判断相册的隐私设置
+					$canView = false;
+					
+					if ($gallery['privat'] == 2) {
+						// 相册仅自己可见
+						if (isset($user) && $user['id'] == $ank['id']) {
+							$canView = true;
+						}
+					} elseif ($gallery['privat'] == 1) {
+						// 相册仅朋友可见
+						if (isset($user) && ($user['id'] == $ank['id'] || $frend == 2)) {
+							$canView = true;
+						}
+					} else {
+						// 相册没有隐私限制（公开）
+						$canView = true;
+					}
+			
+					// 如果相册设置了密码并且当前访问者不是自己，且没有输入密码，则不展示图片
+					if ($gallery['pass'] != NULL) {
+						if (!isset($user) || $user['id'] != $ank['id']) {
+							$canView = false; // 非自己且没有密码，不能查看
+						}
+					}
+			
+					// 如果满足查看条件，展示图片
+					if ($canView) {
+						echo "<a href='/photo/$ank[id]/$photo[id_gallery]/$photo[id]/'><img class='sto500' style='width:103px; height:103px; background-image:url(/photo/photo0/$photo[id].$photo[ras]);' src=''/></a>";
+					}
 				}
 				echo "</div>";
 			}
