@@ -39,7 +39,7 @@ class user
 		static $nicks = [];
 		if (empty($nicks[$user])) {
 			$ank = dbassoc(dbquery('SELECT `group_access`, `pol`, `nick`, `rating`, `browser` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
-			$ank['date_last'] = dbresult(dbquery("SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = $user AND ul.ban = '0' ORDER BY ul.last_online DESC LIMIT 1"), 0);
+			$ank['date_last'] = strtotime(dbresult(dbquery("SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = $user AND ul.ban = '0' ORDER BY ul.last_online DESC LIMIT 1"), 0));
 			$nicks[$user] = $ank;
 		} else {
 			$ank = $nicks[$user];
@@ -87,14 +87,16 @@ class user
 				}
 			}
 		}
+
 		// 在线图标输出
-		if ($user != 0 && isset($ank['date_last']) && $ank['date_last'] > time() - 600 && $on == true) {
+		if ($user != 0 && !empty($ank['date_last']) && $ank['date_last'] > time() - 600 && $on == true) {
 			if ($ank['browser'] == 'wap') {
 				$online = ' <img src="/style/icons/online.gif" alt="WAP" /> ';
 			} else {
 				$online = ' <img src="/style/icons/online_web.gif" alt="WEB" /> ';
 			}
 		}
+
 		// 奖牌输出
 		$R = $ank['rating'];
 		if ($medal == 1 && $R >= 6) {

@@ -39,6 +39,11 @@ if (isset($_SESSION['captcha']) && isset($_POST['chislo'])) {
 err();
 ?>
 
+PHP 时间：<?php echo date('Y-m-d H:i:s'); ?><br>
+数据库时间：<?php echo dbresult(dbquery("SELECT NOW() AS db_time"), 0, 'db_time'); ?><br>
+时区：<?php echo date_default_timezone_get(); ?><br>
+时差偏移量：<?php echo date('P'); ?><br>
+当前用户ID：<?php echo $user['id'] ?? 'N/A' ?><br>
 当前登录方式为：<?php echo $user['type_input'] ?? 'N/A' ?><br>
 当前设备类型为：<?php echo $webbrowser ? 'PC' : 'NoPC'; ?><br>
 当前设备UA为：<?php echo $ua; ?><br>

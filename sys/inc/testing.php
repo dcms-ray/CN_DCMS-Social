@@ -10,6 +10,16 @@ if ($php_ver1 == 8) {
 	$err[] = "测试php版本 {$php_ver1}.{$php_ver2}.{$php_ver3} 未实施";
 }
 
+if (!empty($set['mysql_host']) && !empty($set['mysql_user']) && !empty($set['mysql_pass']) && !empty($set['mysql_db_name'])) {
+	$db_time = dbresult(dbquery("SELECT NOW() AS db_time"), 0, 'db_time');
+	echo 'PHP 时间: ' . date('Y-m-d H:i:s') . '<br>';
+	echo "数据库时间: $db_time<br>";
+	echo '时区偏移量: ' . date('P') . '<br>';
+	if (abs(time() - strtotime($db_time)) > 60) {
+		$err[] = '服务器时间与数据库时间相差了' . abs(time() - strtotime($db_time)) . '秒';
+	}
+}
+
 if (function_exists('disk_free_space') && function_exists('disk_total_space')) {
 	$free_space = disk_free_space(H);
 	$total_space = disk_total_space(H);
@@ -26,28 +36,28 @@ if (function_exists('disk_free_space') && function_exists('disk_total_space')) {
 	}
 }
 
-echo "<span class='on'>网站根目录路径:</span> " . realpath(H) . "<br />";
+echo "网站根目录路径: " . realpath(H) . "<br />";
 
 function folderSize($dir) {
-    $size = 0;
+	$size = 0;
 
-    // 获取目录中的所有文件和子目录
-    foreach (scandir($dir) as $file) {
-        if ($file !== '.' && $file !== '..') {
-            $filePath = $dir . DIRECTORY_SEPARATOR . $file;
+	// 获取目录中的所有文件和子目录
+	foreach (scandir($dir) as $file) {
+		if ($file !== '.' && $file !== '..') {
+			$filePath = $dir . DIRECTORY_SEPARATOR . $file;
 
-            // 如果是目录，递归调用函数；如果是文件，累加其大小
-            if (is_dir($filePath)) {
-                $size += folderSize($filePath);
-            } else {
-                $size += filesize($filePath);
-            }
-        }
-    }
+			// 如果是目录，递归调用函数；如果是文件，累加其大小
+			if (is_dir($filePath)) {
+				$size += folderSize($filePath);
+			} else {
+				$size += filesize($filePath);
+			}
+		}
+	}
 
-    return $size;
+	return $size;
 }
-echo "<span class='on'>网站根目录空间占用:</span> " . size_file(folderSize(H)) . "<br />";
+echo "网站根目录空间占用: " . size_file(folderSize(H)) . "<br />";
 
 echo "<hr />";
 
