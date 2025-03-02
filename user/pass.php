@@ -71,7 +71,13 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 			}
 			if (!isset($err)) {
 				dbquery("UPDATE `user` SET `pass` = '" . password_hash($_POST['pass1'], PASSWORD_DEFAULT) . "' WHERE `id` = '{$_GET['id']}' LIMIT 1");
-				msg('密码更改成功');
+				if (isset($_POST['logout_all_devices']) && $_POST['logout_all_devices'] == 'on') {
+					// 退登所有设备
+					dbquery("UPDATE `user_log` SET `ban` = '1' WHERE `id_user` = {$_GET['id']};");
+					msg('密码更改成功并从所有设备注销');
+				} else {
+					msg('密码更改成功');
+				}
 				// 标记 token 为已使用
 				markValidatePasswordResetTokenAsUsed($_GET['token']);
 				echo '<div class="foot"><a href="/user/aut.php">登录账号</a></div>';
@@ -85,6 +91,7 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 			echo "<input type=\"text\" disabled='disabled' value='{$user2['nick']}' maxlength=\"32\" size=\"16\" /><br />";
 			echo "新密码:<br /><input type='password' name='pass1' value='' /><br />";
 			echo "重复密码:<br /><input type='password' name='pass2' value='' /><br />";
+			echo '<input type="checkbox" name="logout_all_devices" />注销所有设备<br />';
 			echo "<input type='submit' name='save' value='修改' />";
 			echo "</form>";
 		}

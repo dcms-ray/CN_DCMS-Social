@@ -97,11 +97,14 @@ function dbinsertid() {
 	return mysqli_insert_id($db); // 获取最后一次插入的 ID
 }
 
+// 设置数据库时区
+dbquery("SET time_zone = '" . date('P') . "';");
+
 // 设置数据库连接的字符集为 UTF-8MB4，确保支持 Emoji 和其他 Unicode 字符
-dbquery('set charset utf8mb4',$db); 
-dbquery('SET names utf8mb4',$db);
-dbquery('set character_set_client="utf8mb4"',$db);
-dbquery('set character_set_connection="utf8mb4"',$db);
+dbquery('set charset utf8mb4'); 
+dbquery('SET names utf8mb4');
+dbquery('set character_set_client="utf8mb4"');
+dbquery('set character_set_connection="utf8mb4"');
 
 /**
  * 优化数据库表

@@ -5,7 +5,7 @@
  */
 
 // 检查是否存在名为文件ID的PNG图标文件，如果不存在则执行后续操作
-if (!test_file(H . "files/screens/128/{$file_id['id']}.png")) {
+if (!test_file(H . "files/screens/128/{$file_id['id']}.png") && test_file($file)) {
 	// 如果没有找到图标，清除会话中存储的图标信息
 	$_SESSION['file_icon'] = null;
 	

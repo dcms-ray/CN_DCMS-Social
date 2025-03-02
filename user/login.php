@@ -19,7 +19,6 @@ if (isset($_GET['id']) && isset($_GET['pass'])) {
 	if ($user && password_verify($_GET['pass'], $user['pass'])) {
 		$_SESSION['id_user'] = $user['id'];
 		dbquery("UPDATE `user` SET `date_aut` = " . time() . " WHERE `id` = '$user[id]' LIMIT 1");
-		dbquery("UPDATE `user` SET `date_last` = " . time() . " WHERE `id` = '$user[id]' LIMIT 1");
 		dbquery("INSERT INTO `user_log` (`id_user`, `date`, `ua`, `ip`, `method`) values('$user[id]', '" . date('Y-m-d H:i:s') . "', '$ua' , '$ip', '0')");
 	} else {
 		$_SESSION['err'] = '用户名或密码不正确';
@@ -31,24 +30,26 @@ if (isset($_GET['id']) && isset($_GET['pass'])) {
 	if ($user && password_verify($_POST['pass'], $user['pass'])) {
 		$_SESSION['id_user'] = $user['id'];
 		$user = user::get_user($user['id']);
-		dbquery("UPDATE `user` SET `date_aut` = '{$time}', `date_last` = '{$time}' WHERE `id` = '{$user['id']}' LIMIT 1");
-		dbquery("INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) values('{$user['id']}', '" . date('Y-m-d H:i:s') . "', '" . date('Y-m-d H:i:s', $expiration) . "', '" . date('Y-m-d H:i:s') . "', '{$user['ua']}' , '{$user['ip']}', '1')");
+		if (isset($_POST['aut_save']) && $_POST['aut_save']) {
+			$expiration = time() + 60 * 60 * 24 * 365;
+		} else {
+			$expiration = time() + 60 * 60 * 2;
+		}
+		dbquery("UPDATE `user` SET `date_aut` = '{$time}' WHERE `id` = '{$user['id']}' LIMIT 1");
+		dbquery("INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) values('{$user['id']}', '" . date('Y-m-d H:i:s') . "', '" . date('Y-m-d H:i:s', $expiration) . "', '" . date('Y-m-d H:i:s') . "', '{$ua}' , '{$ip}', '1')");
 		$log_id = dbinsertid();
 		$_SESSION['login_id'] = $log_id;
 
 		// 在COOKIE中保存数据
-		if (isset($_POST['aut_save']) && $_POST['aut_save']) {
-			$expiration = time() + 60 * 60 * 24 * 365;
-			$payload = array(
-				"iat" => time(),
-				"exp" => $expiration,
-				"jwt_id" => $log_id,
-				"user_id" => $user['id'],
-				"username" => $_POST['nick']
-			);
-			$jwt = \Firebase\JWT\JWT::encode($payload, $set['shif'], 'HS256');
-			setcookie('auth_token', $jwt, $expiration, '/');
-		}
+		$payload = array(
+			"iat" => time(),
+			"exp" => $expiration,
+			"jwt_id" => $log_id,
+			"user_id" => $user['id'],
+			"username" => $_POST['nick']
+		);
+		$jwt = \Firebase\JWT\JWT::encode($payload, $set['shif'], 'HS256');
+		setcookie('auth_token', $jwt, $expiration, '/');
 	} else {
 		$_SESSION['err'] = '用户名或密码不正确';
 	}

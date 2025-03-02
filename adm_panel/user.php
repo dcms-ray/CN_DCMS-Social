@@ -115,7 +115,7 @@ if (isset($_POST['save'])) {
 		dbquery("UPDATE `user` SET `ank_o_sebe` = '$ank[ank_o_sebe]' WHERE `id` = '$ank[id]' LIMIT 1");
 	} else $err = '你在这个领域犯了一个关于你自己的错误';
 	if (isset($_POST['new_pass']) && strlen2($_POST['new_pass']) > 5) {
-		admin_log('用户', '更改密码', "给用户 '$ank[nick]' 已设置新密码");
+		admin_log('用户', '更改密码', "给用户 “{$ank['nick']}” 已设置新密码");
 		dbquery("UPDATE `user` SET `pass` = '" . password_hash($_POST['new_pass'], PASSWORD_DEFAULT) . "' WHERE `id` = '$ank[id]' LIMIT 1");
 	}
 	if (user_access('user_change_group') && isset($_POST['group_access'])) {
