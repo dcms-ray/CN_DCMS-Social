@@ -9,12 +9,7 @@ function execute_curl_request($url, $post_data=null, $referer=null, $cookie=null
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);	// 将结果以字符串形式返回
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);  		// 设置超时10秒
 
-	$httpheader = [
-		"Accept: */*",
-		"Accept-Encoding: gzip,deflate,sdch",
-		"Accept-Language: zh-CN,zh;q=0.8",
-		"Connection: close"
-	];
+	$httpheader = [];
 	if ($addheader) {
 		$httpheader = array_merge($httpheader, $addheader);
 	}
