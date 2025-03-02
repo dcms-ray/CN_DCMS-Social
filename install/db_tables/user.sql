@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`ban_pr` varchar(64) DEFAULT NULL,
 	`date_reg` int(11) NOT NULL DEFAULT '0',
 	`time` int(11) DEFAULT NULL,
-	`date_aut` int(11) NOT NULL DEFAULT '0',
 	`balls` int(11) NOT NULL DEFAULT '0',
 	`rating` int(11) NOT NULL DEFAULT '0',
 	`level` enum('0','1','2','3','4') NOT NULL DEFAULT '0',

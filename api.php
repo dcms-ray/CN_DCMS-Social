@@ -358,7 +358,7 @@ function checkLoginStatus() {
 			// 找不到此登录记录
 			return ['status' => 'false', 'message' => 'Login log not found'];
 		}
-		if ($user_log['ban'] != '0') {
+		if ($user_log['ban'] != 0) {
 			// 登录记录被 ban
 			return ['status' => 'false', 'message' => 'Login log is banned'];
 		}
@@ -368,10 +368,6 @@ function checkLoginStatus() {
 		$db->update("UPDATE `user_log` SET `last_online` = :last_online WHERE `id` = :id LIMIT 1", [
 			':last_online' => date('Y-m-d H:i:s'),
 			':id' => $log_id
-		]);
-		$db->update("UPDATE `user` SET `date_last` = :time WHERE `id` = :id LIMIT 1", [
-			':time' => time(),
-			':id' => $user_id
 		]);
 		$user = $db->query("SELECT * FROM `user` WHERE `id` = :id LIMIT 1", [':id' => $user_id]);
 		$user['login_id'] = $log_id;
@@ -414,6 +410,29 @@ function checkLoginStatus() {
 	}
 
 	return ['status' => 'false', 'message' => 'No parameters'];
+}
+
+$user = checkLoginStatus();
+if ($user['status'] == 'true') {
+	$user = $user['data'];
+	// 更新数据库的用户在线时间
+	// 更新用户的在线时长
+	$user['last_online'] = $db->query('SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = ? AND ul.ban = 0 ORDER BY ul.last_online DESC LIMIT 1', [$user['id']]);
+	$user['timeactiv'] = time() - strtotime($user['last_online']);
+	if ($user['timeactiv'] < 120) {
+		$db->update('UPDATE `user` SET `time` = ? WHERE `id` = ? LIMIT 1', [($user['time'] + $user['timeactiv']), $user['id']]);
+	}
+	// 更新最后在线时间、记录 url、记录用户的 ip
+	$db->update('UPDATE `user_log` SET `last_online` = ?, `url` = ?, `ip` = ? WHERE `id` = ? LIMIT 1', [
+		date('Y-m-d H:i:s'),
+		$_SERVER['SCRIPT_NAME'],
+		$clientDetails['ip'],
+		$user['login_id']
+	]);
+	// 记录用户的 ua
+	if ($clientDetails['ua']) $db->update('UPDATE `user_log` SET `ua` = ? WHERE `id` = ? LIMIT 1', [$clientDetails['ua'], $user['login_id']]);
+} else {
+	unset($user);
 }
 
 // 核对验证码
@@ -835,13 +854,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 
 } else {
 	// 检查登录状态
-	$user = checkLoginStatus();
-	if ($user['status'] == 'true') {
-		$user = $user['data'];
-		// 更新数据库的用户在线时间
-	} else {
-		unset($user);
-	}
 	if (isset($user)) {
 		$response['status'] = 'success';
 		$response['message'] = "Hello {$user['nick']}";

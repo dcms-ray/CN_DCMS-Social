@@ -13,6 +13,7 @@ only_reg();
 if (setget('exit', 1) == 1) {
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if (isset($_POST['confirm_yes'])) {
+			dbquery("UPDATE `user_log` SET `ban` = '1' WHERE `id` = '{$user['login_id']}';");
 			setcookie('auth_token', '', time() - 3600, '/');
 			session_destroy();
 			header('Location: /?' . session_id());

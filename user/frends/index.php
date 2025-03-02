@@ -113,11 +113,13 @@ if (isset($user) && $user['id'] == $ank['id']) {
 	}
 }
 
-//---------------------Panel---------------------------------//
-$on_f = dbresult(dbquery("SELECT COUNT(*) FROM `frends` INNER JOIN `user` ON `frends`.`frend`=`user`.`id` WHERE `frends`.`user` = '$ank[id]' AND `frends`.`i` = '1' AND `user`.`date_last`>'" . (time() - 600) . "'"), 0);
+//---------------------面板---------------------------------//
+// 获取在线好友数量
+$on_f = dbresult(dbquery("SELECT COUNT(DISTINCT ul.id_user) AS online_friends FROM `frends` f INNER JOIN `user_log` ul ON ul.id_user = f.frend WHERE f.user = '$ank[id]' AND f.i = '1' AND ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0 )"), 0);
 $f = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE `user` = '$ank[id]' AND `i` = '1'"), 0);
 $add = dbresult(dbquery("SELECT COUNT(id) FROM `frends_new` WHERE `to` = '$ank[id]' LIMIT 1"), 0);
-/*echo '<div style="background:white;"><div class="pnl2H">';
+/*
+echo '<div style="background:white;"><div class="pnl2H">';
 echo '<div class="linecd"><span style="margin:9px;">';
 echo ''.($ank['id']==$user['id'] ? '我的朋友们' : ' 友人 '.group($ank['id']).' '.user::nick($ank['id'],1,1,1).'').''; 
 echo '</span> </div></div>';*/
@@ -137,10 +139,10 @@ echo '</ul></nav></div></div>'; }
 */
 echo "<div id='comments' class='menus'>";
 echo "<div class='webmenu'>";
-echo "<a href='index.php?id=$ank[id]' class='activ'>全部 (" . dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE `user` = '$ank[id]' AND `i` = '1'"), 0) . ")</a>";
+echo "<a href='index.php?id={$ank['id']}' class='activ'>全部 (" . dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE `user` = '$ank[id]' AND `i` = '1'"), 0) . ")</a>";
 echo "</div>";
 echo "<div class='webmenu last'>";
-echo "<a href='online.php?id=$ank[id]'>在线 (" . dbresult(dbquery("SELECT COUNT(*) FROM `frends` INNER JOIN `user` ON `frends`.`frend`=`user`.`id` WHERE `frends`.`user` = '$ank[id]' AND `frends`.`i` = '1' AND `user`.`date_last`>'" . (time() - 600) . "'"), 0) . ")</a>";
+echo "<a href='online.php?id={$ank['id']}'>在线 ({$on_f})</a>";
 echo "</div>";
 if (isset($user) && $ank['id'] == $user['id']) {
 	echo "<div class='webmenu last'>";
@@ -184,8 +186,9 @@ while ($frend = dbassoc($q)) {
 	}
 	echo '</td><td style="width:80%;">';
 	if (isset($user) && $user['id'] == $ank['id']) echo " <input type='checkbox' name='post_$frend[id]' value='1' /> ";
-	echo user::nick($frend['id'], 1, 1, 0);
-	echo '<br/><img src="/style/icons/alarm.png"> ' . ($webbrowser ? '最后在线:' : null) . ' ' . vremja($frend['date_last']) . ' </td><td style="width:18px;">';
+	echo user::nick($frend['id'], 1, 1, 0) . '<br/>';
+	if (isset($frend['date_last'])) echo '<img src="/style/icons/alarm.png"> ' . ($webbrowser ? '最后在线:' : null) . ' ' . vremja($frend['date_last']);
+	echo ' </td><td style="width:18px;">';
 	if (isset($user)) {
 		echo "<a href=\"/user/mail.php?id=$frend[id]\"><img src='/style/icons/pochta.gif' alt='*' /></a><br/>";
 		if ($ank['id'] == $user['id'])			echo "<a href='create.php?del=$frend[id]'><img src='/style/icons/delete.gif' alt='*' /></a>";

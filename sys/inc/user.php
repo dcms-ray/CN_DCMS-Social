@@ -35,7 +35,7 @@ if (!empty($user)) {
 	$last_online = dbresult(dbquery("SELECT ul.last_online
 	                                 FROM `user_log` ul
 	                                 WHERE ul.id_user = {$user['id']}
-	                                     AND ul.ban = '0'
+	                                     AND ul.ban = 0
 	                                 ORDER BY ul.last_online DESC
 	                                 LIMIT 1"), 0);
 	$timeactiv  =  time() - strtotime($last_online);
