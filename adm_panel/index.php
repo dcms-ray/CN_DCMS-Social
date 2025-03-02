@@ -31,8 +31,10 @@ if (isset($_SESSION['adm_auth']) && $_SESSION['adm_auth'] > $time || isset($_SES
 	echo "";
 	if ($status_version_data['success'] && version_compare($set['dcms_version'], $status_version_data['version']) <= 0) {
 		echo "<center><font color='red'>有个新版本 - " . $status_version_data['version'] . "! <a href='/adm_panel/update.php'>详细信息</a></font></center>	";
-	} else {
+	} elseif ($status_version_data['success']) {
 		echo "<center><font color='green'>最新版本</font></center>	";
+	} else {
+		echo "<center><font color='red'>无法检查更新" . ($status_version_data['error'] ? ': ' . $status_version_data['error'] : null) . "</font></center>";
 	}
 	echo "</div>";
 

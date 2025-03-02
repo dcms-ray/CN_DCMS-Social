@@ -56,7 +56,7 @@ $q = dbquery("SELECT * FROM `opsos` ORDER BY `opsos` ASC LIMIT $start, $set[p_st
 while ($post = dbassoc($q)) {
 	echo "   <tr>";
 	echo "  <td class='p_t'>";
-	echo long2ip($post['min']).' - '.long2ip($post['max']);
+	echo $post['min'] . ' - ' . $post['max'];
 	echo "  </td>";
 	echo "   </tr>";
 	echo "   <tr>";
