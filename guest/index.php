@@ -23,6 +23,9 @@ if (isset($user)) {
 // 注释操作
 include 'inc/admin_act.php';	// ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
+
+
+
 // 提交评论
 if (isset($_POST['msg']) && isset($user)) {
 	$msg = $_POST['msg'];
@@ -32,7 +35,11 @@ if (isset($_POST['msg']) && isset($user)) {
 		$err[] = '内容长度不能大于 1024 个字符';
 	} elseif (strlen2($msg) < 2) {
 		$err[] = '内容长度不能小于 2 个字符';
-	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `guest` WHERE `id_user` = '$user[id]' AND `msg` = '" . my_esc($msg) . "' LIMIT 1"), 0) != 0) {
+	}
+
+	// 获取该用户的上一条消息
+	$lastMessage = dbassoc(dbquery("SELECT `msg`, `time` FROM `guest` WHERE `id_user` = '$user[id]' ORDER BY `time` DESC LIMIT 1"));
+	if ($lastMessage && $lastMessage['msg'] == $msg && (time() - $lastMessage['time']) < 300) {
 		$err = '您的信息重复上一条信息';
 	} elseif (!isset($err)) {
 		// 活动积分的累积
@@ -53,7 +60,7 @@ if (isset($_POST['msg']) && isset($user)) {
 		exit;
 	}
 
-// 提交留言板
+// 匿名提交留言板
 } elseif (!isset($user) && isset($set['write_guest']) && $set['write_guest'] == 1 && isset($_SESSION['captcha']) && isset($_POST['chislo'])) {
 	$msg = $_POST['msg'];
 	$mat = antimat($msg);
@@ -68,7 +75,9 @@ if (isset($_POST['msg']) && isset($user)) {
 		$err = '为防止 SPAM 攻击，你需要完成人机认证。';
 	} elseif (strlen2($msg) < 2) {
 		$err = '内容长度不能小于 2 个字符';
-	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `guest` WHERE `id_user` = '0' AND `msg` = '" . my_esc($msg) . "' LIMIT 1"), 0) != 0) {
+	}
+	$lastMessage = dbassoc(dbquery("SELECT `msg`, `time` FROM `guest` WHERE `id_user` = '0' ORDER BY `time` DESC LIMIT 1"));
+	if ($lastMessage && $lastMessage['msg'] == $msg && (time() - $lastMessage['time']) < 300) {
 		$err = '您的信息重复上一条信息';
 	} elseif (!isset($err)) {
 		$_SESSION['antiflood'] = $time;
@@ -104,7 +113,7 @@ if (isset($user) || (isset($set['write_guest']) && $set['write_guest'] == 1 && (
 	echo '<input value="发送" type="submit" />';
 	echo '</form>';
 } elseif (!isset($user) && isset($set['write_guest']) && $set['write_guest'] == 1) {
-	?><div class="mess">您将能够通过 <span class="on"><?= abs($time - $_SESSION['antiflood'] - 300) ?> 秒.</span></div><?
+	echo '<div class="mess">您将能够通过 <span class="on">' . abs($time - $_SESSION['antiflood'] - 300) . ' 秒.</span></div>';
 }
 
 // 输出留言板
@@ -139,17 +148,17 @@ echo '</table>';
 if ($k_page > 1) str('index.php?', $k_page, $page); // 输出页数
 
 $online_guest_users = dbresult(dbquery("SELECT COUNT(DISTINCT ul.id_user) AS online_users
-                                        FROM `user_log` ul
-                                        WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
-                                          AND ul.ban = 0
-                                          AND ul.url LIKE '/guest/%'
-                                          AND ul.last_online = (
-                                            SELECT MAX(last_online)
-                                            FROM `user_log` ul2
-                                            WHERE ul2.id_user = ul.id_user
-                                              AND ul2.last_online > NOW() - INTERVAL 100 SECOND
-                                              AND ul2.ban = 0
-                                          )"), 0);
+										FROM `user_log` ul
+										WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
+											AND ul.ban = 0
+											AND ul.url LIKE '/guest/%'
+											AND ul.last_online = (
+											SELECT MAX(last_online)
+											FROM `user_log` ul2
+											WHERE ul2.id_user = ul.id_user
+												AND ul2.last_online > NOW() - INTERVAL 100 SECOND
+												AND ul2.ban = 0
+											)"), 0);
 echo '<div class="foot"><img src="/style/icons/str.gif" alt="*"> <a href="who.php">在线 (' . $online_guest_users . ' 人)</a><br /></div>';
 // 评论清理表单
 include 'inc/admin_form.php';
