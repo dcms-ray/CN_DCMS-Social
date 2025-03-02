@@ -51,8 +51,8 @@ if ($k_post > 0) {
 	while ($post = dbassoc($q)) {
 		echo '<td style="width:350px; height:70px; vertical-align:top; display:inline-table; margin:2px;">';
 		echo "<a href='/news/news.php?id=$post[id]'>" . htmlspecialchars($post['title']) . "</a>";
-		echo "(" . vremja($post['time']) . ")<br />";
-		echo rez_text2(output_text($post['msg']));
+		echo " (" . vremja($post['time']) . ")<br />";
+		echo rez_text2($post['msg']);
 		if ($post['link'] != NULL)	echo "<br /><a href='" . htmlentities($post['link'], ENT_QUOTES, 'UTF-8') . "'>详情 &rarr;</a><br />";
 		echo "<img src='/style/icons/bbl4.png' alt='*' /> (" . dbresult(dbquery("SELECT COUNT(*) FROM `news_komm` WHERE `id_news` = '$post[id]'"), 0) . ")<br />";
 		echo '</td>';
