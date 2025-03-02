@@ -38,9 +38,12 @@ class user
 		*/
 		static $nicks = [];
 		if (empty($nicks[$user])) {
-			$ank = dbassoc(dbquery('SELECT `group_access`, `pol`, `nick`, `date_last`, `rating`, `browser` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
+			$ank = dbassoc(dbquery('SELECT `group_access`, `pol`, `nick`, `rating`, `browser` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
+			$ank['date_last'] = dbresult(dbquery("SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = $user AND ul.ban = '0' ORDER BY ul.last_online DESC LIMIT 1"), 0);
 			$nicks[$user] = $ank;
-		} else $ank = $nicks[$user];
+		} else {
+			$ank = $nicks[$user];
+		}
 		$icon = null;
 		$nick = null;
 		$online = null;

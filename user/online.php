@@ -48,13 +48,13 @@ if ($k_lider > 0) {
 $k_post = dbresult(dbquery("SELECT COUNT(DISTINCT ul.id_user) AS online_users
                             FROM `user_log` ul
                             WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE
-                            AND ul.ban = '0'
+                            AND ul.ban = 0
                             AND ul.last_online = (
                                 SELECT MAX(last_online)
                                 FROM `user_log` ul2
                                 WHERE ul2.id_user = ul.id_user
                                 AND ul2.last_online > NOW() - INTERVAL 10 MINUTE
-                                AND ul2.ban = '0'
+                                AND ul2.ban = 0
                             )"), 0);
 
 $k_page = k_page($k_post, $set['p_str']);
@@ -69,13 +69,13 @@ if ($k_post == 0) {
 	$q = dbquery("SELECT ul.id, ul.id_user, ul.last_online, ul.url
 	              FROM `user_log` ul
 	              WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE
-	                  AND ul.ban = '0'
+	                  AND ul.ban = 0
 	                  AND ul.last_online = (
 	                      SELECT MAX(last_online)
 	                      FROM `user_log` ul2
 	                      WHERE ul2.id_user = ul.id_user
 	                        AND ul2.last_online > NOW() - INTERVAL 10 MINUTE
-	                        AND ul2.ban = '0'
+	                        AND ul2.ban = 0
 	                  )
 	              ORDER BY ul.last_online DESC
 				  LIMIT $start, $set[p_str];");

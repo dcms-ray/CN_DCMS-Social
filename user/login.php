@@ -18,7 +18,6 @@ if (isset($_GET['id']) && isset($_GET['pass'])) {
 
 	if ($user && password_verify($_GET['pass'], $user['pass'])) {
 		$_SESSION['id_user'] = $user['id'];
-		dbquery("UPDATE `user` SET `date_aut` = " . time() . " WHERE `id` = '$user[id]' LIMIT 1");
 		dbquery("INSERT INTO `user_log` (`id_user`, `date`, `ua`, `ip`, `method`) values('$user[id]', '" . date('Y-m-d H:i:s') . "', '$ua' , '$ip', '0')");
 	} else {
 		$_SESSION['err'] = '用户名或密码不正确';
@@ -35,7 +34,6 @@ if (isset($_GET['id']) && isset($_GET['pass'])) {
 		} else {
 			$expiration = time() + 60 * 60 * 2;
 		}
-		dbquery("UPDATE `user` SET `date_aut` = '{$time}' WHERE `id` = '{$user['id']}' LIMIT 1");
 		dbquery("INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) values('{$user['id']}', '" . date('Y-m-d H:i:s') . "', '" . date('Y-m-d H:i:s', $expiration) . "', '" . date('Y-m-d H:i:s') . "', '{$ua}' , '{$ip}', '1')");
 		$log_id = dbinsertid();
 		$_SESSION['login_id'] = $log_id;
@@ -64,16 +62,16 @@ if (!isset($user)) {
 }
 
 // 记录用户的 ip
-dbquery("UPDATE `user_log` SET `ip` = '{$ip}' WHERE `id` = '{$user['login_id']}' LIMIT 1");
+dbquery("UPDATE `user_log` SET `ip` = '{$ip}' WHERE `id` = '{$log_id}' LIMIT 1");
 
 // 记录用户的 ua
-if ($ua) dbquery("UPDATE `user_log` SET `ua` = '" . my_esc($ua) . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
+if ($ua) dbquery("UPDATE `user_log` SET `ua` = '" . my_esc($ua) . "' WHERE `id` = '{$log_id}' LIMIT 1");
 
 // 难以理解的会话
-dbquery("UPDATE `user_log` SET `sess` = '{$sess}' WHERE `id` = '{$user['login_id']}' LIMIT 1");
+dbquery("UPDATE `user_log` SET `sess` = '{$sess}' WHERE `id` = '{$log_id}' LIMIT 1");
 
 // 浏览器类型
-dbquery("UPDATE `user_log` SET `browser` = '" . ($webbrowser == true ? "web" : "wap") . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
+dbquery("UPDATE `user_log` SET `browser` = '" . ($webbrowser == true ? "web" : "wap") . "' WHERE `id` = '{$log_id}' LIMIT 1");
 
 // 检查相似的昵称
 // 一定时间范围内检查是否有多个用户在相同的IP、相同的用户代理和相似的登录时间（10分钟内）之间产生了碰撞，如果有碰撞，则将这两个用户的信息记录在 user_collision 表中

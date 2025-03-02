@@ -142,8 +142,7 @@ echo '<img src="/style/icons/druzya.png" alt="*" /> ';
 echo '<a href="/user/frends/?id=' . $ank['id'] . '">朋友</a> (' . $k_fr . '</b>/';
 $i = 0;
 while ($k_fr = dbarray($res)) {
-	if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `id` = '$k_fr[frend]' && `date_last` > '" . (time() - 600) . "'"), 0) != 0)
-		$i++;
+	if (dbresult(dbquery("SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = '$k_fr[frend]' AND ul.ban = 0 AND ul.last_online > NOW() - INTERVAL 10 MINUTE ORDER BY ul.last_online DESC LIMIT 1;"), 0) != 0) $i++;
 }
 echo "<span style='color:green'><a href='/user/frends/online.php?id=" . $ank['id'] . "'>$i</a></span>)";
 if ($k_f > 0 && $ank['id'] == $user['id']) echo " <a href='/user/frends/new.php'><font color='red'>+$k_f</font></a>";

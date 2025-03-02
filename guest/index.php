@@ -141,14 +141,14 @@ if ($k_page > 1) str('index.php?', $k_page, $page); // 输出页数
 $online_guest_users = dbresult(dbquery("SELECT COUNT(DISTINCT ul.id_user) AS online_users
                                         FROM `user_log` ul
                                         WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
-                                          AND ul.ban = '0'
+                                          AND ul.ban = 0
                                           AND ul.url LIKE '/guest/%'
                                           AND ul.last_online = (
                                             SELECT MAX(last_online)
                                             FROM `user_log` ul2
                                             WHERE ul2.id_user = ul.id_user
                                               AND ul2.last_online > NOW() - INTERVAL 100 SECOND
-                                              AND ul2.ban = '0'
+                                              AND ul2.ban = 0
                                           )"), 0);
 echo '<div class="foot"><img src="/style/icons/str.gif" alt="*"> <a href="who.php">在线 (' . $online_guest_users . ' 人)</a><br /></div>';
 // 评论清理表单

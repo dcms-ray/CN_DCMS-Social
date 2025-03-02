@@ -219,11 +219,15 @@ if ($ank['group_access'] > 1) {
 			/*-------------------------------------------------------------*/
 			/*--------------------------在线好友----------------------*/
 			$set['p_str'] = 20;
-			$k_post = dbresult(dbquery("SELECT COUNT(*) FROM `frends` INNER JOIN `user` ON `frends`.`frend`=`user`.`id` WHERE `frends`.`user` = '$ank[id]' AND `frends`.`i` = '1' AND `user`.`date_last`>'" . (time() - 600) . "'"), 0);
+			// 查询当前用户的在线好友数量
+			$k_post = dbresult(dbquery("SELECT COUNT(DISTINCT ul.id_user) AS online_friends FROM `frends` f INNER JOIN `user_log` ul ON ul.id_user = f.frend WHERE f.user = '$ank[id]' AND f.i = '1' AND ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0 )"), 0);
+			
 			$k_page = k_page($k_post, $set['p_str']);
 			$page = page($k_page);
 			$start = $set['p_str'] * $page - $set['p_str'];
-			$q = dbquery("SELECT * FROM `frends` INNER JOIN `user` ON `frends`.`frend`=`user`.`id` WHERE `frends`.`user` = '$ank[id]' AND `frends`.`i` = '1' AND `user`.`date_last`>'" . (time() - 600) . "' ORDER BY `user`.`date_last` DESC LIMIT $start, $set[p_str]");
+			//$q = dbquery("SELECT * FROM `frends` INNER JOIN `user` ON `frends`.`frend`=`user`.`id` WHERE `frends`.`user` = '$ank[id]' AND `frends`.`i` = '1' AND `user`.`date_last`>'" . (time() - 600) . "' ORDER BY `user`.`date_last` DESC LIMIT $start, $set[p_str]");
+			// 在线好友列表
+			$q = dbquery("SELECT f.*, ul.last_online FROM `frends` f INNER JOIN `user_log` ul ON ul.id_user = f.frend INNER JOIN `user` u ON u.id = f.frend WHERE f.user = '$ank[id]' AND f.i = '1' AND ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0) ORDER BY ul.last_online DESC LIMIT $start, $set[p_str]");
 			if ($k_post > 0) {
 				echo "<div class='foot'>在线好友 ($k_post)</div>";
 			}
@@ -247,7 +251,7 @@ if ($ank['group_access'] > 1) {
 			?>
 		</td>
 		<td class='block_info'>
-			<?
+			<?php
 			echo '<table>';
 			/*---------------------------朋友-----------------------------*/
 			$k_f = dbresult(dbquery("SELECT COUNT(id) FROM `frends_new` WHERE `to` = '$ank[id]' LIMIT 1"), 0);
@@ -256,11 +260,11 @@ if ($ank['group_access'] > 1) {
 			echo '<a class="top_nav" href="/user/frends/?id=' . $ank['id'] . '">朋友 (' . $k_fr . '</b>/';
 			$i = 0;
 			while ($k_fr = dbarray($res)) {
-				if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `id` = '$k_fr[frend]' && `date_last` > '" . (time() - 800) . "'"), 0) != 0) $i++;
+				if (dbresult(dbquery("SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = '$k_fr[frend]' AND ul.ban = 0 AND ul.last_online > NOW() - INTERVAL 10 MINUTE ORDER BY ul.last_online DESC LIMIT 1;"), 0) != 0) $i++;
 			}
 			echo $i;
 			if ($k_f > 0 && $ank['id'] == $user['id']) echo " +" . $k_f . "";
-			echo "</a>";
+			echo ")</a>";
 			/*--------------------------------------------------------------*/
 			/*------------------------相片册---------------------------*/
 			echo "<a class='top_nav' href='/photo/$ank[id]/'>照片 ";

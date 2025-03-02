@@ -31,7 +31,7 @@ function get_user_info($user_id, $log_id, $db) {
 		// 找不到此登录记录
 		return ['status' => 'false', 'message' => 'Login log not found'];
 	}
-	if ($user_log_ban['ban'] != '0') {
+	if ($user_log_ban['ban'] != 0) {
 		// 登录记录被 ban
 		return ['status' => 'false', 'message' => 'Login log is banned'];
 	}
