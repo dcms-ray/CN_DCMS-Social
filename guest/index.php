@@ -52,7 +52,7 @@ if (isset($_POST['msg']) && isset($user)) {
 		if (isset($ank_reply['id'])) {
 			$notifiacation = dbassoc(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $ank_reply['id'] . "' LIMIT 1"));
 			if ($notifiacation['komm'] == 1 && $ank_reply['id'] != $user['id'])
-				dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `type`, `time`) VALUES ('$user[id]', '$ank_reply[id]', 'guest', '$time')");
+				dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$ank_reply[id]', 0, 'guest', '$time')");
 		}
 		dbquery("INSERT INTO `guest` (id_user, time, msg) values('$user[id]', '$time', '" . my_esc($msg) . "')");
 		$_SESSION['message'] = '留言添加成功';
