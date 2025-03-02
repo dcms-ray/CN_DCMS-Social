@@ -1,4 +1,4 @@
-<?
+<?php
 include_once '../../sys/inc/start.php';
 include_once '../../sys/inc/compress.php';
 include_once '../../sys/inc/sess.php';
@@ -64,20 +64,21 @@ $set['title'] = '给 ' . $ank['nick'] . ' 的礼物：' . htmlspecialchars($gift
 include_once '../../sys/inc/thead.php';
 title();
 aut();
+
 /*
 ==================================
-Вывод подарка пользователя
+用户礼品提现
 ==================================
 */
 echo '<div class="foot">';
 echo '<img src="/style/icons/str2.gif" alt="*" /> ' . user::nick($ank['id'], 1, 0, 0) . '</a> | <a href="/user/gift/index.php?id=' . $ank['id'] . '">礼物</a> | <b>' . htmlspecialchars($gift['name']) . '</b>';
 echo '</div>';
-// Подарок
+// 礼物
 echo '<div class="nav2">';
 echo '<img src="/sys/gift/' . $gift['id'] . '.png" style="max-width:' . $width . 'px;" alt="*" /><br />';
 echo htmlspecialchars($gift['name']) . ' :: ' . vremja($post['time']) . '<br />';
 echo '</div>';
-// Автор подарка
+// 礼物的作者
 echo '<div class="nav1">';
 echo user::nick($anketa['id'],1,1,0);
 if ($post['coment']) echo '评论: <br />' . output_text($post['coment']);
@@ -85,16 +86,15 @@ echo '</div>';
 if ($ank['id'] == $user['id']) {
 	echo '<div class="nav2">';
 	if ($post['status'] == 0) {
-		// Новый подарок - Действие
+		// 新礼物 - 行动
 		echo '<center><img src="/style/icons/ok.gif" alt="*" /> <a href="?id=' . $post['id'] . '&amp;ok">接受</a> ';
 		echo '<img src="/style/icons/delete.gif" alt="*" /> <a href="?id=' . $post['id'] . '&amp;no">拒绝</a></center>';
 	} else {
-		// Удаление 
 		echo '<img src="/style/icons/delete.gif" alt="*" /> <a href="/user/gift/gift.php?id=' . $post['id'] . '&amp;delete">删除</a>';
 	}
 	echo '</div>';
 }
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="*" /> ' . user::nick($ank['nick'],1,0,0) . '</a> | <a href="/user/gift/index.php?id=' . $ank['id'] . '">礼物</a> | <b>' . htmlspecialchars($gift['name']) . '</b>';
+echo '<img src="/style/icons/str2.gif" alt="*" /> ' . user::nick($ank['id'], 1, 0, 0) . '</a> | <a href="/user/gift/index.php?id=' . $ank['id'] . '">礼物</a> | <b>' . htmlspecialchars($gift['name']) . '</b>';
 echo '</div>';
 include_once '../../sys/inc/tfoot.php';
