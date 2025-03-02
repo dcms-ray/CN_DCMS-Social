@@ -112,7 +112,7 @@ while ($post = dbassoc($q)) {
 	echo "IP: {$post['ip']}<br />";
 	echo 'UA: ' . output_text($post['ua']);
 	echo '<div style="text-align:right;">';
-	if ($post['ban'] == 0) echo '<a href="?logout=' . $post['id'] . '"><img src="/style/icons/blicon.gif" alt="*">注销</a>';
+	if ($post['ban'] == 0 && strtotime($post['expire_date']) > time()) echo '<a href="?logout=' . $post['id'] . '"><img src="/style/icons/blicon.gif" alt="*">注销</a>';
 	if (false) echo ' <a href="?delete=' . $post['id'] . '"><img src="/style/icons/delete.gif" alt="*">删除</a>';	// 暂时还不允许删除
 	echo "</div>";
 	echo '</div>';
