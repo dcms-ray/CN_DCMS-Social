@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `user_log` (
 	`id` int NOT NULL auto_increment PRIMARY KEY,
-	`id_user` int NOT NULL,						-- 用户ID
+	`id_user` int NOT NULL,								-- 用户ID
 	`method` set('1','0') NOT NULL DEFAULT '0',
 	`date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			-- 登录时间
 	`expire_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,	-- 登录记录过期时间

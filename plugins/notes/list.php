@@ -171,7 +171,6 @@ if ($notes['private'] == 1 && $user['id'] != $avtor['id'] && $frend != 2  && !us
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
-	exit;
 }
 if ($notes['private'] == 2 && $user['id'] != $avtor['id']  && !user_access('notes_delete')) {
 	msg('用户已禁止查看日记');
@@ -179,7 +178,6 @@ if ($notes['private'] == 2 && $user['id'] != $avtor['id']  && !user_access('note
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
-	exit;
 }
 if (isset($_GET['delete']) && ($user['id'] == $avtor['id'] || user_access('notes_delete'))) {
 	echo "<center>";
