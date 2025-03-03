@@ -102,6 +102,9 @@ class Database {
 			
 			// 设置默认的查询结果获取模式为关联数组
 			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+			// 设置数据库会话时区为为 PHP 时区
+			$this->pdo->exec("SET time_zone = '" . date('P') . "';");
 		} catch (PDOException $e) {
 			// 连接失败时，输出错误信息并终止脚本执行
 			http_response_code(506);
@@ -198,27 +201,56 @@ if (empty($set['api']) || $set['api'] == '0') {
  * 获取客户端 IP 和 User-Agent
  * @return array
  */
-function get_client_details() {
-	global $set;
+class ClientDetails
+{
+	protected $set;
+	protected $db;
 
-	// 从数据库获取 CDN IP 范围
-	function get_cdn_ips() {
-		global $db;
-		// 查询 'cdn_ips' 表中的所有数据
-		$result = $db->queryAll("SELECT `ip_range` FROM `cdn_ips`"); // 执行查询并获取所有结果
-
-		// 检查查询结果是否有数据
-		if (count($result) > 0) {
-			// 使用 array_column 提取所有 ip_range
-			return array_column($result, 'ip_range');
-		} else {
-			return []; // 如果没有数据，返回空数组
-		}
+	public function __construct($set, $db) {
+		$this->set = $set;
+		$this->db = $db;
 	}
 
-	// 检查一个IP是否在特定IP范围内
-	function isIpInRange($ip, $ranges) {
-		$ipAddress = \IPLib\Factory::addressFromString($ip);
+	/**
+	 * 获取客户端 IP 和 User-Agent
+	 * @return array
+	 */
+	public function getClientDetails() {
+		$cdnIpRanges = $this->getCdnIpRanges();
+		$ip = $this->getClientIp($cdnIpRanges);
+		$ua = $this->getUserAgent();
+
+		return [
+			'ip' => $ip,
+			'ua' => $ua
+		];
+	}
+
+	/**
+	 * 从数据库获取 CDN IP 范围
+	 * @return array
+	 */
+	protected function getCdnIpRanges() {
+		// 查询 'cdn_ips' 表中的所有数据
+		$result = $this->db->queryAll("SELECT `ip_range` FROM `cdn_ips`"); 
+
+		// 如果没有数据，返回空数组
+		if (count($result) > 0) {
+			return array_map(function ($cidr) {
+				return IPLib\Factory::parseRangeString($cidr['ip_range']);
+			}, $result);
+		}
+		return [];
+	}
+
+	/**
+	 * 检查一个IP是否在特定IP范围内
+	 * @param string $ip
+	 * @param array $ranges
+	 * @return bool
+	 */
+	protected function isIpInRange($ip, $ranges) {
+		$ipAddress = IPLib\Factory::addressFromString($ip);
 		foreach ($ranges as $range) {
 			if ($range->contains($ipAddress)) {
 				return true;
@@ -227,93 +259,130 @@ function get_client_details() {
 		return false;
 	}
 
-	// 读取 CDN IP 列表并创建 Range 数组
-	$cdnIpRanges = array_map(function ($cidr) {
-		return \IPLib\Factory::parseRangeString($cidr);
-	}, get_cdn_ips());
-
-	// 获取客户端 IP 地址
-	$ip = '';
-	switch ($set['get_ip_from_header']) {
-		case 'Forwarded':
-			if (!empty($_SERVER['HTTP_FORWARDED']) && isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
-				foreach (array_map('trim', explode(',', $_SERVER['HTTP_FORWARDED'])) as $part) {
-					if (stripos($part, 'for=') !== false) {
-						$ip = trim(str_ireplace('for=', '', $part));
-						break;
-					}
-				}
-			} else {
+	/**
+	 * 获取客户端 IP 地址
+	 * @param array $cdnIpRanges
+	 * @return string
+	 */
+	protected function getClientIp($cdnIpRanges) {
+		$ip = '';
+		switch ($this->set['get_ip_from_header']) {
+			case 'Forwarded':
+				$ip = $this->getForwardedIp($cdnIpRanges);
+				break;
+			case 'X-Forwarded-For':
+				$ip = $this->getXForwardedForIp($cdnIpRanges);
+				break;
+			case 'X-Real-IP':
+				$ip = $this->getXRealIp($cdnIpRanges);
+				break;
+			case 'CF-Connecting-IP':
+				$ip = $this->getCfConnectingIp($cdnIpRanges);
+				break;
+			case 'True-Client-IP':
+				$ip = $this->getTrueClientIp($cdnIpRanges);
+				break;
+			case 'disabled':
+			default:
 				$ip = $_SERVER['REMOTE_ADDR'];
-			}
-			break;
-		case 'X-Forwarded-For':
-			if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
-				foreach (array_map('trim', explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])) as $ip) {
-					if (isIpInRange($ip, $cdnIpRanges)) {
-						continue;
-					}
-					break;
-				}
-			} else {
-				$ip = $_SERVER['REMOTE_ADDR'];
-			}
-			break;
-
-		case 'X-Real-IP':
-			if (!empty($_SERVER['HTTP_X_REAL_IP']) && isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
-				$ip = $_SERVER['HTTP_X_REAL_IP'];
-			} else {
-				$ip = $_SERVER['REMOTE_ADDR'];
-			}
-			break;
-
-		case 'CF-Connecting-IP':
-			if (!empty($_SERVER['HTTP_CF_CONNECTING_IP']) && isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
-				$ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
-			} else {
-				$ip = $_SERVER['REMOTE_ADDR'];
-			}
-			break;
-
-		case 'True-Client-IP':
-			if (!empty($_SERVER['HTTP_TRUE_CLIENT_IP']) && isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
-				$ip = $_SERVER['HTTP_TRUE_CLIENT_IP'];
-			} else {
-				$ip = $_SERVER['REMOTE_ADDR'];
-			}
-			break;
-
-		case 'disabled':
-		default:
-			$ip = $_SERVER['REMOTE_ADDR'];
-			break;
-	}
-
-	// 获取 User-Agent
-	$ua = 'N/A';
-	if (isset($_SERVER['HTTP_USER_AGENT'])) {
-		$ua = $_SERVER['HTTP_USER_AGENT'];
-		$result = UAParser\Parser::create()->parse($ua);
-		if (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) && stripos($ua, 'Opera') !== false) {
-			$ua_om = preg_replace('#[^a-z_\. 0-9\-]#iu', null, strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']));
-			$ua = $result->toString();
-			$ua = $ua . '(' . $ua_om . ')';
-		} else {
-			$ua = $result->toString();
+				break;
 		}
+		return $ip;
 	}
 
-	return [
-		'ip' => $ip,
-		'ua' => $ua
-	];
+	/**
+	 * 处理 'Forwarded' 头部的 IP
+	 * @param array $cdnIpRanges
+	 * @return string
+	 */
+	protected function getForwardedIp($cdnIpRanges) {
+		if (!empty($_SERVER['HTTP_FORWARDED']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
+			foreach (array_map('trim', explode(',', $_SERVER['HTTP_FORWARDED'])) as $part) {
+				if (stripos($part, 'for=') !== false) {
+					return trim(str_ireplace('for=', '', $part));
+				}
+			}
+		}
+		return $_SERVER['REMOTE_ADDR'];
+	}
+
+	/**
+	 * 处理 'X-Forwarded-For' 头部的 IP
+	 * @param array $cdnIpRanges
+	 * @return string
+	 */
+	protected function getXForwardedForIp($cdnIpRanges) {
+		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
+			foreach (array_map('trim', explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])) as $ip) {
+				if ($this->isIpInRange($ip, $cdnIpRanges)) {
+					continue;
+				}
+				return $ip;
+			}
+		}
+		return $_SERVER['REMOTE_ADDR'];
+	}
+
+	/**
+	 * 处理 'X-Real-IP' 头部的 IP
+	 * @param array $cdnIpRanges
+	 * @return string
+	 */
+	protected function getXRealIp($cdnIpRanges) {
+		return !empty($_SERVER['HTTP_X_REAL_IP']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)
+			? $_SERVER['HTTP_X_REAL_IP'] 
+			: $_SERVER['REMOTE_ADDR'];
+	}
+
+	/**
+	 * 处理 'CF-Connecting-IP' 头部的 IP
+	 * @param array $cdnIpRanges
+	 * @return string
+	 */
+	protected function getCfConnectingIp($cdnIpRanges) {
+		return !empty($_SERVER['HTTP_CF_CONNECTING_IP']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)
+			? $_SERVER['HTTP_CF_CONNECTING_IP'] 
+			: $_SERVER['REMOTE_ADDR'];
+	}
+
+	/**
+	 * 处理 'True-Client-IP' 头部的 IP
+	 * @param array $cdnIpRanges
+	 * @return string
+	 */
+	protected function getTrueClientIp($cdnIpRanges) {
+		return !empty($_SERVER['HTTP_TRUE_CLIENT_IP']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)
+			? $_SERVER['HTTP_TRUE_CLIENT_IP'] 
+			: $_SERVER['REMOTE_ADDR'];
+	}
+
+	/**
+	 * 获取 User-Agent
+	 * @return string
+	 */
+	protected function getUserAgent() {
+		$ua = 'N/A';
+		if (isset($_SERVER['HTTP_USER_AGENT'])) {
+			$ua = $_SERVER['HTTP_USER_AGENT'];
+			$result = UAParser\Parser::create()->parse($ua);
+			if (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) && stripos($ua, 'Opera') !== false) {
+				$ua_om = preg_replace('#[^a-z_\. 0-9\-]#iu', null, strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']));
+				$ua = $result->toString() . '(' . $ua_om . ')';
+			} else {
+				$ua = $result->toString();
+			}
+		}
+		return $ua;
+	}
 }
 /**
- * $ip = $clientDetails['ip'];
- * $ua = $clientDetails['ua'];
+ * 使用方式
+ * 
+ * 获取 IP 和 User-Agent
+ * $ip = $clientInfo['ip'];
+ * $ua = $clientInfo['ua'];
  */
-$clientDetails = get_client_details();
+$clientDetails = (new ClientDetails($set, $db))->getClientDetails();
 
 /**
  * 检查用户是否登录
@@ -417,7 +486,7 @@ if ($user['status'] == 'true') {
 	$user = $user['data'];
 	// 更新数据库的用户在线时间
 	// 更新用户的在线时长
-	$user['last_online'] = $db->query('SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = ? AND ul.ban = 0 ORDER BY ul.last_online DESC LIMIT 1', [$user['id']]);
+	$user['last_online'] = $db->query('SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = ? AND ul.ban = 0 ORDER BY ul.last_online DESC LIMIT 1', [$user['id']])['last_online'];
 	$user['timeactiv'] = time() - strtotime($user['last_online']);
 	if ($user['timeactiv'] < 120) {
 		$db->update('UPDATE `user` SET `time` = ? WHERE `id` = ? LIMIT 1', [($user['time'] + $user['timeactiv']), $user['id']]);
@@ -465,7 +534,7 @@ function validateCaptchaToken($user_input, $captcha_token) {
 	// 查询数据库，检查 token 是否存在且未使用
 	$token_record = $db->query("SELECT * FROM captcha_tokens WHERE captcha_token = ? AND status = 'unused'", [$captcha_token]);
 
-	if (!$token_record) {
+	if (isset($token_record['captcha_token']) && $token_record['captcha_token'] != $captcha_token) {
 		// captcha_token 无效或已使用
 		return ['status' => 'error', 'message' => 'captcha_token invalid or used'];
 	}
@@ -513,52 +582,83 @@ function getStringLength($str) {
 function sendEmail($subject, $body, $recipientEmail, $recipientName) {
 	global $set;
 	if ($set['mail_transport_type'] == 'smtp') {
-		// 创建 PHPMailer 实例
-		$mail = new PHPMailer\PHPMailer\PHPMailer(true);
-		try {
-			// 服务器设置
-			$mail->isSMTP();
-			$mail->Host = $set['smtp_host'];											// SMTP 服务器（替换为你自己的 SMTP 服务器）
-			$mail->SMTPAuth = ($set['smtp_auth'] == '1' ? true : false);				// 启用 SMTP 验证
-			$mail->Username = $set['smtp_username'];									// SMTP 用户名
-			$mail->Password = $set['smtp_password'];									// SMTP 密码
-			if ($set['smtp_secure'] == 'tls') {
-				$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS; // 使用 TLS 加密
-			} elseif ($set['smtp_secure'] == 'ssl') {
-				$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SSL;      // 使用 SSL 加密
-			} else {
-				$mail->SMTPSecure = NULL;                                               // 不加密，使用纯文本传输
+		if (class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+			// 创建 PHPMailer 实例
+			$mail = new PHPMailer\PHPMailer\PHPMailer(true);
+			try {
+				// 服务器设置
+				$mail->isSMTP();
+				$mail->Host = $set['smtp_host'];											// SMTP 服务器（替换为你自己的 SMTP 服务器）
+				$mail->SMTPAuth = ($set['smtp_auth'] == '1' ? true : false);				// 启用 SMTP 验证
+				$mail->Username = $set['smtp_username'];									// SMTP 用户名
+				$mail->Password = $set['smtp_password'];									// SMTP 密码
+				if ($set['smtp_secure'] == 'tls') {
+					$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS; // 使用 TLS 加密
+				} elseif ($set['smtp_secure'] == 'ssl') {
+					$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SSL;      // 使用 SSL 加密
+				} else {
+					$mail->SMTPSecure = NULL;                                               // 不加密，使用纯文本传输
+				}
+				$mail->Port = (int)$set['smtp_port'];										// SMTP 端口号
+
+				$mail->CharSet = 'UTF-8';													// 设置邮件的字符集为 UTF-8
+
+				// 发件人设置
+				$mail->setFrom($set['set_email_from'], $set['set_email_from_name'] ?? '');
+				$mail->addReplyTo($set['set_email_reply_to'], $set['set_email_reply_to_name'] ?? '');
+
+				// 收件人设置
+				$mail->addAddress($recipientEmail, $recipientName);
+
+				// 内容设置
+				$mail->isHTML(true);  // 邮件内容为 HTML 格式
+				$mail->Subject = '=?utf-8?B?' . base64_encode($subject) . '?=';
+				$mail->Body = $body;
+
+				// 发送邮件
+				$mail->send();
+				return ['status' => 'success', 'message' => 'email sent successfully'];
+
+			} catch (PHPMailer\PHPMailer\Exception $e) {
+				return ['status' => 'error', 'message' => 'email sending failed: ' . $mail->ErrorInfo];
 			}
-			$mail->Port = (int)$set['smtp_port'];										// SMTP 端口号
-
-			// 发件人设置
-			$mail->setFrom($set['set_email_from'], $set['set_email_from_name'] ?? '');
-			$mail->addReplyTo($set['set_email_reply_to'], $set['set_email_reply_to_name'] ?? '');
-
-			// 收件人设置
-			$mail->addAddress($recipientEmail, $recipientName);
-
-			// 内容设置
-			$mail->isHTML(true);  // 邮件内容为 HTML 格式
-			$mail->Subject = '=?utf-8?B?' . base64_encode($subject) . '?=';
-			$mail->Body = $body;
-
-			// 发送邮件
-			$mail->send();
-			return ['status' => 'success', 'message' => 'email sent successfully'];
-
-		} catch (PHPMailer\PHPMailer\Exception $e) {
-			return ['status' => 'error', 'message' => 'email sending failed: ' . $mail->ErrorInfo];
+		} else {
+			return ['status' => 'error', 'message' => 'email sending failed: PHPMailer is not installed and cannot send emails using SMTP'];
 		}
 	} else {
 		mail($recipientEmail, '=?utf-8?B?' . base64_encode($subject), $body);
 	}
 }
 
+/**
+ * 获取 HTTP 类型（http 或 https）
+ * @return string
+ */
+function get_http_type() {
+	global $set;
+	// 优先检查 HTTPS
+	$http_type = 'http';
+
+	// 检查 HTTPS 是否开启
+	if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1)) {
+		$http_type = 'https';
+	} elseif ($set['get_ip_from_header'] != 'disabled') {	// 检查 X-Forwarded-Proto 或 Forwarded 头部
+		if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+			$http_type = 'https';
+		} elseif (isset($_SERVER['HTTP_FORWARDED'])) {
+			// 解析 Forwarded 头部并检查 proto
+			if (preg_match('/proto=https/', $_SERVER['HTTP_FORWARDED'])) {
+				$http_type = 'https';
+			}
+		}
+	}
+	return $http_type;
+}
+
 
 
 // 删除过期的captcha_token
-$db->query("DELETE FROM captcha_tokens WHERE expires_at < :date", ['date' => date("Y-m-d H:i:s")]);
+$db->query("DELETE FROM captcha_tokens WHERE expires_at < NOW()");
 
 
 
@@ -570,10 +670,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 
 		if ($user && password_verify($_POST['password'], $user['pass'])) {	// 比较密码
 			// 登录成功
-
-			// 更新用户的登录时间
-			$updateQuery = "UPDATE `user` SET `date_aut` = :time, `date_last` = :time WHERE `id` = :id LIMIT 1";
-			$db->update($updateQuery, ['time' => time(), 'id' => $user['id']]);
 
 			// 选择了“记住我”
 			if (isset($_POST['aut_save']) && $_POST['aut_save']) {
@@ -674,7 +770,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 		if (isset($_POST['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
 			throw new Exception('invalid email address');
 		}
-	
+
 		// 检查昵称
 		if (!preg_match("#^([A-Za-z0-9\-\_\ ])+$#", $_POST['reg_nick'])) {
 			// 昵称含有非法字符
@@ -683,33 +779,32 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 		$nickLength = getStringLength($_POST['reg_nick']);
 		if ($nickLength < 3) throw new Exception('nick too short');
 		if ($nickLength > 32) throw new Exception('nick too long');
-	
+
 		// 检查用户昵称和电子邮件是否已存在
 		if ($db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = ?", [$_POST['reg_nick']])['COUNT(*)'] > 0) {
 			throw new Exception('nick already registered');
 		} elseif (isset($_POST['email']) && $db->query("SELECT COUNT(*) FROM `reg_mail` WHERE `mail` = ?", [$_POST['email']])['COUNT(*)'] != 0) {
 			throw new Exception('email already registered');
 		}
-	
+
 		// 检查密码
 		$passwordLength = getStringLength($_POST['password']);
 		if ($passwordLength < 6) throw new Exception('password too short');
 		if ($passwordLength > 32) throw new Exception('password too long');
-	
+
 		// 如果开启了邮箱验证，创建激活码
-		if ($set['reg_select'] == 'open_mail') $activation = md5(passgen());
-	
+		if ($set['reg_select'] == 'open_mail') $activation = md5(random_bytes(16));
+
 		// 注册用户
-		$id_reg = $db->insert("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `date_last`, `pol`, `activation`, `email`) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+		$id_reg = $db->insert("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `pol`, `activation`, `email`) VALUES (?, ?, ?, ?, ?, ?)", [
 			$_POST['reg_nick'],
 			password_hash($_POST['password'], PASSWORD_DEFAULT),
-			time(),
 			time(),
 			intval((isset($_POST['pol']) && ($_POST['pol'] == '1')) ? 1 : 0),
 			($set['reg_select'] == 'open_mail') ? $activation : NULL,
 			$_POST['email'] ?? null
 		]);
-	
+
 		// 邮件激活逻辑
 		if ($set['reg_select'] == 'open_mail') {
 			$subject = "帐户激活";
@@ -721,8 +816,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 
 
 			// 调用封装的发送邮件函数
-			$emailResult = sendEmail($subject, $regmail, $_POST['email'], $user2['nick']);
-			
+			$emailResult = sendEmail($subject, $regmail, $_POST['email'], $_POST['reg_nick']);
+
 			if ($emailResult['status'] == 'success') {
 				// 如果邮件发送成功
 				$response['status'] = 'success';
@@ -745,7 +840,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	}
 
 
-
 } elseif (isset($_GET['action']) && $_GET['action'] == 'get_captcha_url') {
 	// 获取 Captcha URL 和 Captcha token
 
@@ -758,7 +852,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 
 	$response['status'] = 'success';
 	// 给验证码添加过期时间，加密后进行 base64 编码，与 base64 编码过的 iv 拼装在一起作为 captcha_token
-	$response['captcha_token'] = base64_encode(openssl_encrypt($captcha . '.' . time() + 600, 'aes-256-cbc', $set['shif'], 0, $iv)) . '.' . base64_encode($iv);
+	$response['captcha_token'] = base64_encode(openssl_encrypt($captcha_value . '.' . (time() + 600), 'aes-256-cbc', $set['shif'], 0, $iv)) . '.' . base64_encode($iv);
 	// 生成验证码图片 URL
 	$response['captcha_url'] = "/captcha.php?captcha_token={$response['captcha_token']}";
 
@@ -823,7 +917,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 				$regmail = "你好！ $user2[nick]<br />
 							您已激活密码恢复<br />
 							要设置新密码，请点击链接:<br />
-							<a href='http://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}'>http://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
+							<a href='" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
 							此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
 
 				// 调用封装的发送邮件函数
