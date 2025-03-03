@@ -3,7 +3,7 @@
 * $name 对象操作描述
 */
 if ($type == 'them' && $post['avtor'] != $user['id']) {
-	$name = '创建' . ($avtor['pol'] == 1 ? null : "а") . ' 在论坛主题 ';
+	$name = '创建' . ($avtor['pol'] == 1 ? null : "а") . '在论坛主题 ';
 }
 
 /*

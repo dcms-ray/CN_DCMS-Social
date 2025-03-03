@@ -142,7 +142,6 @@ if ($k_post == 0) {
 while ($post = dbassoc($q)) {
 	$type = $post['type'];
 	$avtor = user::get_user($post['avtor']);
-	$name = null;
 
 	if ($post['read'] == 0) {
 		$s1 = "<font color='red'>";
