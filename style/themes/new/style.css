@@ -73,7 +73,7 @@ input[type="submit"]:hover {
 	border-radius: 4px;
 }
 
-/* текстовое поле */
+/* 文本字段 */
 textarea {
 	width: 98%;
 	height: 6pc;
@@ -579,3 +579,142 @@ img.stenka:hover {
 
 .on {color: #1c9044;}
 .off {color: #FF0000;}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color:black;
+		color: #e8e6e3;
+		border-color: #2f2f2f;
+	}
+	.rating1 {
+		background-color: #080018;
+	}
+	a:link, a:visited {
+		color: rgb(51, 162, 255);
+	}
+	a:hover {
+		color: #0078f8;
+	}
+	table {
+		border-color: #545b5e;
+	}
+	input[type="submit"] {
+		color: rgb(232, 230, 227);
+		background-color: rgb(8, 55, 156);
+	}
+	input[type="submit"]:hover {
+		color: rgb(232, 230, 227);
+		background-color: #0b255e;
+	}
+	textarea {
+		border:1px solid rgb(60, 65, 68);
+		color: rgb(181, 175, 165);
+		background-color: rgb(18, 20, 20);
+	}
+	input, select {
+		border-color: rgb(60, 65, 68);
+		background-color: rgb(18, 20, 20);
+		color: rgb(181, 175, 165);
+	}
+	.logo {
+		background-color: rgb(47, 71, 122);
+	}
+	.auts {
+		background-color: rgb(8, 55, 156);
+		border-color: rgb(54, 81, 138);
+	}
+	.auts:hover {
+		background-color: #02205f;
+	}
+	.title {
+		background-color: #0443ab;
+		color: rgb(255, 235, 26);
+	}
+	.titles {
+		background-color: rgb(4, 67, 171);
+		border-bottom-color: rgb(12, 136, 177);
+		color: rgb(255, 235, 26);
+		border-right-color: rgb(50, 83, 155);
+	}
+	.titles a {
+		color: rgb(141, 178, 218);
+	}
+	.titles a:hover {
+		color: #c9c9c9;
+	}
+	.err {
+		background-color: rgb(57, 4, 23);
+		border-color: rgb(141, 15, 53);
+		color: rgb(238, 96, 140);
+	}
+	.msg {
+		background-color: rgb(15, 56, 53);
+		border-color: rgb(1, 201, 192);
+		color: #01afa7;
+	}
+	.mess {
+		background: black;
+		border-color: #a17e00;
+	}
+	.c2 {
+		color: rgb(209, 205, 199);
+		background-color: rgb(30, 32, 33);
+		border-color: rgb(52, 57, 59);
+	}
+	.tmenu a {
+		color: rgb(232, 230, 227);
+		background-color: rgb(8, 55, 156);
+	}
+	.tmenu a:hover {
+		background: #132957;
+	}
+	.menus {
+		background-color: rgb(32, 35, 37);
+		border-color: rgb(22, 39, 90);
+	}
+	a.activ {
+		background-color: rgb(8, 55, 156);
+		color:rgb(232, 230, 227);
+	}
+	.nav1 {
+		background-color: rgb(30, 32, 33);
+		border-bottom-color: rgb(57, 61, 64);
+	}
+	.nav2 {
+		background-color: rgb(24, 26, 27);
+		border-bottom-color: rgb(57, 61, 64);
+	}
+	.main_menu, .main2 {
+		color: rgb(232, 230, 227);
+		background: black;
+		border-bottom-color: rgb(57, 61, 64);
+	}
+	.main, .rekl {
+		color: rgb(209, 205, 199);
+		background-color: rgb(32, 35, 37);
+		border-color: rgb(22, 39, 90);
+	}
+	.p_t {
+		border-top-color: rgb(28, 63, 90);
+		background-color: rgb(32, 35, 36);
+	}
+	.p_m {
+		border-bottom-color: rgb(28, 63, 90);
+		background-color: rgb(0, 59, 59);
+	}
+	.ank_n {
+		color: rgb(178, 172, 162);
+	}
+	.copy {
+		background-color: rgb(0, 39, 124);
+		border-color: rgb(8, 53, 151);
+		color: rgb(226, 223, 219);
+	}
+	.copy a {
+		color: rgb(232, 230, 227);
+	}
+	.foot {
+		border-color: rgb(29, 98, 73);
+		background-color: rgb(19, 68, 56);
+	}
+}
