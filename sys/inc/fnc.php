@@ -352,7 +352,7 @@ function admin_log($mod, $act, $opis) {
 function fiera($msg) {
 	$msg = str_replace("script", "sсript", $msg);
 	$msg = str_replace("javascript:", "javаscript:", $msg);
-	if ($_SERVER['PHP_SELF'] != '/adm_panel/mysql.php')
+	if ($_SERVER['PHP_SELF'] != '/adm_panel/mysql.php' && $_SERVER['PHP_SELF'] != '/adm_panel/settings_email.php')
 		$msg = addslashes(stripslashes(trim($msg)));
 	return $msg;
 }
@@ -370,12 +370,20 @@ while ($filebase = readdir($opdirbase)) {
 // 参观记录
 dbquery("INSERT INTO `visit_today` (`ip`, `ua`, `ua_hash`, `time`) VALUES ('$ip', '" . my_esc(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '" . md5(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '$time')");
 
-// 确保所有通过 GET 方法传入的数据都被清理和转义
+// 确保所有通过 GET/POST 方法传入的数据都被清理和转义（没卵用）
+/*
 if(isset($_GET)) {
 	foreach($_GET as $key => $value) {
 		$_GET[$key] = fiera($value);
 	}
 }
+if (isset($_POST)) {
+	foreach($_POST as $key => $value) {
+		$_POST[$key] = fiera($value);
+	}
+}
+*/
+
 
 function ages($age) {
 	$str = '';

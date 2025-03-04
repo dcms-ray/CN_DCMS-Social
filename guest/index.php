@@ -11,7 +11,7 @@ include_once '../sys/inc/user.php';
 
 /* 封禁的用户 */
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'guest' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0')"), 0) != 0) {
-	header('Location: /user/ban.php');
+	header('Location: ../user/ban.php');
 	exit;
 }
 
@@ -21,9 +21,7 @@ if (isset($user)) {
 }
 
 // 注释操作
-include 'inc/admin_act.php';	// ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
-
-
+include 'inc/admin_act.php';
 
 
 // 提交评论
@@ -43,7 +41,7 @@ if (isset($_POST['msg']) && isset($user)) {
 		$err = '您的信息重复上一条信息';
 	} elseif (!isset($err)) {
 		// 活动积分的累积
-		include_once H . 'sys/add/user.active.php';
+		include_once '../sys/add/user.active.php';
 		/*
 		==========================
 		回复通知
@@ -103,12 +101,12 @@ $start = $set['p_str'] * $page - $set['p_str'];
 // 留言板输入框
 if (isset($user) || (isset($set['write_guest']) && $set['write_guest'] == 1 && (!isset($_SESSION['antiflood']) || $_SESSION['antiflood'] < $time - 300))) {
 	echo '<form method="post" name="message" action="?page=' . $page . REPLY . '">';
-	if (is_file(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php'))
-		include_once H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php';
+	if (is_file('../style/themes/' . $set['set_them'] . '/altername_post_form.php'))
+		include_once '../style/themes/' . $set['set_them'] . '/altername_post_form.php';
 	else
 		echo $tPanel . '<textarea name="msg">' . $insert . '</textarea><br />';
 	if (!isset($user) && isset($set['write_guest']) && $set['write_guest'] == 1) {
-		echo "<img src=\"/captcha.php?SESS={$sess}\" width=\"100\" height=\"30\" alt=\"Captcha\" /> <input name=\"chislo\" size=\"7\" maxlength=\"5\" value=\"\" type=\"text\" placeholder=\"验证码..\" /><br />";
+		echo "<img src=\"../captcha.php?SESS={$sess}\" width=\"100\" height=\"30\" alt=\"Captcha\" /> <input name=\"chislo\" size=\"7\" maxlength=\"5\" value=\"\" type=\"text\" placeholder=\"验证码..\" /><br />";
 	}
 	echo '<input value="发送" type="submit" />';
 	echo '</form>';
@@ -159,7 +157,7 @@ $online_guest_users = dbresult(dbquery("SELECT COUNT(DISTINCT ul.id_user) AS onl
 												AND ul2.last_online > NOW() - INTERVAL 100 SECOND
 												AND ul2.ban = 0
 											)"), 0);
-echo '<div class="foot"><img src="/style/icons/str.gif" alt="*"> <a href="who.php">在线 (' . $online_guest_users . ' 人)</a><br /></div>';
+echo '<div class="foot"><img src="../style/icons/str.gif" alt="*"> <a href="who.php">在线 (' . $online_guest_users . ' 人)</a><br /></div>';
 // 评论清理表单
 include 'inc/admin_form.php';
 include_once '../sys/inc/tfoot.php';

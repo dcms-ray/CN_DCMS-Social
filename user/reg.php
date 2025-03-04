@@ -32,7 +32,7 @@ if ($set['reg_select'] == 'close') {
 	// 管理员已关闭注册
 	$err = '已关闭注册';
 	err();
-	echo "<a href='/user/aut.php'>已注册?点击此处登录账号</a><br />";
+	echo "<a href='aut.php'>已注册?点击此处登录账号</a><br />";
 	include_once '../sys/inc/tfoot.php';
 } elseif ($set['reg_select'] == 'open_mail' && isset($_GET['id']) && isset($_GET['activation']) && $_GET['activation'] != NULL) {	// 激活帐户
 	if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `id` = '" . intval($_GET['id']) . "' AND `activation` = '" . my_esc($_GET['activation']) . "'"), 0) == 1) {

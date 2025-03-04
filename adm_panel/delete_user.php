@@ -15,18 +15,18 @@ adm_check();
 if (isset($_GET['id'])) {
 	$ank['id'] = intval($_GET['id']);
 } else {
-	header("Location: /index.php?" . session_id());
+	header("Location: ../index.php?" . session_id());
 	exit;
 }
 
 if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `id` = '$ank[id]' LIMIT 1"), 0) == 0) {
-	header("Location: /index.php?" . session_id());
+	header("Location: ../index.php?" . session_id());
 	exit;
 }
 
 $ank = user::get_user($ank['id']);
 if ($user['level'] <= $ank['level']) {
-	header("Location: /index.php?" . session_id());
+	header("Location: ../index.php?" . session_id());
 	exit;
 }
 
@@ -82,7 +82,7 @@ if (isset($_POST['delete'])) {
 		dbquery("DELETE FROM `checkin_records` WHERE `user_id` = '$ank[id]'");
 		$q5 = dbquery("SELECT * FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
 		while ($post5 = dbassoc($q5)) {
-			unlink(H . 'files/down/' . $post5['id'] . '.dat');
+			unlink('../files/down/' . $post5['id'] . '.dat');
 		}
 		dbquery("DELETE FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
 		dbquery("DELETE FROM `users_konts` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
@@ -105,7 +105,7 @@ if (isset($_POST['delete'])) {
 				dbquery("DELETE FROM `news_komm` WHERE `id_user` = '$collisions[$i]'");
 				$q5 = dbquery("SELECT * FROM `downnik_files` WHERE `id_user` = '$collisions[$i]'");
 				while ($post5 = dbassoc($q5)) {
-					unlink(H . 'files/down/' . $post5['id'] . '.dat');
+					unlink('../files/down/' . $post5['id'] . '.dat');
 				}
 				dbquery("DELETE FROM `downnik_files` WHERE `id_user` = '$collisions[$i]'");
 				dbquery("DELETE FROM `users_konts` WHERE `id_user` = '$collisions[$i]' OR `id_kont` = '$collisions[$i]'");

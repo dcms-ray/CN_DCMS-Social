@@ -11,7 +11,7 @@ include_once '../../sys/inc/user.php';
 
 /* 屏蔽封禁用户 */
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0')"), 0) != 0) {
-	header('Location: /user/ban.php?' . session_id());
+	header('Location: ../../user/ban.php?' . session_id());
 	exit;
 }
 $notes = dbassoc(dbquery("SELECT * FROM `notes` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1"));
@@ -84,7 +84,7 @@ if (isset($_GET['spam'])  &&  isset($user)) {
 		echo "<div class='mess'>举报有关<font color='green'>$spamer[nick]</font> 它将在不久的将来考虑。</div>";
 	}
 	echo "<div class='foot'>";
-	echo "<img src='/style/icons/str2.gif' alt='*'> <a href='?id=$notes[id]&amp;page=" . intval($_GET['page']) . "'>返回</a><br />";
+	echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='?id=$notes[id]&amp;page=" . intval($_GET['page']) . "'>返回</a><br />";
 	echo "</div>";
 	include_once '../../sys/inc/tfoot.php';
 	exit;
@@ -223,15 +223,15 @@ if (isset($user)) {
 	}
 }
 echo "<div class=\"foot\">";
-echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ";
+echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ";
 echo user::nick($notes['id_user'], 1, 0, 0);
 echo ' | <b>' . output_text($notes['name']) . '</b>';
 echo "</div>";
 echo "<div class='main'>";
-echo "<table style='width:110%;'><td style='width:4%;'>" . (empty($avtor['id']) ? '<img class="avatar" src="/style/user/avatar.gif" height="50" width="50" alt="No Avatar">' : user::avatar($avtor['id'])) . "</td>";
+echo "<table style='width:110%;'><td style='width:4%;'>" . (empty($avtor['id']) ? '<img class="avatar" src="../../style/user/avatar.gif" height="50" width="50" alt="No Avatar">' : user::avatar($avtor['id'])) . "</td>";
 echo "<td style='width:96%;'> 作者: " . user::nick($notes['id_user'], 1, 1, 0) . " ";
-echo "(<img src='/style/icons/them_00.png'>  " . vremja($notes['time']) . ")<br/>";
-echo "<img src='/style/icons/eye.png'> 预览: " . $notes['count'] . "</td></table></div>";
+echo "(<img src='../../style/icons/them_00.png'>  " . vremja($notes['time']) . ")<br/>";
+echo "<img src='../../style/icons/eye.png'> 预览: " . $notes['count'] . "</td></table></div>";
 $stat1 = $notes['msg'];
 if (!$set['web']) $mn = 20;
 else $mn = 90; // 按浏览器显示的词数
@@ -262,33 +262,33 @@ echo "<div class='main2'>";
 if (isset($user)) {
 	$share = dbresult(dbquery("SELECT COUNT(*)FROM `notes` WHERE `share_id`='" . $notes['id'] . "' AND `share_type`='notes'"), 0);
 	if (dbresult(dbquery("SELECT COUNT(*)FROM `notes` WHERE `id_user`='" . $user['id'] . "' AND `share_type`='notes' AND `share_id`='" . $notes['id'] . "' LIMIT 1"), 0) == 0 && isset($user) && $user['id'] != $notes['id_user']) {
-		echo " <a href='share.php?id=" . $notes['id'] . "'><img src='/style/icons/action_share_color.gif'> 分享: (" . $share . ")</a>";
+		echo " <a href='share.php?id=" . $notes['id'] . "'><img src='../../style/icons/action_share_color.gif'> 分享: (" . $share . ")</a>";
 	} else {
-		echo "<img src='/style/icons/action_share_color.gif'> 分享:  (" . $share . ")";
+		echo "<img src='../../style/icons/action_share_color.gif'> 分享:  (" . $share . ")";
 	}
 }
 if (isset($user) && (user_access('notes_delete') || $user['id'] == $notes['id_user'])) {
-	echo "<br/><a href='edit.php?id=$notes[id]'><img src='/style/icons/edit.gif'> 修改</a> <a href='?id=$notes[id]&amp;delete'><img src='/style/icons/delete.gif'> 删除</a>";
+	echo "<br/><a href='edit.php?id=$notes[id]'><img src='../../style/icons/edit.gif'> 修改</a> <a href='?id=$notes[id]&amp;delete'><img src='../../style/icons/delete.gif'> 删除</a>";
 }
 echo "</div><div class='main'>";
 $l1 = dbresult(dbquery("SELECT COUNT(*) FROM `notes_like` WHERE `like` = '0' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0);
 $l2 = dbresult(dbquery("SELECT COUNT(*) FROM `notes_like` WHERE `like` = '1' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0);
 if (isset($user) && isset($avtor['id']) && $user['id'] != $avtor['id']) {
 	if (dbresult(dbquery("SELECT COUNT(*) FROM `notes_like` WHERE `id_user` = '" . $user['id'] . "' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0) == 0)
-		echo "<a href='list.php?id=$notes[id]&amp;like=1'><img src='/style/icons/thumbu.png' alt='*' /> </a> (" . ($l2 - $l1) . ") <a href='list.php?id=$notes[id]&amp;like=0'><img src='/style/icons/thumbd.png' alt='*' /></a>";
+		echo "<a href='list.php?id=$notes[id]&amp;like=1'><img src='../../style/icons/thumbu.png' alt='*' /> </a> (" . ($l2 - $l1) . ") <a href='list.php?id=$notes[id]&amp;like=0'><img src='../../style/icons/thumbd.png' alt='*' /></a>";
 	else
-		echo " <img src='/style/icons/thumbu.png' alt='*' /> (" . ($l2 - $l1) . ") <img src='/style/icons/thumbd.png' alt='*' /> ";
+		echo " <img src='../../style/icons/thumbu.png' alt='*' /> (" . ($l2 - $l1) . ") <img src='../../style/icons/thumbd.png' alt='*' /> ";
 } else {
-	echo " <img src='/style/icons/thumbu.png' alt='*' />  (" . ($l2 - $l1) . ") <img src='/style/icons/thumbd.png' alt='*' /> ";
+	echo " <img src='../../style/icons/thumbu.png' alt='*' />  (" . ($l2 - $l1) . ") <img src='../../style/icons/thumbd.png' alt='*' /> ";
 }
 //--------------------------移至书签-----------------------------//
 if (isset($user)) {
-	echo "" . ($webbrowser ? "&bull;" : null) . " <img src='/style/icons/add_fav.gif' alt='*' /> ";
+	echo "" . ($webbrowser ? "&bull;" : null) . " <img src='../../style/icons/add_fav.gif' alt='*' /> ";
 	if (dbresult(dbquery("SELECT COUNT(*) FROM `bookmarks` WHERE `id_user` = '" . $user['id'] . "' AND `id_object` = '" . $notes['id'] . "' AND `type`='notes' LIMIT 1"), 0) == 0)
 		echo "<a href='list.php?id=$notes[id]&amp;fav=1'>添加到书签</a><br />";
 	else
 		echo "<a href='list.php?id=$notes[id]&amp;fav=0'>删除书签</a><br />";
-	echo "<img src='/style/icons/add_fav.gif' alt='*' />  <a href='fav.php?id=" . $notes['id'] . "'>谁将它添加到书签?</a> (" . $markinfo . ")";
+	echo "<img src='../../style/icons/add_fav.gif' alt='*' />  <a href='fav.php?id=" . $notes['id'] . "'>谁将它添加到书签?</a> (" . $markinfo . ")";
 }
 echo '</div>';
 
@@ -346,7 +346,7 @@ if ($k_post == 0) {
 		if (isset($user)) {
 			echo '<div style="text-align:right;">';
 			if ($post['id_user'] != $user['id']) echo "<a href=\"?id=$notes[id]&amp;page=$page&amp;spam=$post[id]\"><img src='/style/icons/blicon.gif' alt='*'>举报</a> ";
-			if (isset($user) && ((user_access('notes_delete') || $user['id'] == $notes['id_user']) || $user['id'] == $post['id_user'])) echo '<a href="delete.php?komm=' . $post['id'] . '"><img src="/style/icons/delete.gif" alt="*">删除</a>';
+			if (isset($user) && ((user_access('notes_delete') || $user['id'] == $notes['id_user']) || $user['id'] == $post['id_user'])) echo '<a href="delete.php?komm=' . $post['id'] . '"><img src="../../style/icons/delete.gif" alt="*">删除</a>';
 			echo "</div>";
 		}
 		echo "</div>";
@@ -372,8 +372,8 @@ if ($notes['private_komm'] == 2 && $user['id'] != $avtor['id'] && !user_access('
 }
 if (isset($user)) {
 	echo "<form method=\"post\" name='message' action=\"?id=" . intval($_GET['id']) . "&amp;page=$page" . $go_otv . "\">";
-	if ($set['web'] && is_file(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
-		include_once H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php';
+	if ($set['web'] && is_file('../../style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
+		include_once '../../style/themes/' . $set['set_them'] . '/altername_post_form.php';
 	} else {
 		echo "$tPanel<textarea name=\"msg\">$otvet</textarea><br />";
 	}
@@ -381,7 +381,7 @@ if (isset($user)) {
 	echo "</form>";
 }
 echo '<div class="foot">';
-echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ". user::nick($notes['id_user'], 1, 0, 0);
+echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ". user::nick($notes['id_user'], 1, 0, 0);
 echo ' | <b>' . output_text($notes['name']) . '</b>';
 echo "</div>";
 include_once '../../sys/inc/tfoot.php';
