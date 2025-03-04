@@ -25,12 +25,14 @@ if ($k_post > 0) {
 	while ($ank = dbassoc($q)) {
 		$ank = user::get_user($ank['id_user']);
 
-		echo '<td class="oline_user">';
+		if (isset($ank['id'])) {
+			echo '<td class="oline_user">';
 
-		echo "<a href='/user/info.php?id=$ank[id]'>" . user::avatar($ank['id']) . '<br />';
-		echo "<b><small>$ank[nick]</small></b></a>";
+			echo "<a href='/user/info.php?id=$ank[id]'>" . user::avatar($ank['id']) . '<br />';
+			echo "<b><small>$ank[nick]</small></b></a>";
 
-		echo '</td>';
+			echo '</td>';
+		}
 	}
 	echo '</tr>';
 	echo '</table>';

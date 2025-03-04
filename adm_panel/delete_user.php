@@ -39,90 +39,99 @@ if (isset($_POST['delete'])) {
 	$mass[0] = $ank['id'];
 	$collisions = user_collision($mass, 1);
 	dbquery("DELETE FROM `user` WHERE `id` = '$ank[id]' LIMIT 1");
-	dbquery("DELETE FROM `chat_post` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `gifts_user` WHERE `id_user` = '$ank[id]' OR `id_ank` = '$ank[id]'");
-	dbquery("DELETE FROM `frends` WHERE `user` = '$ank[id]' OR `frend` = '$ank[id]'");
-	dbquery("DELETE FROM `frends_new` WHERE `user` = '$ank[id]' OR `to` = '$ank[id]'");
-	dbquery("DELETE FROM `password_reset_tokens` WHERE `user_id` = '$ank[id]'");
-	dbquery("DELETE FROM `stena` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `stena_like` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `status_like` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `status` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `status_komm` WHERE `id_user` = '$ank[id]'");
-	$q5 = dbquery("SELECT * FROM `forum_t` WHERE `id_user` = '$ank[id]'");
-	while ($post5 = dbassoc($q5)) {
-		dbquery("DELETE FROM `forum_p` WHERE `id_them` = '$post5[id]'");
-	}
-	dbquery("DELETE FROM `forum_t` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `user_set` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `notification` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `notification_set` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `discussions` WHERE `id_user` = '$ank[id]' OR `id_user` = '$ank[id]' OR `ot_kogo` = '$ank[id]'");
-	dbquery("DELETE FROM `discussions_set` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `forum_p` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `forum_zakl` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `downnik_komm` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `news_komm` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `user_files` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `user_music` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `like_object` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `status` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `status_like` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `status_komm` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `status_count` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `mark_notes` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `mark_files` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `mark_people` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `mark_photo` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `tape_set` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `tape` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `tape` WHERE `avtor` = '$ank[id]'");
-	dbquery("DELETE FROM `tape` WHERE `id_file` = '$ank[id]' AND `type` = 'frend'");
-	dbquery("DELETE FROM `checkin_records` WHERE `user_id` = '$ank[id]'");
-	$opdirbase = @opendir(H . 'sys/add/delete_user_act');
-	while ($filebase = @readdir($opdirbase)) if (preg_match('#\.php$#i', $filebase)) include_once(check_replace(H . 'sys/add/delete_user_act/' . $filebase));
-	$q5 = dbquery("SELECT * FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
-	while ($post5 = dbassoc($q5)) {
-		unlink(H . 'files/down/' . $post5['id'] . '.dat');
-	}
-	dbquery("DELETE FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
-	dbquery("DELETE FROM `users_konts` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
-	dbquery("DELETE FROM `mail` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
-	dbquery("DELETE FROM `user_voice` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
-	dbquery("DELETE FROM `user_collision` WHERE `id_user` = '$ank[id]' OR `id_user2` = '$ank[id]'");
-	dbquery("DELETE FROM `votes_user` WHERE `u_id` = '$ank[id]'");
-	if (count($collisions) > 1 && isset($_GET['all'])) {
-		for ($i = 1; $i < count($collisions); $i++) {
-			dbquery("DELETE FROM `user` WHERE `id` = '$collisions[$i]' LIMIT 1");
-			dbquery("DELETE FROM `chat_post` WHERE `id_user` = '$collisions[$i]'");
-			dbquery("DELETE FROM `forum_t` WHERE `id_user` = '$collisions[$i]'");
-			$q5 = dbquery("SELECT * FROM `forum_t` WHERE `id_user` = '$collisions[$i]'");
-			while ($post5 = dbassoc($q5)) {
-				dbquery("DELETE FROM `forum_p` WHERE `id_them` = '$post5[id]'");
-			}
-			dbquery("DELETE FROM `forum_p` WHERE `id_user` = '$collisions[$i]'");
-			dbquery("DELETE FROM `forum_zakl` WHERE `id_user` = '$collisions[$i]'");
-			dbquery("DELETE FROM `downnik_komm` WHERE `id_user` = '$collisions[$i]'");
-			dbquery("DELETE FROM `news_komm` WHERE `id_user` = '$collisions[$i]'");
-			$q5 = dbquery("SELECT * FROM `downnik_files` WHERE `id_user` = '$collisions[$i]'");
-			while ($post5 = dbassoc($q5)) {
-				unlink(H . 'files/down/' . $post5['id'] . '.dat');
-			}
-			dbquery("DELETE FROM `downnik_files` WHERE `id_user` = '$collisions[$i]'");
-			dbquery("DELETE FROM `users_konts` WHERE `id_user` = '$collisions[$i]' OR `id_kont` = '$collisions[$i]'");
-			dbquery("DELETE FROM `mail` WHERE `id_user` = '$collisions[$i]' OR `id_kont` = '$collisions[$i]'");
-			dbquery("DELETE FROM `user_voice` WHERE `id_user` = '$collisions[$i]' OR `id_kont` = '$collisions[$i]'");
-			dbquery("DELETE FROM `user_collision` WHERE `id_user` = '$collisions[$i]' OR `id_user2` = '$collisions[$i]'");
-			dbquery("DELETE FROM `votes_user` WHERE `u_id` = '$collisions[$i]'");
+	dbquery("DELETE FROM `user_log` WHERE `id_user` = '$ank[id]'");
+	if (isset($_POST['delete_all_data']) && $_POST['delete_all_data'] == 'on') {
+		dbquery("DELETE FROM `chat_post` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `gifts_user` WHERE `id_user` = '$ank[id]' OR `id_ank` = '$ank[id]'");
+		dbquery("DELETE FROM `frends` WHERE `user` = '$ank[id]' OR `frend` = '$ank[id]'");
+		dbquery("DELETE FROM `frends_new` WHERE `user` = '$ank[id]' OR `to` = '$ank[id]'");
+		dbquery("DELETE FROM `password_reset_tokens` WHERE `user_id` = '$ank[id]'");
+		dbquery("DELETE FROM `stena` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `stena_like` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `status_like` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `status` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `status_komm` WHERE `id_user` = '$ank[id]'");
+		$q5 = dbquery("SELECT * FROM `forum_t` WHERE `id_user` = '$ank[id]'");
+		while ($post5 = dbassoc($q5)) {
+			dbquery("DELETE FROM `forum_p` WHERE `id_them` = '$post5[id]'");
 		}
-		admin_log('用户', '删除', "删除用户组 '$ank[nick]' (id#" . implode(',id#', $collisions) . ")");
-		msg('所有用户数据已被删除');
+		dbquery("DELETE FROM `forum_t` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `user_set` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `notification` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `notification_set` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `discussions` WHERE `id_user` = '$ank[id]' OR `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `discussions_set` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `forum_p` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `forum_zakl` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `downnik_komm` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `news_komm` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `user_files` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `user_music` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `like_object` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `status` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `status_like` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `status_komm` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `mark_notes` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `mark_files` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `mark_people` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `mark_photo` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `tape_set` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `tape` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `tape` WHERE `avtor` = '$ank[id]'");
+		dbquery("DELETE FROM `tape` WHERE `id_file` = '$ank[id]' AND `type` = 'frend'");
+		dbquery("DELETE FROM `checkin_records` WHERE `user_id` = '$ank[id]'");
+		$q5 = dbquery("SELECT * FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
+		while ($post5 = dbassoc($q5)) {
+			unlink(H . 'files/down/' . $post5['id'] . '.dat');
+		}
+		dbquery("DELETE FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
+		dbquery("DELETE FROM `users_konts` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
+		dbquery("DELETE FROM `mail` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
+		dbquery("DELETE FROM `user_voice2` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
+		dbquery("DELETE FROM `user_collision` WHERE `id_user` = '$ank[id]' OR `id_user2` = '$ank[id]'");
+		dbquery("DELETE FROM `votes_user` WHERE `id_user` = '$ank[id]'");
+		if (count($collisions) > 1 && isset($_GET['all'])) {
+			for ($i = 1; $i < count($collisions); $i++) {
+				dbquery("DELETE FROM `user` WHERE `id` = '$collisions[$i]' LIMIT 1");
+				dbquery("DELETE FROM `chat_post` WHERE `id_user` = '$collisions[$i]'");
+				dbquery("DELETE FROM `forum_t` WHERE `id_user` = '$collisions[$i]'");
+				$q5 = dbquery("SELECT * FROM `forum_t` WHERE `id_user` = '$collisions[$i]'");
+				while ($post5 = dbassoc($q5)) {
+					dbquery("DELETE FROM `forum_p` WHERE `id_them` = '$post5[id]'");
+				}
+				dbquery("DELETE FROM `forum_p` WHERE `id_user` = '$collisions[$i]'");
+				dbquery("DELETE FROM `forum_zakl` WHERE `id_user` = '$collisions[$i]'");
+				dbquery("DELETE FROM `downnik_komm` WHERE `id_user` = '$collisions[$i]'");
+				dbquery("DELETE FROM `news_komm` WHERE `id_user` = '$collisions[$i]'");
+				$q5 = dbquery("SELECT * FROM `downnik_files` WHERE `id_user` = '$collisions[$i]'");
+				while ($post5 = dbassoc($q5)) {
+					unlink(H . 'files/down/' . $post5['id'] . '.dat');
+				}
+				dbquery("DELETE FROM `downnik_files` WHERE `id_user` = '$collisions[$i]'");
+				dbquery("DELETE FROM `users_konts` WHERE `id_user` = '$collisions[$i]' OR `id_kont` = '$collisions[$i]'");
+				dbquery("DELETE FROM `mail` WHERE `id_user` = '$collisions[$i]' OR `id_kont` = '$collisions[$i]'");
+				dbquery("DELETE FROM `user_voice2` WHERE `id_user` = '$collisions[$i]' OR `id_kont` = '$collisions[$i]'");
+				dbquery("DELETE FROM `user_collision` WHERE `id_user` = '$collisions[$i]' OR `id_user2` = '$collisions[$i]'");
+				dbquery("DELETE FROM `votes_user` WHERE `id_user` = '$collisions[$i]'");
+			}
+			admin_log('用户', '删除', "删除用户组 '$ank[nick]' (id#" . implode(',id#', $collisions) . ")");
+			msg('所有用户数据已被删除');
+		} else {
+			admin_log('用户', '删除', "删除用户和数据 “{$ank['nick']}” (id#{$ank['id']})");
+			msg("所有用户数据 {$ank['nick']} 已删除");
+		}
 	} else {
-		admin_log('用户', '删除', "删除用户 '$ank[nick]' (id#$ank[id])");
-		msg("所有用户数据 $ank[nick] 已删除");
+		admin_log('用户', '删除', "删除用户 “{$ank['nick']}” (id#{$ank['id']})");
+		msg("用户 {$ank['nick']} 已删除");
 	}
-	$tab = dbquery("SHOW TABLES");
+	if (is_dir('../sys/add/delete_user_act')) {
+		$opdirbase = opendir('../sys/add/delete_user_act');
+		while ($filebase = readdir($opdirbase)) {
+			if (preg_match('#\.php$#i', $filebase)) include_once(check_replace('../sys/add/delete_user_act/' . $filebase));
+		}
+	}
 
+	$tab = dbquery("SHOW TABLES");
 	while ($name = mysqli_fetch_array($tab)) {
   	  //就是table 名字，接下去就用mysqi 的写法写下去就是了
 		dbquery("OPTIMIZE TABLE `" . $name[0] . "`");
@@ -131,7 +140,7 @@ if (isset($_POST['delete'])) {
 	// 	dbquery("OPTIMIZE TABLE `" . mysql_tablename($tab, $i) . "`");
 	// }
 	echo "<div class='foot'>";
-	echo "&laquo;<a href='/users.php'>用户</a><br />";
+	echo "&laquo;<a href='../user/users.php'>用户</a><br />";
 	echo "</div>";
 	include_once '../sys/inc/tfoot.php';
 }
@@ -248,11 +257,16 @@ if (count($collisions) > 1 && isset($_GET['all'])) {
 }
 echo "<span class=\"ank_n\">下载中心中的文件:</span> <span class=\"ank_d\">$downnik</span><br />";
 
-$opdirbase = opendir(H . 'sys/add/delete_user_info');
-while ($filebase = readdir($opdirbase)) if (preg_match('#\.php$#i', $filebase)) include_once(check_replace(H . 'sys/add/delete_user_info/' . $filebase));
+if (is_dir('../sys/add/delete_user_info')) {
+	$opdirbase = opendir('../sys/add/delete_user_info');
+	while ($filebase = readdir($opdirbase)) {
+		if (preg_match('#\.php$#i', $filebase)) include_once(check_replace('../sys/add/delete_user_info/' . $filebase));
+	}
+}
 
 echo "<form method=\"post\" action=\"\">";
 echo "<input value=\"删除\" type=\"submit\" name='delete' />";
+echo '<input type="checkbox" name="delete_all_data" />同时删除用户的所有内容<br />';
 echo "</form>";
 
 if (count($collisions) > 1 && isset($_GET['all'])) {
@@ -269,8 +283,8 @@ if (count($collisions) > 1 && isset($_GET['all'])) {
 
 echo "无法恢复已删除的数据<br />";
 echo "<div class='foot'>";
-echo "&laquo;<a href='/user/info.php?id={$ank['id']}'>返回资料</a><br />";
-echo "&laquo;<a href='/users.php'>用户</a><br />";
+echo "&laquo;<a href='../user/info.php?id={$ank['id']}'>返回资料</a><br />";
+echo "&laquo;<a href='../user/users.php'>用户</a><br />";
 echo "</div>";
 
 include_once '../sys/inc/tfoot.php';

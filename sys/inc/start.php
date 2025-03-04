@@ -52,14 +52,7 @@ if (preg_match('#([0-9]*)([a-z]*)#i', $upload_max_filesize, $varrs)) {
 	elseif ($varrs[2] == 'G') $upload_max_filesize = $varrs[1] * 1024 * 1048576;
 }
 
-function fiera($msg) {
-	$msg = str_replace("script", "sсript", $msg);
-	$msg = str_replace("javаscript:", "javаscript:", $msg);
-	if ($_SERVER['PHP_SELF'] != '/adm_panel/mysql.php')
-		$msg = addslashes(stripslashes(trim($msg)));
-	return $msg;
-}
-// Полночь
+// 午夜时间
 $ftime = mktime(0, 0, 0);
 
 // 引入第三方库

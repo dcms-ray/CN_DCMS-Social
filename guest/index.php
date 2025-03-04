@@ -136,7 +136,7 @@ while ($post = dbassoc($q)) {
 	}
 	echo '(' . vremja($post['time']) . ')';
 	echo '<br />' . output_text($post['msg']) . '<br />';
-	if (isset($user) && (((empty($ank['id']) || $user['level'] > $ank['level']) && $user['level'] != 0) || $user['id'] == $ank['id'] || user_access('guest_delete'))) {
+	if (isset($user) && (((empty($ank['id']) || $user['level'] > $ank['level']) && $user['level'] != 0) || $user['id'] == $post['id_user'] || user_access('guest_delete'))) {
 		echo '<div class="right">';
 		echo '<a href="delete.php?id=' . $post['id'] . '"><img src="/style/icons/delete.gif" alt="*"></a>';
 		echo '</div>';

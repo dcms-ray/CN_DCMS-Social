@@ -92,6 +92,27 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 		} else {
 			// 未开启邮箱验证，直接注册
 			dbquery("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `group_access`, `pol`) values('" . $_SESSION['reg_nick'] . "', '" . password_hash($_POST['pass1'], PASSWORD_DEFAULT) . "', '$time', '1', '" . intval($_POST['pol']) . "')", $db);
+
+			// 登录
+			$user['id'] = dbinsertid();
+			$_SESSION['id_user'] = $user['id'];
+			if (isset($_POST['aut_save']) && $_POST['aut_save']) {
+				$expiration = time() + 60 * 60 * 24 * 365;
+			} else {
+				$expiration = time() + 60 * 60 * 2;
+			}
+			dbquery("INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) values('{$user['id']}', '" . date('Y-m-d H:i:s') . "', '" . date('Y-m-d H:i:s', $expiration) . "', '" . date('Y-m-d H:i:s') . "', '{$ua}' , '{$ip}', '1')");
+			$log_id = dbinsertid();
+			$_SESSION['login_id'] = $log_id;
+			// 在COOKIE中保存数据
+			$payload = array(
+				"iat" => time(),
+				"exp" => $expiration,
+				"jwt_id" => $log_id,
+				"user_id" => $user['id'],
+				"username" => $_SESSION['reg_nick']
+			);
+			setcookie('auth_token', \Firebase\JWT\JWT::encode($payload, $set['shif'], 'HS256'), $expiration, '/');
 		}
 		// 获取用户信息
 		$user = dbassoc(dbquery("SELECT * FROM `user` WHERE `nick` = '" . my_esc($_SESSION['reg_nick']) . "' LIMIT 1"));

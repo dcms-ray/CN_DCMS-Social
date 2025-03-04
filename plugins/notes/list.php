@@ -165,21 +165,21 @@ if (isset($user) && isset($avtor['id'])) $frend = dbresult(dbquery("SELECT COUNT
 title();
 aut(); // 授权表格
 err();
-if ($notes['private'] == 1 && $user['id'] != $avtor['id'] && $frend != 2  && !user_access('notes_delete')) {
+if ($notes['private'] == 1 && $user['id'] != $notes['id_user'] && $frend != 2  && !user_access('notes_delete')) {
 	msg('日记只提供给朋友');
 	echo "  <div class='foot'>";
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
 }
-if ($notes['private'] == 2 && $user['id'] != $avtor['id']  && !user_access('notes_delete')) {
+if ($notes['private'] == 2 && $user['id'] != $notes['id_user']  && !user_access('notes_delete')) {
 	msg('用户已禁止查看日记');
 	echo "  <div class='foot'>";
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
 }
-if (isset($_GET['delete']) && ($user['id'] == $avtor['id'] || user_access('notes_delete'))) {
+if (isset($_GET['delete']) && ($user['id'] == $notes['id_user'] || user_access('notes_delete'))) {
 	echo "<center>";
 	echo "你真的想删除日记吗 " . output_text($notes['name']) . "?<br />";
 	echo "[<a href='delete.php?id=$notes[id]'><img src='/style/icons/ok.gif'> 删除</a>] [<a href='list.php?id=$notes[id]'><img src='/style/icons/delete.gif'> 取消</a>] ";
@@ -267,7 +267,7 @@ if (isset($user)) {
 		echo "<img src='/style/icons/action_share_color.gif'> 分享:  (" . $share . ")";
 	}
 }
-if (isset($user) && (user_access('notes_delete') || $user['id'] == $avtor['id'])) {
+if (isset($user) && (user_access('notes_delete') || $user['id'] == $notes['id_user'])) {
 	echo "<br/><a href='edit.php?id=$notes[id]'><img src='/style/icons/edit.gif'> 修改</a> <a href='?id=$notes[id]&amp;delete'><img src='/style/icons/delete.gif'> 删除</a>";
 }
 echo "</div><div class='main'>";
@@ -308,7 +308,7 @@ if ($k_post == 0) {
 	echo '<div class="mess">';
 	echo "没有评论";
 	echo '</div>';
-} else if (isset($user)) {
+} else {
 	/*------------按时间排列--------------*/
 	if (isset($user)) {
 		echo "<div id='comments' class='menus'>";
@@ -381,7 +381,7 @@ if (isset($user)) {
 	echo "</form>";
 }
 echo '<div class="foot">';
-echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ". user::nick($avtor['id'], 1, 0, 0);
+echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ". user::nick($notes['id_user'], 1, 0, 0);
 echo ' | <b>' . output_text($notes['name']) . '</b>';
 echo "</div>";
 include_once '../../sys/inc/tfoot.php';

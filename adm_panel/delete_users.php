@@ -52,17 +52,22 @@ if (isset($_POST['write']) && isset($_POST['write2'])) {
 		dbquery("DELETE FROM `user_files` WHERE `id_user` = '$ank[id]'");
 		dbquery("DELETE FROM `user_music` WHERE `id_user` = '$ank[id]'");
 		dbquery("DELETE FROM `like_object` WHERE `id_user` = '$ank[id]'");
-		$opdirbase = @opendir(H . 'sys/add/delete_user_act');
-		while ($filebase = @readdir($opdirbase)) if (preg_match('#\.php$#', $filebase)) include_once(H . 'sys/add/delete_user_act/' . $filebase);
+		if (is_dir('../sys/add/delete_user_act')) {
+			$opdirbase = opendir('../sys/add/delete_user_act');
+			while ($filebase = readdir($opdirbase)) {
+				if (preg_match('#\.php$#', $filebase)) include_once('../sys/add/delete_user_act/' . $filebase);
+			}
+		}
 		$q5 = dbquery("SELECT * FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
 		while ($post5 = dbassoc($q5)) {
-			unlink(H . 'files/down/' . $post5['id'] . '.dat');
+			unlink('../files/down/' . $post5['id'] . '.dat');
 		}
 		dbquery("DELETE FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
 		dbquery("DELETE FROM `users_konts` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
 		dbquery("DELETE FROM `mail` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
 		dbquery("DELETE FROM `user_voice` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
 		dbquery("DELETE FROM `user_collision` WHERE `id_user` = '$ank[id]' OR `id_user2` = '$ank[id]'");
+		dbquery("DELETE FROM `user_log` WHERE `id_user` = '$ank[id]'");
 		dbquery("DELETE FROM `votes_user` WHERE `u_id` = '$ank[id]'");
 		$del_th++;
 	}
@@ -81,6 +86,7 @@ echo "<option value=\"mes\">个月</option>";
 echo "<option value=\"sut\">天数</option>";
 echo "</select><br />";
 echo "<input value=\"删除\" type=\"submit\" /><br />";
+echo '<input type="checkbox" name="delete_all_data" />同时删除用户的所有内容<br />';
 echo "<a href=\"?\">取消</a><br />";
 echo "</form>";
 

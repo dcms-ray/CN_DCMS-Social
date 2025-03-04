@@ -55,6 +55,7 @@ echo '</table>';
 
 // 输出页数
 if ($k_page>1) str('index.php?',$k_page,$page); 
+
 if (user_access('adm_news')) {	
 	echo '<div class="foot">';
 	echo '<img src="/style/icons/ok.gif" alt="*" />  <a href="add.php">创建新闻项目</a><br />';	

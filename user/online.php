@@ -82,64 +82,64 @@ if ($k_post == 0) {
 
 	while ($ank_log = dbassoc($q)) {
 		$ank = user::get_user($ank_log['id_user']);
-		if ($ank['ank_d_r'] != NULL && $ank['ank_m_r'] != NULL && $ank['ank_g_r'] != NULL) {
-			$ank['ank_age'] = date("Y") - $ank['ank_g_r'];
-			if (date("n") < $ank['ank_m_r'])
-				$ank['ank_age'] = $ank['ank_age'] - 1;
-			elseif (date("n") == $ank['ank_m_r'] && date("j") < $ank['ank_d_r'])
-				$ank['ank_age'] = $ank['ank_age'] - 1;
-		} else {
-			$ank['ank_age'] = null;
-		}
 		echo '<div class="' . ($num % 2 ? "nav1" : "nav2") . '">';
 		$num++;
-		echo user::nick($ank['id'], 1, 1, 0) .' <br />';//输出用户名
-		// 高级模式
-		if (isset($user) && isset($_SESSION['admin'])) {
-			// Возможные ники
-			$mass[0] = $ank['id'];
-			$collisions = user_collision($mass);
-			if (count($collisions) > 1) {
-				echo '<span class="ank_n">可能的昵称</span> ';
-				echo '<span class="ank_d">';
-				for ($i = 1; $i < count($collisions); $i++) {
-					echo ' :: ' . user::nick($collisions[$i], 1, 1, 0);//输出用户名
-				}
-				echo '</span><br />';
+		echo user::nick($ank_log['id_user'], 1, 1, 0) .' <br />';//输出用户名
+		if (isset($ank['id'])) {
+			if ($ank['ank_d_r'] != NULL && $ank['ank_m_r'] != NULL && $ank['ank_g_r'] != NULL) {
+				$ank['ank_age'] = date("Y") - $ank['ank_g_r'];
+				if (date("n") < $ank['ank_m_r'])
+					$ank['ank_age'] = $ank['ank_age'] - 1;
+				elseif (date("n") == $ank['ank_m_r'] && date("j") < $ank['ank_d_r'])
+					$ank['ank_age'] = $ank['ank_age'] - 1;
+			} else {
+				$ank['ank_age'] = null;
 			}
-			// 用户 IP
-			if ($ank['ip'] != NULL) {
-				if (user_access('user_show_ip') && $ank['ip'] != 0) {
-					echo '<span class="ank_n">IP:</span> <span class="ank_d">' . $ank['ip'] . '</span>';
-					if (user_access('adm_ban_ip')) echo ' [<a href="/adm_panel/ban_ip.php?min=' . $ank['ip'] . '">禁令</a>]';
-					echo '<br />';
+			// 高级模式
+			if (isset($user) && isset($_SESSION['admin'])) {
+				$mass[0] = $ank_log['id_user'];
+				$collisions = user_collision($mass);
+				if (count($collisions) > 1) {
+					echo '<span class="ank_n">可能的昵称</span> ';
+					echo '<span class="ank_d">';
+					for ($i = 1; $i < count($collisions); $i++) {
+						echo ' :: ' . user::nick($collisions[$i], 1, 1, 0);//输出用户名
+					}
+					echo '</span><br />';
 				}
-			}
-			// 浏览器 UA
-			if (user_access('user_show_ua') && $ank['ua'] != NULL)
-				echo '<span class="ank_n">浏览器:</span> <span class="ank_d">' . $ank['ua'] . '</span><br />';
-			if (user_access('user_show_ip') && opsos($ank['ip']))
-				echo '<span class="ank_n">IP:</span> <span class="ank_d">' . opsos($ank['ip']) . '</span><br />';
-			if ($user['level'] > $ank['level'] && $user['id'] != $ank['id']) {
-				if (user_access('user_prof_edit'))
-					echo '[<a href="/adm_panel/user.php?id=' . $ank['id'] . '"><img src="/style/icons/edit.gif" alt="*" /> 编辑</a>] ';
-				if ($user['id'] != $ank['id']) {
-					if (user_access('user_ban_set') || user_access('user_ban_set_h') || user_access('user_ban_unset'))
-						echo '[<a href="/adm_panel/ban.php?id=' . $ank['id'] . '"><img src="/style/icons/blicon.gif" alt="*" /> 举报</a>] ';
-					if (user_access('user_delete')) {
-						echo '[<a href="/adm_panel/delete_user.php?id=' . $ank['id'] . '"><img src="/style/icons/delete.gif" alt="*" /> 删除</a>] ';
+				// 用户 IP
+				if ($ank['ip'] != NULL) {
+					if (user_access('user_show_ip') && $ank['ip'] != 0) {
+						echo '<span class="ank_n">IP:</span> <span class="ank_d">' . $ank['ip'] . '</span>';
+						if (user_access('adm_ban_ip')) echo ' [<a href="/adm_panel/ban_ip.php?min=' . $ank['ip'] . '">禁令</a>]';
 						echo '<br />';
 					}
 				}
+				// 浏览器 UA
+				if (user_access('user_show_ua') && $ank['ua'] != NULL)
+					echo '<span class="ank_n">浏览器:</span> <span class="ank_d">' . $ank['ua'] . '</span><br />';
+				if (user_access('user_show_ip') && opsos($ank['ip']))
+					echo '<span class="ank_n">IP:</span> <span class="ank_d">' . opsos($ank['ip']) . '</span><br />';
+				if ($user['level'] > $ank['level'] && $user['id'] != $ank['id']) {
+					if (user_access('user_prof_edit'))
+						echo '[<a href="/adm_panel/user.php?id=' . $ank['id'] . '"><img src="/style/icons/edit.gif" alt="*" /> 编辑</a>] ';
+					if ($user['id'] != $ank['id']) {
+						if (user_access('user_ban_set') || user_access('user_ban_set_h') || user_access('user_ban_unset'))
+							echo '[<a href="/adm_panel/ban.php?id=' . $ank['id'] . '"><img src="/style/icons/blicon.gif" alt="*" /> 举报</a>] ';
+						if (user_access('user_delete')) {
+							echo '[<a href="/adm_panel/delete_user.php?id=' . $ank['id'] . '"><img src="/style/icons/delete.gif" alt="*" /> 删除</a>] ';
+							echo '<br />';
+						}
+					}
+				}
+			} else {
+				echo '<b>(' . (($ank['pol'] == 1) ? '男' : '女') . (($ank['ank_age'] == null) ? '/未指定' : '/' . $ank['ank_age']) . ')</b>';
+				if ($ank['ank_city'] != NULL) echo ', ' . text($ank['ank_city']);
+				if ($ank['ank_o_sebe'] != NULL) echo ', ' . text($ank['ank_o_sebe']);
+				echo ', ';
 			}
-		} else {
-			echo '<b>(' . (($ank['pol'] == 1) ? '男' : '女') . (($ank['ank_age'] == null) ? '/未指定' : '/' . $ank['ank_age']) . ')</b>';
-			if ($ank['ank_city'] != NULL)
-				echo ', ' . text($ank['ank_city']);
-			if ($ank['ank_o_sebe'] != NULL)
-				echo ', ' . text($ank['ank_o_sebe']);
-			echo ', <img src="/style/icons/time.png" alt="away" /> [' . vremja($ank['date_last']) . ']';
 		}
+		echo '<img src="/style/icons/time.png" alt="away" /> [' . vremja($ank['date_last']) . ']';
 		echo '</div>';
 	}
 }

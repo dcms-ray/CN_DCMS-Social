@@ -339,19 +339,43 @@ function admin_log($mod, $act, $opis) {
 	dbquery("INSERT INTO `admin_log` (`time`, `id_user`, `mod`, `act`, `opis`) VALUES ('" . time() . "','$user[id]', '$id_mod', '$id_act', '" . my_esc($opis) . "')");
 }
 
+/**
+ * 对输入字符串进行安全处理，防止潜在的脚本注入和SQL注入。
+ *
+ * 这个函数主要用于清理和转义用户输入的字符串。它会将 "script" 替换为带有西里尔字母的 "sсript"，
+ * 以防止 XSS 攻击（跨站脚本攻击），并在特定条件下对字符串进行去空格和转义处理，以准备用于数据库操作。
+ * 注意：如果当前脚本是 '/adm_panel/mysql.php'，则不会进行转义处理。
+ *
+ * @param string $msg 需要处理的输入字符串，通常来自用户输入。
+ * @return string 返回处理后的字符串，已替换特殊字符并根据条件进行转义。
+ */
+function fiera($msg) {
+	$msg = str_replace("script", "sсript", $msg);
+	$msg = str_replace("javascript:", "javаscript:", $msg);
+	if ($_SERVER['PHP_SELF'] != '/adm_panel/mysql.php')
+		$msg = addslashes(stripslashes(trim($msg)));
+	return $msg;
+}
+
 
 // 从文件夹"sys/fnc"加载其余功能 
 $opdirbase = opendir(H . 'sys/fnc');
-
 while ($filebase = readdir($opdirbase)) {
 	if (preg_match('#\.php$#i', $filebase)) {
 		include_once(H . 'sys/fnc/' . $filebase);
 	}
 }
 
+
 // 参观记录
 dbquery("INSERT INTO `visit_today` (`ip`, `ua`, `ua_hash`, `time`) VALUES ('$ip', '" . my_esc(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '" . md5(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '$time')");
 
+// 确保所有通过 GET 方法传入的数据都被清理和转义
+if(isset($_GET)) {
+	foreach($_GET as $key => $value) {
+		$_GET[$key] = fiera($value);
+	}
+}
 
 function ages($age) {
 	$str = '';
