@@ -31,14 +31,16 @@ function decrypt_captcha_token($captcha_token) {
 
 	// 使用 openssl 解密
 	$decrypted_captcha_token = openssl_decrypt(base64_decode($token_parts[0]), 'aes-256-cbc', setget()['shif'], 0, base64_decode($token_parts[1]));
-
+	if ($decrypted_captcha_token == false) {
+		throw new Exception('captcha_token 解密失败');
+	}
 	$decrypted_captcha_token_parts = explode('.', $decrypted_captcha_token);
 	if (count($decrypted_captcha_token_parts) !== 2) {
 		throw new Exception('captcha_token 参数格式不正确');
 	}
 
 	if ($decrypted_captcha_token_parts[1] < time()) {
-		throw new Exception('captcha_token 已过期');
+		throw new Exception('captcha_token 已过期：' . $decrypted_captcha_token_parts[1]);
 	}
 
 	// 检查解码后的验证码是否是5位纯数字
@@ -178,13 +180,14 @@ class captcha
 }
 
 
-try {
-	if (isset($_GET['captcha_token'])) {
+
+if (isset($_GET['captcha_token'])) {
+	try {
 		$captcha_code = decrypt_captcha_token($_GET['captcha_token']);
-	} else {
-		throw new Exception('无 captcha_token 参数');
+	} catch(Exception $e) {
+		echo $e->getMessage();
 	}
-} catch(Exception $e) {
+} else {
 	session_name('SESS');
 	session_start();
 	// 随机生成5位数字

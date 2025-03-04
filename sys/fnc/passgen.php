@@ -58,4 +58,4 @@ function passgen($k_simb = 8, $types = 3) {
 }
 
 // 生成一个默认的随机密码
-$passgen = @passgen();
+$passgen = passgen();

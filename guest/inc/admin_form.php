@@ -1,8 +1,6 @@
-<?
-if (user_access('guest_clear'))
-{
-	if (isset($_GET['act']) && $_GET['act'] == 'create')
-	{
+<?php
+if (user_access('guest_clear')) {
+	if (isset($_GET['act']) && $_GET['act'] == 'create') {
 		?>
 		<form method="post" class="nav2" action="?">
 		将删除撰写的帖子...返回<br />
@@ -18,8 +16,7 @@ if (user_access('guest_clear'))
 	}
 	?>
 	<div class="foot">
-	<img src='/style/icons/str.gif' alt='*'> <a href="?act=create">清除留言</a><br />
+	<img src='../style/icons/str.gif' alt='*'> <a href="?act=create">清除留言</a><br />
 	</div>
 	<?
 }
-?>

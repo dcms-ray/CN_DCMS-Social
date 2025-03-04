@@ -88,7 +88,7 @@
 
 ## 全局变量 `set`
 
-- **来源**：`sys\inc\settings.php`
+- **来源**：`sys/inc/settings.php`
 - **作用**：获取配置文件 `sys/dat/settings.php` 的配置内容。
 - **用法**：
 
@@ -101,20 +101,8 @@
 
 ## 变量 `ip`
 
-- **来源**：`sys\inc\ipua.php`
+- **来源**：`sys/inc/ipua.php`
 - **作用**：获取用户 IP 地址
-
----
-
-## 文件 `sys\dat\cloudflare-ips-v4.txt`
-
-- **内容**：Cloudflare IPv4 列表
-
----
-
-## 文件 `sys\dat\cloudflare-ips-v6.txt`
-
-- **内容**：Cloudflare IPv6 列表
 
 ---
 
@@ -129,6 +117,8 @@
   echo "Latest Stable Version: " . $result['version'] . PHP_EOL;
   echo "ZIP Download URL: " . $result['zip_url'] . PHP_EOL;
   ```
+
+---
 
 ## 获取在线用户的SQL语句
 
@@ -147,6 +137,8 @@ WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE
 ORDER BY ul.last_online DESC;
 ```
 
+---
+
 ## 获取在线用户数量的SQL语句
 
 ```sql
@@ -163,6 +155,8 @@ WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE
   )
 ```
 
+---
+
 ## 获取某个用户的最后在线时间的SQL语句
 
 ```sql
@@ -173,6 +167,8 @@ WHERE ul.id_user = ?  -- 这里 ? 需要替换为查询的用户 ID
 ORDER BY ul.last_online DESC
 LIMIT 1;
 ```
+
+---
 
 ## 查询某个用户是否在线
 
@@ -185,3 +181,10 @@ WHERE ul.id_user = ?  -- 这里 ? 需要替换为查询的用户 ID
 ORDER BY ul.last_online DESC
 LIMIT 1;
 ```
+
+---
+
+## 环境变量 `H`
+
+- **来源**：`sys/inc/home.php`
+- **作用**：获取DCMS PHP程序根目录

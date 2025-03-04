@@ -1,4 +1,4 @@
-<?
+<?php
 include_once '../../sys/inc/start.php';
 include_once '../../sys/inc/compress.php';
 include_once '../../sys/inc/sess.php';
@@ -8,13 +8,15 @@ include_once '../../sys/inc/db_connect.php';
 include_once '../../sys/inc/ipua.php';
 include_once '../../sys/inc/fnc.php';
 include_once '../../sys/inc/user.php';
+
 only_reg();
 $set['title'] = '设置通知';
 include_once '../../sys/inc/thead.php';
 title();
+
 $notSet = dbarray(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $user['id'] . "' LIMIT 1"));
 if (isset($_POST['save'])) {
-    // Комментарии
+    // 评论
     if (isset($_POST['komm']) && ($_POST['komm'] == 0 || $_POST['komm'] == 1)) {
         dbquery("UPDATE `notification_set` SET `komm` = '" . intval($_POST['komm']) . "' WHERE `id_user` = '$user[id]'");
     }
@@ -22,26 +24,27 @@ if (isset($_POST['save'])) {
     header('Location: settings.php');
     exit;
 }
+
 err();
 aut();
 echo "<div id='comments' class='menus'>";
 echo "<div class='webmenu'>";
-echo "<a href='/user/info/settings.php'>通用</a>";
+echo "<a href='../info/settings.php'>通用</a>";
 echo "</div>";
 echo "<div class='webmenu last'>";
-echo "<a href='/user/tape/settings.php'>通知消息</a>";
+echo "<a href='../tape/settings.php'>通知消息</a>";
 echo "</div>";
 echo "<div class='webmenu last'>";
-echo "<a href='/user/discussions/settings.php'>讨论</a>";
+echo "<a href='../discussions/settings.php'>讨论</a>";
 echo "</div>";
 echo "<div class='webmenu last'>";
-echo "<a href='/user/notification/settings.php' class='activ'>@提到我的</a>";
+echo "<a href='../notification/settings.php' class='activ'>@提到我的</a>";
 echo "</div>";
 echo "<div class='webmenu last'>";
-echo "<a href='/user/info/settings.privacy.php' >隐私保护</a>";
+echo "<a href='../info/settings.privacy.php' >隐私保护</a>";
 echo "</div>";
 echo "<div class='webmenu last'>";
-echo "<a href='/user/info/secure.php' >更改密码</a>";
+echo "<a href='../info/secure.php' >更改密码</a>";
 echo "</div>";
 echo "</div>";
 echo "<form action='?' method=\"post\">";
@@ -58,6 +61,6 @@ echo "<input type='submit' name='save' value='保存' />";
 echo "</div>";
 echo "</form>";
 echo "<div class='foot'>";
-echo "<img src='/style/icons/str2.gif' alt='*' /> <a href='index.php'>通知书</a> | <b>设置</b><br />";
+echo "<img src='../../style/icons/str2.gif' alt='*' /> <a href='index.php'>通知书</a> | <b>设置</b><br />";
 echo "</div>";
 include_once '../../sys/inc/tfoot.php';
