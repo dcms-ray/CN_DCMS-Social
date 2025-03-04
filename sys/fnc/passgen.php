@@ -27,33 +27,27 @@
  * $generatedPassword = passgen(12, 3); // 返回一个包含小写字母、大写字母和数字的 12 位密码
  */
 function passgen($k_simb = 8, $types = 3) {
-	$password = null;	
-	$small = 'abcdefghijklmnopqrstuvwxyz';	// 小写字母集合
-	$large = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';	// 大写字母集合
-	$numbers = '1234567890';	// 数字集合
-	
-	// 初始化随机数生成器
-	mt_srand((double)microtime() * 1000000);	 
-	
+	$password = null;
+	$small = 'abcdefghijklmnopqrstuvwxyz';	// 小写字母
+	$large = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';	// 大写字母
+	$numbers = '1234567890';				// 数字
+
 	// 生成密码
-	for ($i = 0; $i < $k_simb; $i++) {		
+	for ($i = 0; $i < $k_simb; $i++) {
 		$type = mt_rand(1, min($types, 3));	// 随机选择字符类型
 		
-		// 根据选定的字符类型生成密码字符
-		switch ($type) {		
-			case 3: // 大写字母
-				$password .= $large[mt_rand(0, 25)];			
-				break;			
-			case 2: // 小写字母
-				$password .= $small[mt_rand(0, 25)];			
-				break;			
-			case 1: // 数字
-				$password .= $numbers[mt_rand(0, 9)];			
-				break;		
-		}	
-	}	
-	
-	// 返回生成的密码
+		switch ($type) {
+			case 3:							// 大写字母
+				$password .= $large[mt_rand(0, 25)];            
+				break;
+			case 2:							// 小写字母
+				$password .= $small[mt_rand(0, 25)];            
+				break;
+			case 1:							// 数字
+				$password .= $numbers[mt_rand(0, 9)];
+				break;
+		}
+	}
 	return $password;
 }
 
