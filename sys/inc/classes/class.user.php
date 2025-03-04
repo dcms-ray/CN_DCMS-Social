@@ -41,8 +41,10 @@ class user
 			$ank = dbassoc(dbquery('SELECT `id`, `group_access`, `pol`, `nick`, `rating` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
 			if (isset($ank['id'])) {
 				$ank_login_lsat = dbassoc(dbquery("SELECT ul.last_online, ul.browser FROM `user_log` ul WHERE ul.id_user = $user AND ul.ban = '0' ORDER BY ul.last_online DESC LIMIT 1"));
-				$ank['browser'] = $ank_login_lsat['browser'];
-				if (!empty($ank_login_lsat)) $ank['date_last'] = strtotime($ank_login_lsat['last_online']);
+				if (isset($ank_login_lsat['last_online'])) {
+					$ank['date_last'] = strtotime($ank_login_lsat['last_online']);
+					$ank['browser'] = $ank_login_lsat['browser'];
+				}
 			}
 			$nicks[$user] = $ank;
 		} else {
