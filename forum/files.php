@@ -16,7 +16,7 @@ if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `forum_files` W
 	$file = dbassoc(dbquery("SELECT * FROM `forum_files` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1"));
 
     // 如果文件存在，并且用户有足够权限，且请求删除
-	if (is_file(H.'sys/forum/files/' . $file['id'] . '.frf') && isset($user) && $user['level'] >= 1 && isset($_GET['del'])) {
+	if (is_file(H.'files/forum/' . $file['id'] . '.frf') && isset($user) && $user['level'] >= 1 && isset($_GET['del'])) {
         // 获取返回的链接，如果没有，使用首页链接
 		if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != NULL) {
 			$link = $_SERVER['HTTP_REFERER'];
@@ -27,7 +27,7 @@ if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `forum_files` W
         // 从数据库中删除文件记录
 		dbquery("DELETE FROM `forum_files` WHERE `id` = '$file[id]' LIMIT 1");
         // 删除实际的文件
-		unlink(H . 'sys/forum/files/' . $file['id'] . '.frf');
+		unlink(H . 'files/forum/' . $file['id'] . '.frf');
 
         // 如果有返回地址，跳转回原页面，否则跳转到论坛首页
 		if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != NULL) {
@@ -36,11 +36,11 @@ if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `forum_files` W
 			header("Location: /forum/index.php?" . session_id());
 		}
 
-	} elseif (is_file(H . 'sys/forum/files/' . $file['id'] . '.frf')) {
+	} elseif (is_file(H . 'files/forum/' . $file['id'] . '.frf')) {
         // 如果文件存在且没有删除请求，更新下载次数并触发文件下载
 		dbquery("UPDATE `forum_files` SET `count` = '" . ($file['count'] + 1) . "' WHERE `id` = '$file[id]' LIMIT 1");
         // 执行文件下载操作
-		DownloadFile(H . 'sys/forum/files/' . $file['id'] . '.frf', $file['name'] . '.' . $file['ras'], ras_to_mime($file['ras']));
+		DownloadFile(H . 'files/forum/' . $file['id'] . '.frf', $file['name'] . '.' . $file['ras'], ras_to_mime($file['ras']));
 	} else {
 		http_response_code(404);
 		die('服务器错误：找不到文件');

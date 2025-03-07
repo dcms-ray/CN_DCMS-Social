@@ -26,15 +26,41 @@ if (isset($_GET['act']) && $_GET['act'] == 'avatar') {
 }
 
 /*
-* 删除照片
-*/
-if ((user_access('photo_photo_edit') || isset($user) && $user['id'] == $ank['id']) && isset($_GET['act']) && $_GET['act'] == 'delete' && isset($_GET['ok'])) {
-	if ($user['id'] != $ank['id']) admin_log('图片集锦', '照片', "删除用户的照片 '[url=/user/info.php?id=$ank[id]]" . user::nick($ank['id'], 1, 0, 0) . "[/url]'");
-	@unlink(H . "sys/gallery/48/$photo[id].jpg");
-	@unlink(H . "sys/gallery/128/$photo[id].jpg");
-	@unlink(H . "sys/gallery/640/$photo[id].jpg");
-	@unlink(H . "sys/gallery/photo/$photo[id].jpg");
+ * 删除照片
+ */
+if (
+	(user_access('photo_photo_edit') || (isset($user) && $user['id'] == $ank['id'])) &&
+	isset($_GET['act']) && $_GET['act'] == 'delete' &&
+	isset($_GET['ok'])
+) {
+	// 记录管理员日志
+	if ($user['id'] != $ank['id']) {
+		admin_log(
+			'图片集锦',
+			'照片',
+			"删除用户的照片 '[url=/user/info.php?id=$ank[id]]" . user::nick($ank['id'], 1, 0, 0) . "[/url]'"
+		);
+	}
+
+	// 定义照片文件路径
+	$photoPaths = [
+		H . "files/gallery/48/$photo[id].jpg",
+		H . "files/gallery/128/$photo[id].jpg",
+		H . "files/gallery/640/$photo[id].jpg",
+		H . "files/gallery/photo/$photo[id].jpg",
+	];
+
+	// 删除文件
+	foreach ($photoPaths as $path) {
+		if (file_exists($path) && is_writable($path)) {
+			unlink($path);
+		}
+	}
+
+	// 从数据库中删除记录
 	dbquery("DELETE FROM `gallery_photo` WHERE `id` = '$photo[id]' LIMIT 1");
+
+	// 设置成功消息并跳转
 	$_SESSION['message'] = '照片已成功删除';
 	header("Location: /photo/$ank[id]/$gallery[id]/");
 	exit;

@@ -38,11 +38,13 @@ class user
 		*/
 		static $nicks = [];
 		if (empty($nicks[$user])) {
-			$ank = dbassoc(dbquery('SELECT `group_access`, `pol`, `nick`, `rating` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
+			$ank = dbassoc(dbquery('SELECT `id`, `group_access`, `pol`, `nick`, `rating` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
 			if (isset($ank['id'])) {
-				$ank_login_lsat = dbassoc(dbquery("SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = $user AND ul.ban = '0' ORDER BY ul.last_online DESC LIMIT 1"));
-				$ank['browser'] = $ank_date_lsat['browser'];
-				if (!empty($ank_date_lsat)) $ank['date_last'] = strtotime($ank_date_lsat['last_online']);
+				$ank_login_lsat = dbassoc(dbquery("SELECT ul.last_online, ul.browser FROM `user_log` ul WHERE ul.id_user = $user AND ul.ban = '0' ORDER BY ul.last_online DESC LIMIT 1"));
+				if (isset($ank_login_lsat['last_online'])) {
+					$ank['date_last'] = strtotime($ank_login_lsat['last_online']);
+					$ank['browser'] = $ank_login_lsat['browser'];
+				}
 			}
 			$nicks[$user] = $ank;
 		} else {
@@ -65,7 +67,7 @@ class user
 		}
 
 		// 用户组图标
-		if ($on == true) {
+		if ($on == 1) {
 			$is_ban = dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `id_user` = '$user' AND (`time` > 'time()' OR `navsegda` = '1')"), 0);
 			if ($is_ban != 0) {
 				$icon = ' <img src="/style/user/ban.png" alt="*" class="icon" id="icon_group" /> ';
@@ -93,7 +95,7 @@ class user
 		}
 
 		// 在线图标输出
-		if ($user != 0 && !empty($ank['date_last']) && $ank['date_last'] > time() - 600 && $on == true) {
+		if ($user != 0 && !empty($ank['date_last']) && $ank['date_last'] > time() - 600 && $on == 1) {
 			if ($ank['browser'] == 'wap') {
 				$online = ' <img src="/style/icons/online.gif" alt="WAP" /> ';
 			} else {
@@ -148,7 +150,7 @@ class user
 			} else {
 				$avatar = $avatars[$user];
 			}
-			if (isset($avatar['id']) && test_file(H . 'sys/gallery/50/' . $avatar['id'] . '.jpg')) {
+			if (isset($avatar['id']) && test_file(H . 'files/gallery/50/' . $avatar['id'] . '.jpg')) {
 				$AVATAR = ' <img class="avatar" src="/photo/photo50/' . $avatar['id'] . '.jpg" alt="Avatar" /> ';
 			} else {
 				$AVATAR = '<img class="avatar" src="/style/user/avatar.gif" height= "50" width="50" alt="No Avatar" />';

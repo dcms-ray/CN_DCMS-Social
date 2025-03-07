@@ -80,7 +80,7 @@ if (isset($_GET['fav']) && $_GET['fav'] == 0) {
 }
 
 // 获取照片尺寸并赋值给变量。
-$IS = GetImageSize(H . 'sys/gallery/photo/' . $photo['id'] . '.' . $photo['ras']);
+$IS = GetImageSize(H . 'files/gallery/photo/' . $photo['id'] . '.' . $photo['ras']);
 printf("", $IS[0], $IS[1]);
 $w = $IS[0];
 $h = $IS[1];
@@ -326,7 +326,7 @@ if (!isset($block_photo)) {
 			echo output_text($photo['opis']) . '<br />';
 		echo '<img src="/style/icons/d.gif" alt="*"> <a href="/photo/photo0/' . $photo['id'] . '.' . $photo['ras'] . '" title="下载原图">';
 		echo '下载';
-		echo ' (' . size_file(filesize(H . 'sys/gallery/photo/' . $photo['id'] . '.' . $photo['ras'])) . ')';
+		echo ' (' . size_file(filesize(H . 'files/gallery/photo/' . $photo['id'] . '.' . $photo['ras'])) . ')';
 		echo '</a><br />';
 		echo '</div>';
 		if (user_access('photo_photo_edit') && $ank['level'] < $user['level'] || isset($user) && $ank['id'] == $user['id']) include_once check_replace('inc/gallery_show_photo_form.php');
