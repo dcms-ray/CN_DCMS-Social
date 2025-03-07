@@ -38,4 +38,4 @@ test_chmod(H.'sys/update/',777);
 test_chmod(H.'sys/tmp/',777);
 test_chmod(H.'style/themes/',777);
 test_chmod(H.'files/smiles/',777);
-test_chmod(H.'sys/gift/',777);
+test_chmod(H.'files/gift/',777);

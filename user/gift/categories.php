@@ -24,7 +24,7 @@ $width = ($webbrowser == 'web' ? '100' : '70'); // Размер подарков
 if (isset($_GET['id'])) $ank['id'] = intval($_GET['id']);
 $ank = user::get_user($ank['id']);
 if (!$ank || $ank['id'] == 0 || $ank['id'] == $user['id']) {
-	header("Location: /index.php?" . session_id());
+	header("Location: ../../index.php?" . session_id());
 	exit;
 }
 $set['title'] = "送给 {$ank['nick']} 的礼物";
@@ -55,7 +55,7 @@ if (isset($_GET['gift']) && isset($_GET['category'])) {
 			*/
 			dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('{$user['id']}', '{$ank['id']}', '{$id_gift}', 'new_gift', '{$time}')");
 			$_SESSION['message'] = '您的礼物已成功送出';
-			header("Location: /user/info.php?id={$ank['id']}");
+			header("Location: ../info.php?id={$ank['id']}");
 			exit;
 		} else {
 			$err = '您的帐户中没有足够的资金';
@@ -63,22 +63,22 @@ if (isset($_GET['gift']) && isset($_GET['category'])) {
 	}
 	err();
 	echo '<div class="foot">';
-	echo '<img src="/style/icons/str2.gif" alt="*" />  <a href="?id=' . $ank['id'] . '">类别</a> |  <a href="?category=' . $category['id'] . '&amp;id=' . $ank['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>' . htmlspecialchars($gift['name']) . '</b><br />';
+	echo '<img src="../../style/icons/str2.gif" alt="*" />  <a href="?id=' . $ank['id'] . '">类别</a> |  <a href="?category=' . $category['id'] . '&amp;id=' . $ank['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>' . htmlspecialchars($gift['name']) . '</b><br />';
 	echo '</div>';
 	echo '<form action="?category=' . $category['id'] . '&amp;gift=' . $gift['id'] . '&amp;id=' . $ank['id'] . '&amp;ok" method="post">';
 	echo '<div class="mess">';
-	echo '赠送礼物 <img src="/sys/gift/' . $gift['id'] . '.png" style="max-width:' . $width . 'px;" alt="*" /> 给 ';
+	echo '赠送礼物 <img src="../../files/gift/' . $gift['id'] . '.png" style="max-width:' . $width . 'px;" alt="*" /> 给 ';
 	echo user::avatar($ank['id']), group($ank['id']), $ank['nick'], medal($ank['id']), online($ank['id']) . '<br />';
 	echo '需要花费 <b><font color=red>' . intval($gift['money']) . '</font> <font color=green>' . $sMonet[0] . '</font></b>，你有 <b><font color=red>' . $user['money'] . '</font>  <font color=green>' . $sMonet[0] . '</font></b><br />';
 	echo '</div>';
 	echo '<div class="mess">';
 	echo $tPanel . '<textarea type="text" name="msg" value=""/></textarea><br />';
 	echo '<input class="submit" type="submit" value="送出礼物" /> ';
-	echo '<img src="/style/icons/delete.gif" alt="*" /> <a href="/user/info.php?id=' . $ank['id'] . '">取消</a> ';
+	echo '<img src="../../style/icons/delete.gif" alt="*" /> <a href="../info.php?id=' . $ank['id'] . '">取消</a> ';
 	echo '</div>';
 	echo "</form>";
 	echo '<div class="foot">';
-	echo '<img src="/style/icons/str2.gif" alt="*" />  <a href="?id=' . $ank['id'] . '">分类</a> |  <a href="?category=' . $category['id'] . '&amp;id=' . $ank['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>' . htmlspecialchars($gift['name']) . '</b><br />';
+	echo '<img src="../../style/icons/str2.gif" alt="*" />  <a href="?id=' . $ank['id'] . '">分类</a> |  <a href="?category=' . $category['id'] . '&amp;id=' . $ank['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>' . htmlspecialchars($gift['name']) . '</b><br />';
 	echo '</div>';
 } elseif (isset($_GET['category'])) {
 	/*
@@ -94,7 +94,7 @@ if (isset($_GET['gift']) && isset($_GET['category'])) {
 			exit;
 		}
 		echo '<div class="foot">';
-		echo '<img src="/style/icons/str2.gif" alt="*" />  <a href="?id=' . $ank['id'] . '">分类</a> | <b>' . htmlspecialchars($category['name']) . '</b><br />';
+		echo '<img src="../../style/icons/str2.gif" alt="*" />  <a href="?id=' . $ank['id'] . '">分类</a> | <b>' . htmlspecialchars($category['name']) . '</b><br />';
 		echo '</div>';
 		// 礼品清单
 		$k_post = dbresult(dbquery("SELECT COUNT(id) FROM `gift_list` WHERE `id_category` = '$category[id]'"), 0);
@@ -117,14 +117,14 @@ if (isset($_GET['gift']) && isset($_GET['category'])) {
 				$num = 0;
 			}
 			/*---------------------------*/
-			echo '<img src="/sys/gift/' . $post['id'] . '.png" style="max-width:' . $width . 'px;" alt="*" /><br />';
+			echo '<img src="../../files/gift/' . $post['id'] . '.png" style="max-width:' . $width . 'px;" alt="*" /><br />';
 			echo '<a href="?category=' . $category['id'] . '&amp;gift=' . $post['id'] . '&amp;id=' . $ank['id'] . '"><b>' . htmlspecialchars($post['name']) . '</b></a> :: ';
 			echo '<b><font color=red>' . intval($post['money']) . '</font> <font color=green>' . $sMonet[0] . '</font></b>';
 			echo '</div>';
 		}
 		if ($k_page > 1) str('categories.php?id=' . intval($_GET['id']) . '&amp;category=' . intval($_GET['category']) . '&amp;', $k_page, $page); // 输出页数
 		echo '<div class="foot">';
-		echo '<img src="/style/icons/str2.gif" alt="*" />  <a href="?id=' . $ank['id'] . '">分类</a> | <b>' . htmlspecialchars($category['name']) . '</b><br />';
+		echo '<img src="../../style/icons/str2.gif" alt="*" />  <a href="?id=' . $ank['id'] . '">分类</a> | <b>' . htmlspecialchars($category['name']) . '</b><br />';
 		echo '</div>';
 	} else {
 		/*
@@ -133,7 +133,7 @@ if (isset($_GET['gift']) && isset($_GET['category'])) {
 		==================================
 		*/
 		echo '<div class="foot">';
-		echo '<img src="/style/icons/str2.gif" alt="*" /> '.user::nick($ank['id'],1,0,0).' | <b>类别</b>';
+		echo '<img src="../../style/icons/str2.gif" alt="*" /> '.user::nick($ank['id'],1,0,0).' | <b>类别</b>';
 		echo '</div>';
 		$k_post = dbresult(dbquery("SELECT COUNT(id) FROM `gift_categories`"), 0);
 		if ($k_post == 0) {
@@ -152,12 +152,12 @@ if (isset($_GET['gift']) && isset($_GET['category'])) {
 				$num = 0;
 			}
 			/*---------------------------*/
-			echo '<img src="/style/themes/default/loads/14/dir.png" alt="*" /> <a href="categories.php?category=' . $post['id'] . '&amp;id=' . $ank['id'] . '">' . htmlspecialchars($post['name']) . '</a> ';
+			echo '<img src="../../style/themes/default/loads/14/dir.png" alt="*" /> <a href="categories.php?category=' . $post['id'] . '&amp;id=' . $ank['id'] . '">' . htmlspecialchars($post['name']) . '</a> ';
 			echo '(' . dbresult(dbquery("SELECT COUNT(id) FROM `gift_list` WHERE `id_category` = '$post[id]'"), 0) . ')';
 			echo '</div>';
 		}
 		echo '<div class="foot">';
-		echo '<img src="/style/icons/str2.gif" alt="*" /> ' . user::nick($ank['id'], 1, 0, 0) . '</a> | <b>分类</b>';
+		echo '<img src="../../style/icons/str2.gif" alt="*" /> ' . user::nick($ank['id'], 1, 0, 0) . '</a> | <b>分类</b>';
 		echo '</div>';
 	}
 include_once '../../sys/inc/tfoot.php';
