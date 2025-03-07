@@ -23,11 +23,11 @@ function test_chmod($df,$chmod) {
 if (file_exists(H.'install/')) test_chmod(H.'install/', 777);
 test_chmod(H.'sys/dat/',777);
 test_chmod(H.'files/forum',777);
-test_chmod(H.'sys/gallery/48/',777);
-test_chmod(H.'sys/gallery/50/',777);
-test_chmod(H.'sys/gallery/128/',777);
-test_chmod(H.'sys/gallery/640/',777);
-test_chmod(H.'sys/gallery/photo/',777);
+test_chmod(H.'files/gallery/48/',777);
+test_chmod(H.'files/gallery/50/',777);
+test_chmod(H.'files/gallery/128/',777);
+test_chmod(H.'files/gallery/640/',777);
+test_chmod(H.'files/gallery/photo/',777);
 test_chmod(H.'sys/inc/',777);
 test_chmod(H.'sys/fnc/',777);
 test_chmod(H.'files/down/',777);

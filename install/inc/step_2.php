@@ -7,11 +7,11 @@ if(isset($_GET['chmod_ok'])) {
 	@chmod(H.'sys/avatar/',0777);
 	@chmod(H.'sys/dat/',0777);
 	@chmod(H.'files/forum',0777);
-	@chmod(H.'sys/gallery/48/',0777);
-	@chmod(H.'sys/gallery/50/',0777);
-	@chmod(H.'sys/gallery/128/',0777);
-	@chmod(H.'sys/gallery/640/',0777);
-	@chmod(H.'sys/gallery/photo/',0777);
+	@chmod(H.'files/gallery/48/',0777);
+	@chmod(H.'files/gallery/50/',0777);
+	@chmod(H.'files/gallery/128/',0777);
+	@chmod(H.'files/gallery/640/',0777);
+	@chmod(H.'files/gallery/photo/',0777);
 	@chmod(H.'sys/inc/',0777);
 	@chmod(H.'sys/fnc/',0777);
 	@chmod(H.'files/down/',0777);

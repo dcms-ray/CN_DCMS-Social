@@ -56,7 +56,7 @@ if ($ank['id'] != $user['id'] && isset($user['group_access']) && ($user['group_a
 }
 
 if ($size == 0) {
-	$file_path = H . "sys/gallery/photo/{$if_photo}.{$photo['ras']}";
+	$file_path = H . "files/gallery/photo/{$if_photo}.{$photo['ras']}";
 	// 检查文件是否存在
 	if (is_file($file_path)) {
 		header('Access-Control-Allow-Origin: *');
@@ -67,7 +67,7 @@ if ($size == 0) {
 		http_response_code(404);
 	}
 } else {
-	$file_path = H . "sys/gallery/{$size}/{$if_photo}.jpg";
+	$file_path = H . "files/gallery/{$size}/{$if_photo}.jpg";
 	// 检查文件是否存在
 	if (is_file($file_path)) {
 		header('Access-Control-Allow-Origin: *');

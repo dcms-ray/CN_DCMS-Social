@@ -150,7 +150,7 @@ class user
 			} else {
 				$avatar = $avatars[$user];
 			}
-			if (isset($avatar['id']) && test_file(H . 'sys/gallery/50/' . $avatar['id'] . '.jpg')) {
+			if (isset($avatar['id']) && test_file(H . 'files/gallery/50/' . $avatar['id'] . '.jpg')) {
 				$AVATAR = ' <img class="avatar" src="/photo/photo50/' . $avatar['id'] . '.jpg" alt="Avatar" /> ';
 			} else {
 				$AVATAR = '<img class="avatar" src="/style/user/avatar.gif" height= "50" width="50" alt="No Avatar" />';
