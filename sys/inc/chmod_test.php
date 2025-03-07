@@ -22,7 +22,7 @@ function test_chmod($df,$chmod) {
 
 if (file_exists(H.'install/')) test_chmod(H.'install/', 777);
 test_chmod(H.'sys/dat/',777);
-test_chmod(H.'sys/forum/files',777);
+test_chmod(H.'files/forum',777);
 test_chmod(H.'sys/gallery/48/',777);
 test_chmod(H.'sys/gallery/50/',777);
 test_chmod(H.'sys/gallery/128/',777);

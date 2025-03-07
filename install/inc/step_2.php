@@ -6,7 +6,7 @@ if(isset($_GET['chmod_ok'])) {
 	@chmod(H.'install/',0777);
 	@chmod(H.'sys/avatar/',0777);
 	@chmod(H.'sys/dat/',0777);
-	@chmod(H.'sys/forum/files',0777);
+	@chmod(H.'files/forum',0777);
 	@chmod(H.'sys/gallery/48/',0777);
 	@chmod(H.'sys/gallery/50/',0777);
 	@chmod(H.'sys/gallery/128/',0777);
