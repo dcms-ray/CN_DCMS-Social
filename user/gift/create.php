@@ -51,17 +51,17 @@ if (isset($_GET['edit_gift']) && isset($_GET['category'])) {
 	aut();
 	err();
 	echo '<div class="foot">';
-	echo '<img src="/style/icons/str2.gif" alt="*" />  <a href="?">类别</a> |  <a href="?category=' . $category['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>添加礼物</b><br />';
+	echo '<img src="../../style/icons/str2.gif" alt="*" />  <a href="?">类别</a> |  <a href="?category=' . $category['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>添加礼物</b><br />';
 	echo '</div>';
 	// 礼品编辑表
 	echo '<form class="main" method="post" enctype="multipart/form-data"  action="?category=' . $category['id'] . '&amp;edit_gift=' . $gift['id'] . '&amp;page=' . intval($_GET['page']) . '">';
-	echo '<img src="/files/gift/' . $gift['id'] . '.png" style="max-width:' . $width . 'px;" alt="*" /><br />';
+	echo '<img src="../../files/gift/' . $gift['id'] . '.png" style="max-width:' . $width . 'px;" alt="*" /><br />';
 	echo '标题:<br /><input type="text" name="name" value="' . htmlspecialchars($gift['name']) . '" /><br />';
 	echo '价格:<br /><input type="text" name="money" value="' . $gift['money'] . '" style="width:30px;"/><br />';
 	echo '<input value="保存" type="submit" />';
 	echo '</form>';
 	echo '<div class="foot">';
-	echo '<img src="/style/icons/str2.gif" alt="*" />  <a href="?">类别</a> |  <a href="?category=' . $category['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>添加礼物</b><br />';
+	echo '<img src="../../style/icons/str2.gif" alt="*" />  <a href="?">类别</a> |  <a href="?category=' . $category['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>添加礼物</b><br />';
 	echo '</div>';
 } elseif (isset($_GET['add_gift']) && isset($_GET['category'])) {
 	/*==================================
@@ -76,9 +76,9 @@ if (isset($_GET['edit_gift']) && isset($_GET['category'])) {
 	if (isset($_POST['name']) && isset($_POST['money']) && isset($_FILES['gift'])) {	// 创建记录
 		$name = my_esc($_POST['name']);
 		$money = intval($_POST['money']);
-		if ($money < 1) $err = 'Укажите стоимость подарка';
-		if (strlen2($name) < 2) $err = 'Короткое название';
-		if (strlen2($name) > 128) $err = 'Длина названия превышает предел в 128 символов';
+		if ($money < 1) $err = '输入礼品的价值';
+		if (strlen2($name) < 1) $err = '请输入名称';
+		if (strlen2($name) > 128) $err = '标题长度超过 128 个字符的限制';
 		if (!isset($err)) {
 			dbquery("INSERT INTO `gift_list` (`name`, `money`, `id_category`) values('$name', '$money', '$category[id]')");
 			$file_id = dbinsertid();
@@ -105,7 +105,7 @@ if (isset($_GET['edit_gift']) && isset($_GET['category'])) {
 	echo '<input value="增加" type="submit" />';
 	echo '</form>';
 	echo '<div class="foot">';
-	echo '<img src="/style/icons/str2.gif" alt="*" />  <a href="?">类别</a> |  <a href="?category=' . $category['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>附加礼物</b><br />';
+	echo '<img src="../../style/icons/str2.gif" alt="*" />  <a href="?">类别</a> |  <a href="?category=' . $category['id'] . '">' . htmlspecialchars($category['name']) . '</a> | <b>附加礼物</b><br />';
 	echo '</div>';
 } elseif (isset($_GET['category'])) {
 	/*==================================
