@@ -21,7 +21,7 @@ if(isset($_GET['chmod_ok'])) {
 	@chmod(H.'sys/update/',0777);
 	@chmod(H.'sys/tmp/',0777);
 	@chmod(H.'style/themes/',0777);
-	@chmod(H.'style/smiles/',0777);
+	@chmod(H.'files/smiles/',0777);
 	@chmod(H.'sys/gift/',0777);
 	msg('成功设置权限！');
 }

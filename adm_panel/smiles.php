@@ -1,19 +1,13 @@
 <?php
-/**
- * & CMS Name :: DCMS-Social
- * & Author   :: Alexandr Andrushkin
- * & Contacts :: ICQ 587863132
- * & Site     :: http://dcms-social.ru
- */
 include_once '../sys/inc/home.php';
-include_once H . 'sys/inc/start.php';
-include_once H . 'sys/inc/compress.php';
-include_once H . 'sys/inc/sess.php';
-include_once H . 'sys/inc/settings.php';
-include_once H . 'sys/inc/db_connect.php';
-include_once H . 'sys/inc/ipua.php';
-include_once H . 'sys/inc/fnc.php';
-include_once H . 'sys/inc/user.php';
+include_once '../sys/inc/start.php';
+include_once '../sys/inc/compress.php';
+include_once '../sys/inc/sess.php';
+include_once '../sys/inc/settings.php';
+include_once '../sys/inc/db_connect.php';
+include_once '../sys/inc/ipua.php';
+include_once '../sys/inc/fnc.php';
+include_once '../sys/inc/user.php';
 only_level(3);
 
 if(isset($_GET['id'])) {
@@ -23,7 +17,7 @@ if(isset($_GET['id'])) {
 	// 删除表情符号
 	if(isset($_GET['del'])) {
 		$del = dbassoc(dbquery("SELECT * FROM `smile` WHERE `id` = '" . intval($_GET['del']) . "' LIMIT 1"));
-		unlink(H.'style/smiles/' . $del['id'] . '.gif');
+		unlink('../files/smiles/' . $del['id'] . '.gif');
 		dbquery("DELETE FROM `smile` WHERE `id` = '" . intval($_GET['del']) . "'");
 		$_SESSION['message'] = '已删除此表情';
 		header('Location: ?id=' . intval($_GET['id']) . '&page=' . intval($_GET['page']));
@@ -39,8 +33,8 @@ if(isset($_GET['id'])) {
 				$smile = my_esc($_POST["smile_{$i}"]);
 				dbquery("INSERT INTO `smile` (`smile`,`dir`) values('$smile','" . intval($_GET['id']) . "')");
 				$ID = dbinsertid();
-				if (copy($_FILES["file_{$i}"]['tmp_name'], H . 'style/smiles/' . $ID . '.gif')) {
-					chmod(H . 'style/smiles/' . $ID . '.gif', 0777);
+				if (copy($_FILES["file_{$i}"]['tmp_name'], '../files/smiles/' . $ID . '.gif')) {
+					chmod(H . '../files/smiles/' . $ID . '.gif', 0777);
 					$_SESSION['message'] = '上传成功';
 				}
 			} else {
@@ -59,7 +53,7 @@ if(isset($_GET['id'])) {
 if(isset($_GET['delete'])) {
 	$q = dbquery("SELECT * FROM `smile` WHERE `dir` = '" . intval($_GET['delete']) . "'");
 	while($post = dbarray($q)) {
-		unlink(H . 'style/smiles/' . $post['id'] . '.gif');
+		unlink('../files/smiles/' . $post['id'] . '.gif');
 		dbquery("DELETE FROM `smile` WHERE `id` = '" . $post['id'] . "'");
 	}
 	dbquery("DELETE FROM `smile_dir` WHERE `id` = '" . intval($_GET['delete']) . "'");
@@ -68,7 +62,7 @@ if(isset($_GET['delete'])) {
 	exit;
 }
 $set['title'] = '管理表情';
-include_once H . 'sys/inc/thead.php';
+include_once '../sys/inc/thead.php';
 err();
 title();
 aut();
@@ -100,6 +94,7 @@ if (isset($_GET['id'])) {
 		</form>
 		<?php
 	}
+
 	/*
 	========================
 	显示表情符号
@@ -119,9 +114,9 @@ if (isset($_GET['id'])) {
 		echo '<div class="' . ($num % 2 ? "nav1" : "nav2") . '">';
 		$num++;
 		?>
-		<img src="/style/smiles/<?=$post['id']?>.gif" alt="smile"/> <?=text($post['smile'])?> 
-		<a href="?id=<?=intval($_GET['id'])?>&amp;edit=<?=$post['id']?>&amp;page=<?=$page?>"><img src="/style/icons/edit.gif" alt="*"></a> 
-		<a href="?id=<?=intval($_GET['id'])?>&amp;del=<?=$post['id']?>&amp;page=<?=$page?>"><img src="/style/icons/delete.gif" alt="*"></a>
+		<img src="../files/smiles/<?=$post['id']?>.gif" alt="smile"/> <?=text($post['smile'])?> 
+		<a href="?id=<?=intval($_GET['id'])?>&amp;edit=<?=$post['id']?>&amp;page=<?=$page?>"><img src="../style/icons/edit.gif" alt="*"></a> 
+		<a href="?id=<?=intval($_GET['id'])?>&amp;del=<?=$post['id']?>&amp;page=<?=$page?>"><img src="../style/icons/delete.gif" alt="*"></a>
 		<?php
 		/*
 		========================
@@ -156,14 +151,13 @@ if (isset($_GET['id'])) {
 	if ($k_page>1) str('?id=' . intval($_GET['id']) . '&amp;', $k_page, $page);
 	?>
 	<div class="foot">
-		<img src="/style/icons/str.gif" alt="*" /> <a href="?id=<?=intval($_GET['id'])?>&amp;act=add_smile">添加一个微笑</a>
+		<img src="../style/icons/str.gif" alt="*" /> <a href="?id=<?=intval($_GET['id'])?>&amp;act=add_smile">添加一个微笑</a>
 	</div>
 	<div class="foot">
-		<img src="/style/icons/str.gif" alt="*" /> <a href="smiles.php">表情符号的类别</a>
+		<img src="../style/icons/str.gif" alt="*" /> <a href="smiles.php">表情符号的类别</a>
 	</div>
 	<?php
-	include_once H . 'sys/inc/tfoot.php';
-	exit;
+	include_once '../sys/inc/tfoot.php';
 }
 
 
@@ -212,10 +206,10 @@ while($post = dbarray($q)) {
 	echo '<div class="' . ($num % 2 ? "nav1" : "nav2") . '">';
 	$num++;
 	?>
-	<img src="/style/themes/<?=$set['set_them']?>/loads/14/dir.png" alt="*"> 
+	<img src="../style/themes/<?=$set['set_them']?>/loads/14/dir.png" alt="*"> 
 	<a href="?id=<?=$post['id']?>"><?=text($post['name'])?></a> (<?=dbresult(dbquery("SELECT COUNT(*) FROM `smile` WHERE `dir` = '$post[id]'"),0)?>)
-	<a href="?edit=<?=$post['id']?>"><img src="/style/icons/edit.gif" alt="*"></a> 
-	<a href="?delete=<?=$post['id']?>"><img src="/style/icons/delete.gif" alt="*"></a>
+	<a href="?edit=<?=$post['id']?>"><img src="../style/icons/edit.gif" alt="*"></a> 
+	<a href="?delete=<?=$post['id']?>"><img src="../style/icons/delete.gif" alt="*"></a>
 	</div>
 	<?php
 
@@ -250,7 +244,7 @@ while($post = dbarray($q)) {
 ?>
 </table>
 <div class="foot">
-	<img src="/style/icons/str.gif" alt="*"> <a href="?act=add_kat">添加类别</a><br />
+	<img src="../style/icons/str.gif" alt="*"> <a href="?act=add_kat">添加类别</a><br />
 </div>
 <?php
-include_once H . 'sys/inc/tfoot.php';
+include_once '../sys/inc/tfoot.php';
