@@ -363,7 +363,7 @@ if (isset($user) && $user['wall'] == 0) {
 }
 echo "</div>";
 
-if (isset($user) && $user['wall'] == 0) include_once H . 'user/stena/index.php';
+if (isset($user) && $user['wall'] == 0) include_once 'stena/index.php';
 
 /*
 ========================================
