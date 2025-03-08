@@ -99,6 +99,7 @@ if (isset($user) && $user['id'] == $ank['id']) {
 	echo "<br />";
 	echo "<img src='../style/icons/apply14.png' alt='' /> <a href='daily_checkin.php'>每日签到</a>";
 }
+echp "<img src='/style/icons/anketa.png' alt='' /> <a href='/news/daily_news.php'>每日新闻</a>";
 echo "</div>";
 
 

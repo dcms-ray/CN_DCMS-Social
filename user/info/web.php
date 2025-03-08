@@ -111,6 +111,7 @@ if ($ank['group_access'] > 1) {
 				echo "<br />"; 
 				echo "<img src='/style/icons/apply14.png' alt='' /> <a href='/user/daily_checkin.php'>每日签到</a>";
 			}
+			echo "<img src='/style/icons/anketa.png' alt='' /> <a href='/news/daily_news.php'>每日新闻</a>";
 			echo "</div>";
 			/*---------------------------------------*/
 			/*------------------------客人---------------------------*/
