@@ -21,17 +21,17 @@ if (!isset($user)) {header("location: index.php?");}
 
 if (isset($_POST['title']) && isset($_POST['msg'])) {
 	if (($user['rating'] < 2 || $user['group_access'] < 6 )) {
-		if (!isset($_SESSION['captcha']))$err[]='验证号码错误';
-		if (!isset($_POST['chislo']))$err[]='输入验证号码';
-		elseif ($_POST['chislo']==null)$err[]='输入验证号码';
-		elseif ($_POST['chislo']!=$_SESSION['captcha'])$err[]='检查验证号码是否输入正确';
+		if (!isset($_SESSION['captcha'])) $err[] = '验证号码错误';
+		if (!isset($_POST['chislo'])) $err[] = '输入验证号码';
+		elseif ($_POST['chislo'] == null) $err[] = '输入验证号码';
+		elseif ($_POST['chislo'] != $_SESSION['captcha']) $err[] = '检查验证号码是否输入正确';
 	}
 	if (!isset($err)) {
 		if(empty($_POST['title'])) {
-			$title=esc(stripslashes(htmlspecialchars(substr($_POST['msg'],0,24)))).' ...';
-			$title=my_esc($title);
+			$title = esc(stripslashes(htmlspecialchars(substr($_POST['msg'],0,24)))).' ...';
+			$title = my_esc($title);
 		} else {
-			$title=my_esc($_POST['title']);
+			$title = my_esc($_POST['title']);
 		}
 		$msg = my_esc($_POST['msg']);
 		$id_dir = intval($_POST['id_dir']);

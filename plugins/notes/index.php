@@ -110,8 +110,7 @@ while ($post = dbassoc($q)) {
 				} else {
 					$allowViewNote = false;
 				}
-			}
-			if ($post['private'] == 2 && ($user['id'] == $post['id_user'] || user_access('notes_delete'))) {
+			} elseif ($post['private'] == 2 && ($user['id'] == $post['id_user'] || user_access('notes_delete'))) {
 				$allowViewNote = true;
 			} else {
 				$allowViewNote = false;
@@ -137,9 +136,9 @@ while ($post = dbassoc($q)) {
 		echo " <a href='fav.php?id=" . $post['id'] . "'><img src='../../style/icons/add_fav.gif'> (" . dbresult(dbquery("SELECT COUNT(`id`)FROM `bookmarks` WHERE `id_object`='" . $post['id'] . "' AND `type`='notes'"), 0) . ")</a> &bull; ";
 		echo " <img src='../../style/icons/action_share_color.gif'> (" . dbresult(dbquery("SELECT COUNT(`id`)FROM `notes` WHERE `share_id`='" . $post['id'] . "' AND `share_type`='notes'"), 0) . ") </font>";
 	} elseif ($post['private'] == 1) {
-		echo '<font color=#666>[内容仅好友可见]</font>';
+		echo '<font color="#999">[内容仅好友可见]</font>';
 	} else {
-		echo '<font color=#666>[内容仅作者可见]</font>';
+		echo '<font color="#999">[内容仅作者可见]</font>';
 	}
 	echo "  </div>";
 }
