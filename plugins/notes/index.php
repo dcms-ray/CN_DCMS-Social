@@ -34,7 +34,6 @@ echo "</div>";
 echo "<div class='webmenu last'>";
 echo "<a href='dir.php'>类别</a>";
 echo "</div>";
-
 if (isset($user)) {
 	echo "<div class='webmenu last'>";
 	echo "<a href='user.php?id=" . $user['id'] . "'>我的</a>";
@@ -88,9 +87,7 @@ $start = $set['p_str'] * $page - $set['p_str'];
 $q = dbquery("SELECT * FROM `notes` $order LIMIT $start, $set[p_str]");
 echo "<table class='post'>";
 if ($k_post == 0) {
-	echo "  <div class='mess'>";
-	echo "没有日记";
-	echo "  </div>";
+	echo "<div class='mess'>没有日记</div>";
 }
 while ($post = dbassoc($q)) {
 	/*-----------代码-----------*/
@@ -102,13 +99,48 @@ while ($post = dbassoc($q)) {
 		$num = 0;
 	}
 	/*---------------------------*/
-	echo user::nick($post['id_user'], 1, 1, 0) . " : <a href='/plugins/notes/list.php?id=" . $post['id'] . "'>" . text($post['name']) . "</a>";
+	if ($post['private'] == 0) {
+		$allowViewNote = true;
+	} else {
+		if (isset($user)) {
+			if ($post['private'] == 1) {
+				$frend = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE (`user` = '{$user['id']}' AND `frend` = '{$post['id_user']}') OR (`user` = '{$post['id_user']}' AND `frend` = '{$user['id']}') LIMIT 1"), 0);
+				if ($user['id'] == $post['id_user'] || $frend == 2  || user_access('notes_delete')) {
+					$allowViewNote = true;
+				} else {
+					$allowViewNote = false;
+				}
+			}
+			if ($post['private'] == 2 && ($user['id'] == $post['id_user'] || user_access('notes_delete'))) {
+				$allowViewNote = true;
+			} else {
+				$allowViewNote = false;
+			}
+		} else {
+			$allowViewNote = false;
+		}
+	}
+	echo user::nick($post['id_user'], 1, 1, 0) . " : <a href='/plugins/notes/list.php?id=" . $post['id'] . "'>";
+	if ($allowViewNote) {
+		echo text($post['name']);
+	} else {
+		echo '[不可见]';
+	}
+	echo "</a>";
 	echo '<span style="float:right;color:#666;">' . vremja($post['time']) . '</span><br/>';
-	echo rez_text($post['msg'], 80) . " <br/>";
-	notes_sh($post['id']);
-	echo "<br/><img src='/style/icons/uv.png'> <font color=#666>(" . dbresult(dbquery("SELECT COUNT(`id`)FROM `notes_komm` WHERE `id_notes`='$post[id]'"), 0) . ") &bull;";
-	echo " <a href='fav.php?id=" . $post['id'] . "'><img src='/style/icons/add_fav.gif'> (" . dbresult(dbquery("SELECT COUNT(`id`)FROM `bookmarks` WHERE `id_object`='" . $post['id'] . "' AND `type`='notes'"), 0) . ")</a> &bull; ";
-	echo " <img src='/style/icons/action_share_color.gif'> (" . dbresult(dbquery("SELECT COUNT(`id`)FROM `notes` WHERE `share_id`='" . $post['id'] . "' AND `share_type`='notes'"), 0) . ") </font>";
+	if ($allowViewNote) {
+		echo rez_text($post['msg'], 80);
+		echo " <br/>";
+		notes_sh($post['id']);
+		// 评论、收藏、分享图标
+		echo "<br/><img src='../../style/icons/uv.png'> <font color=#666>(" . dbresult(dbquery("SELECT COUNT(`id`)FROM `notes_komm` WHERE `id_notes`='$post[id]'"), 0) . ") &bull;";
+		echo " <a href='fav.php?id=" . $post['id'] . "'><img src='../../style/icons/add_fav.gif'> (" . dbresult(dbquery("SELECT COUNT(`id`)FROM `bookmarks` WHERE `id_object`='" . $post['id'] . "' AND `type`='notes'"), 0) . ")</a> &bull; ";
+		echo " <img src='../../style/icons/action_share_color.gif'> (" . dbresult(dbquery("SELECT COUNT(`id`)FROM `notes` WHERE `share_id`='" . $post['id'] . "' AND `share_type`='notes'"), 0) . ") </font>";
+	} elseif ($post['private'] == 1) {
+		echo '<font color=#666>[内容仅好友可见]</font>';
+	} else {
+		echo '<font color=#666>[内容仅作者可见]</font>';
+	}
 	echo "  </div>";
 }
 echo "</table>";
