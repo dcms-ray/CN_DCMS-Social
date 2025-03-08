@@ -30,13 +30,16 @@ if (isset($_GET['nick']) && isset($_GET['pass'])) {
 }
 ?>
 <div class="main" id="umenu">
-<img src='/style/my_menu/ank.png' alt='' /> <a href='/user/info.php'>我的页面</a><br />
+<img src='/style/icons/icon_stranica.png' alt='' /> <a href='/user/info.php'>我的页面</a><br />
 </div>
 <div class="main" id="umenu">
 <img src='/style/icons/apply14.png' alt='' /> <a href='/user/daily_checkin.php'>每日签到</a><br />
 </div>
 <div class="main" id="umenu">
-<img src='/style/my_menu/ank.png' alt='' /> <a href='/user/info/anketa.php'>个人资料</a> [<a href='user/info/edit.php'>编辑.</a>]<br />
+<img src='/style/icons/anketa.png' alt='' /> <a href='/news/daily_news.php'>每日新闻</a><br />
+</div>
+<div class="main" id="umenu">
+<img src='/style/my_menu/ank.png' alt='' /> <a href='/user/info/anketa.php'>个人资料</a> [<a href='user/info/edit.php'>编辑</a>]<br />
 </div>
 <div class="main" id="umenu">
 <img src="/style/my_menu/secure.png" alt="" /> <a href="/user/info/secure.php">更改密码</a><br />
@@ -45,11 +48,12 @@ if (isset($_GET['nick']) && isset($_GET['pass'])) {
 <img src="/style/my_menu/rules.png" alt="" /> <a href="/user/rules.php">规则</a><br />
 </div>
 <div class="main" id="umenu">
-<img src="/style/my_menu/set.png" alt="" /> <a href="/user/info/settings.php">我的设置</a><br />
-</div>
-<div class="main" id="umenu">
 <img src="/style/my_menu/set.png" alt="" /> <a href="./my_aut.php">登录历史</a><br />
 </div>
+<div class="main" id="umenu">
+<img src="/style/icons/settings.png" alt="" /> <a href="/user/info/settings.php">我的设置</a><br />
+</div>
+
 
 <?
 // 管理权限

@@ -288,7 +288,7 @@ if (isset($user)) {
 		echo "<a href='list.php?id=$notes[id]&amp;fav=1'>添加到书签</a><br />";
 	else
 		echo "<a href='list.php?id=$notes[id]&amp;fav=0'>删除书签</a><br />";
-	echo "<img src='../../style/icons/add_fav.gif' alt='*' />  <a href='fav.php?id=" . $notes['id'] . "'>谁将它添加到书签?</a> (" . $markinfo . ")";
+	echo "<img src='../../style/icons/add_fav.gif' alt='*' />  <a href='fav.php?id=" . $notes['id'] . "'>查看收藏者</a> (" . $markinfo . ")";
 }
 echo '</div>';
 

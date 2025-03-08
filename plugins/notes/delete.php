@@ -18,12 +18,12 @@ if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `
 		dbquery("DELETE FROM `notes_count` WHERE `id_notes` = '$post[id]'");
 		dbquery("DELETE FROM `notes_komm` WHERE `id_notes` = '$post[id]'");
 		dbquery("DELETE FROM `mark_notes` WHERE `id_list` = '$post[id]'");
-		$_SESSION['message'] = '日记被成功删除';
+		$_SESSION['message'] = '日记成功删除';
 		header("Location: index.php?" . session_id());
 		exit;
 	}
 } else {
-	echo output_text('你怎么来的？.厄运。');
+	echo output_text('操作请求无效,请重新尝试');
 }
 
 // 删除评论
@@ -37,10 +37,10 @@ if (isset($_GET['komm']) && dbresult(dbquery("SELECT COUNT(*) FROM `notes_komm` 
 		header("Location: " . htmlspecialchars($_SERVER['HTTP_REFERER']));
 		exit;
 	} else {
-		echo output_text('你怎么进来的？.杜姆。');
+		echo output_text('操作请求无效,请重新尝试');
 	}
 } else {
-	echo output_text('你怎么进来的？.杜姆。');
+	echo output_text('操作请求无效,请重新尝试');
 }
 
 // 删除类别
@@ -63,8 +63,8 @@ if (isset($_GET['dir']) && dbresult(dbquery("SELECT COUNT(*) FROM `notes_dir` WH
 		header("Location: " . htmlspecialchars($_SERVER['HTTP_REFERER']));
 		exit;
 	} else {
-		echo output_text('你怎么进来的？.杜姆。');
+		echo output_text('操作请求无效,请重新尝试');
 	}
 } else {
-	echo output_text('你怎么进来的？.杜姆。');
+	echo output_text('操作请求无效,请重新尝试');
 }
