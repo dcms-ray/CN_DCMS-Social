@@ -184,6 +184,11 @@ body {
 	word-wrap: break-word;
 }
 @media (prefers-color-scheme: dark) {
+	.cit {
+		background-color: #000E10;
+		border-color: #006666;
+		border-left-color: #006666;
+	}
 	.content_block {
 		background-color: #030303;
 	}
