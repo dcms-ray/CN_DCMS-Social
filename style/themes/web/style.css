@@ -184,6 +184,11 @@ body {
 	word-wrap: break-word;
 }
 @media (prefers-color-scheme: dark) {
+	.cit {
+		background-color: #000E10;
+		border-color: #006666;
+		border-left-color: #006666;
+	}
 	.content_block {
 		background-color: #030303;
 	}
@@ -490,7 +495,7 @@ textarea:focus {
 
 /* L */
 .link_title2 {
-	/* Оформление кнопок в верху */
+	/* 顶部的按钮设计 */
 	
 	color: #FFFFFF;
 	display: inline-block;
@@ -504,7 +509,7 @@ textarea:focus {
 	height: 49px;
 }
 .link_title {
-	/* Оформление кнопок в верху */
+	/* 顶部的按钮设计 */
 	
 	color: #FFFFFF;
 	display: inline-block;
@@ -528,12 +533,12 @@ b.count {
 }
 .link_title:hover,
 .link_title2:hover {
-	/* Оформление кнопок в верху */
+	/* 顶部的按钮设计 */
 	
 	background: #37587F;
 }
 .link_s {
-	/* Оформление кнопок в форуме */
+	/* 论坛中的按钮设计 */
 	
 	background: #fcefa4;
 	font-size: 11px;
@@ -560,18 +565,23 @@ b.count {
 }
 .layer {
 	overflow: scroll;
-	/* Добавляем полосы прокрутки */
+	/* 添加滚动条 */
 	
 	width: 285px;
-	/* Ширина блока */
+	/* 区块宽度 */
 	
 	max-height: 250px;
-	/* Высота блока */
+	/* 区块高度 */
+}
+@media (prefers-color-scheme: dark) {
+	.link_s {
+		color: #000;
+	}
 }
 
 /* M */
 .mess {
-	/* Див сообщения */
+	/* Div 消息 */
 	
 	padding: 7px;
 	background: #EBF3FE url(img/mess.png) repeat-x left center;
@@ -581,8 +591,8 @@ b.count {
 	margin-right: 2px;
 	border: 1px solid #DADADA;
 }
-.menu_hello/* Главное меню */
-{
+.menu_hello {
+	/* 主菜单 */
 	width: 177px;
 	height: 30px;
 	background-image: url('images/menu.png');
@@ -595,7 +605,7 @@ b.count {
 	text-shadow: 1px 1px 1px #A3A3A3;
 }
 .main_menu {
-	/* Див главного меню */
+	/* 主菜单 Div */
 	
 	display: block;
 	padding: 10px;
@@ -686,7 +696,7 @@ b.count {
 	text-align: center;
 }
 .menus {
-	/* блок сортировки */
+	/* 分拣单位 */
 	
 	display: table;
 }
