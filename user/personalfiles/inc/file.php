@@ -22,7 +22,7 @@ if (empty($file_id['id_user']) or empty($user['id'])  or  $file_id['id_user'] !=
 }
 $dir_id = dbassoc(dbquery("SELECT * FROM `downnik_dir` WHERE `id` = '{$file_id['id_dir']}' LIMIT 1"));
 $ras = $file_id['ras'];
-$file = H . "files/down/$file_id[id].dat";
+$file = H . "files/down/data/$file_id[id].dat";
 $name = $file_id['name'];
 $size = $file_id['size'];
 

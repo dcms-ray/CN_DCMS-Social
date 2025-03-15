@@ -108,7 +108,7 @@ for ($i = $start; $i < $k_post && $i < $set['p_str'] * $page; $i++) {
 		$post = $list[$i]['post'];
 		$k_p = dbresult(dbquery("SELECT COUNT(*) FROM `downnik_komm` WHERE `id_file` = '$post[id]'"), 0);
 		$ras = $post['ras'];
-		$file = H . "files/down/{$post['id']}.dat";
+		$file = H . "files/down/data/{$post['id']}.dat";
 		$name = $post['name'];
 		$size = $post['size'];
 		/*-----------代码-----------*/

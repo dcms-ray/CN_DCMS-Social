@@ -60,7 +60,7 @@ if (isset($_POST['write']) && isset($_POST['write2'])) {
 		}
 		$q5 = dbquery("SELECT * FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
 		while ($post5 = dbassoc($q5)) {
-			unlink('../files/down/' . $post5['id'] . '.dat');
+			unlink('../files/down/data/' . $post5['id'] . '.dat');
 		}
 		dbquery("DELETE FROM `downnik_files` WHERE `id_user` = '$ank[id]'");
 		dbquery("DELETE FROM `users_konts` WHERE `id_user` = '$ank[id]' OR `id_kont` = '$ank[id]'");
