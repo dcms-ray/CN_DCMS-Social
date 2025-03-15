@@ -1,6 +1,6 @@
 <?php
-if (test_file(H . "files/screens/128/$file_id[id].gif")) {
-	echo "<img src='/files/screens/128/$file_id[id].gif' alt='屏幕...' /><br />";
+if (test_file(H . "files/down/screens/128/$file_id[id].gif")) {
+	echo "<img src='/files/down/screens/128/$file_id[id].gif' alt='屏幕...' /><br />";
 }
 $url =   '/down' . $dir_id['dir'] . $file_id['id'] . '.' . $file_id['ras'] . '';
 ?>

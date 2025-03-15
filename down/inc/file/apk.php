@@ -5,7 +5,7 @@
  */
 
 // 检查是否存在名为文件ID的PNG图标文件，如果不存在则执行后续操作
-if (!test_file(H . "files/screens/128/{$file_id['id']}.png") && test_file($file)) {
+if (!test_file(H . "files/down/screens/128/{$file_id['id']}.png") && test_file($file)) {
 	// 如果没有找到图标，清除会话中存储的图标信息
 	$_SESSION['file_icon'] = null;
 	
@@ -75,10 +75,10 @@ if (!test_file(H . "files/screens/128/{$file_id['id']}.png") && test_file($file)
 			chmod(H . "sys/tmp/{$sess}.png", 0777);
 			
 			// 将临时文件复制到指定路径
-			copy(H . "sys/tmp/{$sess}.png", H."files/screens/128/{$file_id['id']}.png");
+			copy(H . "sys/tmp/{$sess}.png", H."files/down/screens/128/{$file_id['id']}.png");
 			
 			// 设置目标图标文件的权限
-			chmod(H . "files/screens/128/$file_id[id].png", 0777);
+			chmod(H . "files/down/screens/128/$file_id[id].png", 0777);
 			
 			// 删除临时文件
 			unlink(H . "sys/tmp/{$sess}.png");
@@ -90,8 +90,8 @@ if (!test_file(H . "files/screens/128/{$file_id['id']}.png") && test_file($file)
 }
 
 // 如果找到了图标文件，则显示该图标
-if (is_file(H . "files/screens/128/{$file_id['id']}.png") && $file_id['ras']=='apk') {
-	echo "<img src='/files/screens/128/{$file_id['id']}.png' alt='*' /><br />";
+if (is_file(H . "files/down/screens/128/{$file_id['id']}.png") && $file_id['ras']=='apk') {
+	echo "<img src='/files/down/screens/128/{$file_id['id']}.png' alt='*' /><br />";
 }
 
 // 如果文件描述不为空，则显示文件描述

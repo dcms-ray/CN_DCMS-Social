@@ -5,7 +5,7 @@
  */
 
 // 检查是否已经存在图标文件，若不存在则进行图标提取
-if (!test_file(H . "files/screens/48/{$post['id']}.png") && test_file($file)) {
+if (!test_file(H . "files/down/screens/48/{$post['id']}.png") && test_file($file)) {
 	// 如果没有图标文件，清除 session 中的图标记录
 	$_SESSION['file_icon'] = null;
 
@@ -77,11 +77,11 @@ if (!test_file(H . "files/screens/48/{$post['id']}.png") && test_file($file)) {
 			chmod(H . "sys/tmp/{$sess}.png", 0777);
 
 			// 复制图标文件到目标位置
-			copy(H . "sys/tmp/{$sess}.png", H . "files/screens/48/{$post['id']}.png");
+			copy(H . "sys/tmp/{$sess}.png", H . "files/down/screens/48/{$post['id']}.png");
 
 			// 调整图标尺寸为 50x50 并保存
-			resize(H . "files/screens/48/{$post['id']}.png", H . "files/screens/48/{$post['id']}.png", 50, 50);
-			chmod(H . "files/screens/48/{$post['id']}.png", 0777);
+			resize(H . "files/down/screens/48/{$post['id']}.png", H . "files/down/screens/48/{$post['id']}.png", 50, 50);
+			chmod(H . "files/down/screens/48/{$post['id']}.png", 0777);
 
 			// 删除临时图标文件
 			unlink(H . "sys/tmp/{$sess}.png");
@@ -93,8 +93,8 @@ if (!test_file(H . "files/screens/48/{$post['id']}.png") && test_file($file)) {
 }
 
 // 如果图标文件已经存在，则直接显示该图标
-if (test_file(H . "files/screens/48/{$post['id']}.png")) {
-	echo "<img src='/files/screens/48/{$post['id']}.png' alt='*' /><br />";
+if (test_file(H . "files/down/screens/48/{$post['id']}.png")) {
+	echo "<img src='/files/down/screens/48/{$post['id']}.png' alt='*' /><br />";
 }
 
 // 清空 session 中的图标记录（即使已经显示了图标）

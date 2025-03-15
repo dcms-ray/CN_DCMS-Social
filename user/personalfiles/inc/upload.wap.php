@@ -126,7 +126,7 @@ if ($dir_id['upload'] == 1) {
 				imagecopyresampled($screen, $imgc, 0, 0, 0, 0, $dstW, $dstH, $img_x, $img_y);
 				imagedestroy($imgc);
 				$screen = img_copyright($screen); // 叠加水印
-				imagegif($screen, H . "files/screens/320/$id_file.gif");
+				imagegif($screen, H . "files/down/screens/320/$id_file.gif");
 				imagedestroy($screen);
 			}
 
@@ -150,7 +150,7 @@ if ($dir_id['upload'] == 1) {
 				imagecopyresampled($screen, $imgc, 0, 0, 0, 0, $dstW, $dstH, $img_x, $img_y);
 				imagedestroy($imgc);
 				$screen = img_copyright($screen); // 叠加水印
-				imagegif($screen, H . "files/screens/128/$id_file.gif");
+				imagegif($screen, H . "files/down/screens/128/$id_file.gif");
 				imagedestroy($screen);
 			}
 			$_SESSION['down_dir'] = null;

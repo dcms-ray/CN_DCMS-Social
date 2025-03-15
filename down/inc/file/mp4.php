@@ -2,8 +2,8 @@
 $url = '/down' . $dir_id['dir'] . $file_id['id'] . '.' . $file_id['ras'] . '';
 
 // 检查是否存在缩略图
-if (test_file(H . "files/screens/128/{$file_id['id']}.gif")) {
-	echo "<img src='/files/screens/128/{$file_id['id']}.gif' alt='缩略图...' /><br />";
+if (test_file(H . "files/down/screens/128/{$file_id['id']}.gif")) {
+	echo "<img src='/files/down/screens/128/{$file_id['id']}.gif' alt='缩略图...' /><br />";
 } else {
 	// 尝试使用 ffmpeg_movie
 	if (class_exists('ffmpeg_movie')) {
@@ -19,11 +19,11 @@ if (test_file(H . "files/screens/128/{$file_id['id']}.gif")) {
 				$s_img = $gd_image;
 				imagecopyresampled($des_img, $s_img, 0, 0, 0, 0, 128, 128, $w, $h);
 				$des_img = img_copyright($des_img); // 版权叠加
-				imagegif($des_img, H . "files/screens/128/{$file_id['id']}.gif");
-				chmod(H . "files/screens/128/{$file_id['id']}.gif", 0777);
+				imagegif($des_img, H . "files/down/screens/128/{$file_id['id']}.gif");
+				chmod(H . "files/down/screens/128/{$file_id['id']}.gif", 0777);
 				imagedestroy($des_img);
 				imagedestroy($s_img);
-				echo "<img src='/files/screens/128/{$file_id['id']}.gif' alt='缩略图...' /><br />";
+				echo "<img src='/files/down/screens/128/{$file_id['id']}.gif' alt='缩略图...' /><br />";
 			}
 		}
 	}
@@ -44,11 +44,11 @@ if (test_file(H . "files/screens/128/{$file_id['id']}.gif")) {
 					$des_img = imagecreatetruecolor(128, 128);
 					imagecopyresampled($des_img, $sourceImage, 0, 0, 0, 0, 128, 128, $w, $h);
 					$des_img = img_copyright($des_img); // 版权叠加
-					imagegif($des_img, H . "files/screens/128/{$file_id['id']}.gif");
-					chmod(H . "files/screens/128/{$file_id['id']}.gif", 0777);
+					imagegif($des_img, H . "files/down/screens/128/{$file_id['id']}.gif");
+					chmod(H . "files/down/screens/128/{$file_id['id']}.gif", 0777);
 					imagedestroy($des_img);
 					imagedestroy($sourceImage);
-					echo "<img src='/files/screens/128/{$file_id['id']}.gif' alt='缩略图...' /><br />";
+					echo "<img src='/files/down/screens/128/{$file_id['id']}.gif' alt='缩略图...' /><br />";
 				}
 			}
 		}
