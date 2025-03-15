@@ -1,5 +1,4 @@
 # git屏蔽代码
 
 /sys/dat/settings.php
-/sys/dat/shif_iv.dat
 /sys/tmp/*
