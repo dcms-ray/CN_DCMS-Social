@@ -393,7 +393,7 @@ if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `id_user` = '$ank[id]' AN
 }
 echo "<span class=\"ank_n\">注册时间:</span> <span class=\"ank_d\">" . vremja($ank['date_reg']) . "</span><br />";
 echo "</div>";
-if ($user['level'] > $ank['level']) {
+if (isset($user['level']) && $user['level'] > $ank['level']) {
 	if (isset($_GET['info'])) {
 		echo "<div class='foot'>";
 		echo "<img src='/style/icons/str.gif' alt='*' /> <a href='?id={$ank['id']}'>隐藏</a><br />";
@@ -451,7 +451,7 @@ if ($user['level'] > $ank['level']) {
 }
 echo "<div class='foot'>";
 if (isset($user) && $user['id'] == $ank['id']) echo "<img src='/style/icons/str.gif' alt='*' /> <a href=\"edit.php\">修改资料</a><br />";
-if ($user['level'] > $ank['level']) {
+if (isset($user['level']) && $user['level'] > $ank['level']) {
 	if (user_access('user_prof_edit'))
 		echo "<img src='/style/icons/str.gif' alt='*' /> <a href='/adm_panel/user.php?id=$ank[id]'>编辑资料</a><br />";
 	if ($user['id'] != $ank['id']) {
