@@ -16,7 +16,7 @@ http://dcms-social.ru
 */
 
 $file_id = dbassoc(dbquery("SELECT * FROM `downnik_files` WHERE `id`='" . intval($_GET['id_file']) . "' LIMIT 1"));
-if (empty($file_id['id_user']) or empty($user['id'])  or  $file_id['id_user'] != $ank['id']) {
+if (empty($file_id['id_user']) or $file_id['id_user'] != $ank['id']) {
 	header("Location: /?" . session_id());
 	exit;
 }
@@ -218,9 +218,9 @@ if ($dir['pass'] != NULL) {
 }
 /*---------------------------------------------------------*/
 // Includim 编辑器
-if (isset($user) && user_access('down_file_edit') || $ank['id'] == $user['id']) include "inc/file.edit.php";
+if (isset($user['id']) && (user_access('down_file_edit') || $ank['id'] == $user['id'])) include "inc/file.edit.php";
 // Includim 去除
-if (isset($user) && user_access('down_file_delete') || $ank['id'] == $user['id']) include "inc/file.delete.php";
+if (isset($user['id']) && (user_access('down_file_delete') || $ank['id'] == $user['id'])) include "inc/file.delete.php";
 echo '<div class="main">';
 if ($dir_id['my'] != 1) {
 	if ($user['id'] == $file_id['id_user']) {
@@ -234,7 +234,7 @@ echo htmlspecialchars($file_id['name']) . (!empty($ras) ? '.' . $ras : '') . ' '
 if ($file_id['metka'] == 1) echo '<font color=red><b>(18+)</b></font> ';
 echo vremja($file_id['time']) . '<br />';
 echo '</div>';
-if (($user['abuld'] == 1 || $file_id['metka'] == 0 || $file_id['id_user'] == $user['id'])) {	// 标签 18+
+if ($file_id['metka'] == 0 || (isset($user['id']) && ($user['abuld'] == 1 || $file_id['id_user'] == $user['id']))) {	// 标签 18+
 	echo '<div class="main">';
 	if (test_file(H . "down/inc/file/{$ras}.php")) {
 		include H . "down/inc/file/{$ras}.php";
@@ -244,15 +244,15 @@ if (($user['abuld'] == 1 || $file_id['metka'] == 0 || $file_id['id_user'] == $us
 	echo '</div>';
 } elseif (!isset($user)) {
 	echo '<div class="mess">';
-	echo '<img src="/style/icons/small_adult.gif" alt="*"><br /> 该文件包含略微的色情内容，只有 18 岁及以上的注册用户才能查看。 <br />';
-	echo '<a href="/user/aut.php">登录</a> | <a href="/user/reg.php">注册</a>';
+	echo '<img src="../../style/icons/small_adult.gif" alt="*"><br /> 该文件包含略微的色情内容，只有 18 岁及以上的注册用户才能查看。 <br />';
+	echo '<a href="../aut.php">登录</a> | <a href="/user/reg.php">注册</a>';
 	echo '</div>';
 } else {
 	echo '<div class="mess">';
-	echo '<img src="/style/icons/small_adult.gif" alt="*"><br /> 
+	echo '<img src="../../style/icons/small_adult.gif" alt="*"><br /> 
 	      该文件包含略微的色情内容。
 	      如果你不介意，而且你已经满 18 岁或 18 岁以上，你可以<a href="?id_file=' . $file_id['id'] . '&amp;sess_abuld=1">继续查看</a>。
-	      你也可以直接在<a href="/user/info/settings.php">设置</a>中禁用该警告。';
+	      你也可以直接在<a href="../info/settings.php">设置</a>中禁用该警告。';
 	echo '</div>';
 }
 /*----------------------清单-------------------*/
@@ -265,9 +265,9 @@ $k_2 = dbresult(dbquery("SELECT COUNT(*) FROM `downnik_files` WHERE `my_dir` = '
 echo ' (第' . $k_1 . '页，共' . $k_2 . '页) ';
 if (isset($listr['id'])) echo '<span class="page">' . ($listr['id'] ? '<a href="?id_file=' . $listr['id'] . '">下一页 &raquo;</a>' : ' 下一页 &raquo;') . '</span>';
 echo '</div>';
-if (($user['abuld'] == 1 || $file_id['metka'] == 0 || $file_id['id_user'] == $user['id'])) { // 标签 18+
+if ($file_id['metka'] == 0 || (isset($user['id']) && ($user['abuld'] == 1 || $file_id['id_user'] == $user['id']))) { // 标签 18+
 	/*----------------对文件执行的操作-------------*/
-	if (user_access('down_file_edit') || $user['id'] == $file_id['id_user']) {
+	if (isset($user['id']) && (user_access('down_file_edit') || $user['id'] == $file_id['id_user'])) {
 		echo '<div class="main">';
 		if ($user['id'] == $file_id['id_user'] && $dir_id['my'] == 1) echo '[<a href="/down/?trans=' . $file_id['id'] . '"><img src="/style/icons/z.gif" alt="*"> 进入区域</a>]';
 		echo ' [<img src="/style/icons/edit.gif" alt="*"> <a href="?id_file=' . $file_id['id'] . '&amp;edit">编辑</a>]';
