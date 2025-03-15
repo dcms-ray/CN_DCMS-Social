@@ -33,7 +33,7 @@ if (isset($_GET['delete_folder']) && isset($_GET['ok'])) {
         $q2 = dbquery("SELECT * FROM `downnik_files` WHERE `my_dir` = '$post[id]'");
         while ($post2 = dbassoc($q2)) {
             echo $post2['name'] . '<br />';
-            unlink(H . 'files/down/' . $post2['id'] . '.dat');
+            unlink(H . 'files/down/data/' . $post2['id'] . '.dat');
             unlink(H . 'files/screens/128/' . $post2['id'] . '.gif');
             unlink(H . 'files/screens/128/' . $post2['id'] . '.png');
             unlink(H . 'files/screens/128/' . $post2['id'] . '.jpg');
@@ -55,7 +55,7 @@ if (isset($_GET['delete_folder']) && isset($_GET['ok'])) {
         $q3 = dbquery("SELECT * FROM `downnik_files` WHERE `my_dir` = '$post[id]'");
         while ($post2 = dbassoc($q3)) {
             echo $post2['name'] . '<br />';
-            unlink(H . 'files/down/' . $post2['id'] . '.dat');
+            unlink(H . 'files/down/data/' . $post2['id'] . '.dat');
             unlink(H . 'files/screens/128/' . $post2['id'] . '.gif');
             unlink(H . 'files/screens/128/' . $post2['id'] . '.png');
             unlink(H . 'files/screens/128/' . $post2['id'] . '.jpg');

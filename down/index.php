@@ -59,21 +59,21 @@ if (isset($_GET['f'])) {
 	if (dbresult(dbquery("SELECT COUNT(`id`) FROM `downnik_files` WHERE `id_dir` = '{$id_dir}' AND `id`='" . intval($_GET['f']) . "' LIMIT 1"), 0) != 0) {
 		$file_id = dbassoc(dbquery("SELECT * FROM `downnik_files` WHERE `id_dir` = '{$id_dir}' AND `id`='" . intval($_GET['f']) . "'"));
 		$ras = $file_id['ras'];
-		$file = H . "files/down/{$file_id['id']}.dat";
+		$file = H . "files/down/data/{$file_id['id']}.dat";
 		$name = $file_id['name'];
 		$size = $file_id['size'];
 		$file_id['name'] = str_replace('_', ' _', $file_id['name']);
 
 		// 处理下载文件
-		if (!isset($_GET['showinfo']) && !isset($_GET['komm']) && test_file(H . 'files/down/' . $file_id['id'] . '.dat')) {
+		if (!isset($_GET['showinfo']) && !isset($_GET['komm']) && test_file(H . 'files/down/data/' . $file_id['id'] . '.dat')) {
 			if ($ras == 'jar' && strtolower(preg_replace('#^.*.#', NULL, $f)) == 'jad') {
 				include_once H . 'sys/inc/zip.php';
-				$zip = new PclZip(H . 'files/down/' . $file_id['id'] . '.dat');
+				$zip = new PclZip(H . 'files/down/data/' . $file_id['id'] . '.dat');
 				$content = $zip->extract(PCLZIP_OPT_BY_NAME, "META-INF/MANIFEST.MF", PCLZIP_OPT_EXTRACT_AS_STRING);
 				$jad = preg_replace("#(MIDlet-Jar-URL:( )*[^(n|r)]*)#i", NULL, $content[0]['content']);
 				$jad = preg_replace("#(MIDlet-Jar-Size:( )*[^(n|r)]*)(n|r)#i", NULL, $jad);
 				$jad = trim($jad);
-				$jad .= "rnMIDlet-Jar-Size: " . filesize(H . 'files/down/' . $file_id['id'] . '.dat') . "";
+				$jad .= "rnMIDlet-Jar-Size: " . filesize(H . 'files/down/data/' . $file_id['id'] . '.dat') . "";
 				$jad .= "rnMIDlet-Jar-URL: /down{$dir_id['dir']}{$file_id['id']}.{$file_id['ras']}";
 				$jad = br($jad, "rn");
 				header('Content-Type: text/vnd.sun.j2me.app-descriptor');
@@ -87,7 +87,7 @@ if (isset($_GET['f'])) {
 			dbquery("UPDATE `downnik_files` SET `k_loads` = '" . ($file_id['k_loads'] + 1) . "' WHERE `id` = '$file_id[id]' LIMIT 1");
 			include_once '../sys/inc/downloadfile.php';
 			header('Access-Control-Allow-Origin: *');
-			DownloadFile(H . 'files/down/' . $file_id['id'] . '.dat', retranslit($file_id['name']) . (!empty($ras) ? '.' . $ras : ''), ras_to_mime($ras));
+			DownloadFile(H . 'files/down/data/' . $file_id['id'] . '.dat', retranslit($file_id['name']) . (!empty($ras) ? '.' . $ras : ''), ras_to_mime($ras));
 			exit;
 		}
 

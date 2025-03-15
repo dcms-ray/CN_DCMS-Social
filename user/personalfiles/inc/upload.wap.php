@@ -95,7 +95,7 @@ if ($dir_id['upload'] == 1) {
 			}
 
 			// 保存文件到服务器
-			if (!copy($_FILES['file']['tmp_name'], H . "files/down/{$id_file}.dat")) {
+			if (!copy($_FILES['file']['tmp_name'], H . "files/down/data/{$id_file}.dat")) {
 				dbquery("DELETE FROM `downnik_files` WHERE `id` = '{$id_file}' LIMIT 1");
 				$err[] = '上传时出错';
 			}
@@ -103,7 +103,7 @@ if ($dir_id['upload'] == 1) {
 
 		// 如果一切成功，设置文件权限并创建截图
 		if (!isset($err)) {
-			chmod(H . "files/down/{$id_file}.dat", 0666);
+			chmod(H . "files/down/data/{$id_file}.dat", 0666);
 
 			// 处理截图逻辑
 			if (isset($_FILES['screen']) && $_FILES['screen']['error'] === UPLOAD_ERR_OK && $imgc = imagecreatefromstring(file_get_contents($_FILES['screen']['tmp_name']))) {

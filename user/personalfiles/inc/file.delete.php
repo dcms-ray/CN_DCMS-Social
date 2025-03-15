@@ -20,7 +20,7 @@ if (isset($_GET['delete'])) {
 	if (isset($_GET['ok'])) {
 		dbquery("DELETE FROM `user_music` WHERE `id_file` = '$file_id[id]' AND `dir` = 'down'");
 		dbquery("DELETE FROM `downnik_files` WHERE `id` = '$file_id[id]'");
-		unlink(H . 'files/down/' . $file_id['id'] . '.dat');
+		unlink(H . 'files/down/data/' . $file_id['id'] . '.dat');
 		unlink(H . 'files/screens/128/' . $file_id['id'] . '.gif');
 		unlink(H . 'files/screens/128/' . $file_id['id'] . '.png');
 		unlink(H . 'files/screens/128/' . $file_id['id'] . '.jpg');
@@ -29,7 +29,7 @@ if (isset($_GET['delete'])) {
 		unlink(H . 'files/screens/48/' . $file_id['id'] . '.png');
 		unlink(H . 'files/screens/48/' . $file_id['id'] . '.jpg');
 		unlink(H . 'files/screens/48/' . $file_id['id'] . '.jpeg');
-		unlink(H . 'files/down/' . $file_id['id'] . '.dat');
+		unlink(H . 'files/down/data/' . $file_id['id'] . '.dat');
 		$_SESSION['message'] = '该文件已成功删除';
 		header("Location: ?page=" . intval($_GET['page']) . "");
 		exit;

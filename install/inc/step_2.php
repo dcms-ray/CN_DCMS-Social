@@ -14,7 +14,7 @@ if(isset($_GET['chmod_ok'])) {
 	@chmod(H.'files/gallery/photo/',0777);
 	@chmod(H.'sys/inc/',0777);
 	@chmod(H.'sys/fnc/',0777);
-	@chmod(H.'files/down/',0777);
+	@chmod(H.'files/down/data/',0777);
 	@chmod(H.'files/screens/14/',0777);
 	@chmod(H.'files/screens/48/',0777);
 	@chmod(H.'files/screens/128/',0777);

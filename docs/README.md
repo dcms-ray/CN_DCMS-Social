@@ -34,7 +34,7 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 ## 主要文件夹与引擎文件
 
 - 论坛附件文件：`files/forum/` (*.frf 文件)
-- 下载中心文件：`files/down/` (*.DAT 文件)
+- 下载中心文件：`files/down/data/` (*.DAT 文件)
 - 相册图片文件：`files/gallery/`
 - 礼物图片文件：`files/gift/`
 - 表情图片文件：`files/smiles/`
