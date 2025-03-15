@@ -1,6 +1,15 @@
 <?php
-// 返回当前页面
-function page($k_page=1) {
+
+/**
+ * 返回当前页面编号。
+ *
+ * 该函数用于确定当前显示的页面编号，支持通过GET请求中的`page`参数动态调整页面编号。
+ * 如果`page`参数为`end`，则返回最大页面数；如果为数字，则返回对应的页面编号。
+ *
+ * @param int $k_page 最大页面编号，默认为1。
+ * @return int 当前页面编号。
+ */
+function page($k_page = 1) {
 	$page = 1;
 	if (isset($_GET['page'])) {
 		if ($_GET['page'] == 'end')
@@ -13,7 +22,15 @@ function page($k_page=1) {
 	return $page;
 }
 
-// 计算页数
+/**
+ * 计算总页数。
+ *
+ * 根据帖子总数和每页显示帖子数量计算出总的页数。
+ *
+ * @param int $k_post 总帖子数，默认为0。
+ * @param int $k_p_str 每页显示帖子数量，默认为10。
+ * @return int 总页数。如果帖子总数为0，则返回1。
+ */
 function k_page($k_post = 0, $k_p_str = 10) {
 	if ($k_post != 0) {
 		$v_pages = ceil($k_post / $k_p_str);
@@ -22,7 +39,17 @@ function k_page($k_post = 0, $k_p_str = 10) {
 	else return 1;
 }
 
-// 页码显示（乍一看似乎很难;)）
+/**
+ * 显示分页链接。
+ *
+ * 生成并输出分页链接HTML代码，允许用户在不同页面间导航。此函数考虑了当前页面、总页数以及链接格式，
+ * 并提供了省略号（..）来表示未显示的页面。
+ *
+ * @param string $link 分页链接的基本部分，默认为'?'。
+ * @param int $k_page 总页数，默认为1。
+ * @param int $page 当前页面编号，默认为1。
+ * @return void
+ */
 function str($link = '?', $k_page = 1,$page = 1) {
 	if ($page < 1) $page = 1;
 	echo '<div class="c2">';
