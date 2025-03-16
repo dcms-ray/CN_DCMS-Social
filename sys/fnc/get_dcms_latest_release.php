@@ -6,7 +6,7 @@
  */
 function getLatestStableRelease() {
 	// 设置API的URL
-	$api_url = "https://api.guguan.us.kg/dcms_github_releases.php";
+	$api_url = "https://api.guguan.dpdns.org/dcms_github_releases.php";
 
 	// 执行cURL请求并获取响应数据
 	$response = execute_curl_request($api_url);
