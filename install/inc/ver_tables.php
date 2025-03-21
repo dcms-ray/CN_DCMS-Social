@@ -1,7 +1,7 @@
 <?php
 // 此脚本将缺失的表添加到数据库
 // 它也用于安装引擎
-$tab = mysqli_query($db,'SHOW TABLES');
+$tab = mysqli_query($mydb,'SHOW TABLES');
 while ($tables = mysqli_fetch_array($tab)) {
 	$_ver_table[$tables[0]] = 1;
 }
@@ -16,7 +16,7 @@ while ($filetables = readdir($opdirtables)) {
 			$sql = SQLParser::getQueriesFromFile(H . 'install/db_tables/' . $filetables);
 			for ($i = 0; $i < count($sql); $i++) {
 				$k_sql++; // 查询计数器（用于安装程序）
-				if (@mysqli_query($db,$sql[$i])) {
+				if (@mysqli_query($mydb,$sql[$i])) {
 					$ok_sql++; // 成功查询计数器（用于安装程序）
 				}
 			}
@@ -35,7 +35,7 @@ if (!isset($install)) {
 			include_once H . 'sys/inc/sql_parser.php';
 			$sql = SQLParser::getQueriesFromFile(H . 'install/update/' . $rd);
 			for ($i = 0; $i < count($sql); $i++) {
-				mysqli_query($db,$sql[$i]);
+				mysqli_query($mydb,$sql[$i]);
 			}
 			$set['update'][$rd] = true;
 			$save_settings = true;

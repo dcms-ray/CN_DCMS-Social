@@ -1,6 +1,6 @@
 <?php
 $err = NULL;
-$db = NULL;
+$mydb = NULL;
 $time = NULL;
 $passgen = NULL;
 $sess = NULL;

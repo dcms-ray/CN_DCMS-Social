@@ -2,7 +2,7 @@
 // 连接数据库服务器
 // 使用 mysqli_connect 函数连接到数据库，传入数据库主机、用户名、密码和数据库名称
 // 如果连接失败，输出错误信息并终止脚本
-$db = mysqli_connect($set['mysql_host'], $set['mysql_user'], $set['mysql_pass'], $set['mysql_db_name']);
+$mydb = mysqli_connect($set['mysql_host'], $set['mysql_user'], $set['mysql_pass'], $set['mysql_db_name']);
 if (mysqli_connect_errno()) { 
 	exit("连接 MySQL 失败: " . mysqli_connect_error()); // 显示连接失败的错误信息
 }
@@ -47,8 +47,8 @@ function dbresult($result, $row, $field = 0) {
  * @return mixed 返回查询结果的资源
  */
 function dbquery($query) {
-	global $db;
-	return mysqli_query($db, $query); // 执行 SQL 查询并返回结果
+	global $mydb;
+	return mysqli_query($mydb, $query); // 执行 SQL 查询并返回结果
 }
 
 /**
@@ -59,7 +59,7 @@ function dbquery($query) {
  * @return int 返回查询结果的总行数
  */
 function dbrows($result) {
-	global $db;
+	global $mydb;
 	return mysqli_num_rows($result); // 获取查询结果的行数
 }
 
@@ -71,7 +71,7 @@ function dbrows($result) {
  * @return array 返回查询结果的下一行数据，以数组形式返回
  */
 function dbarray($result) {
-	global $db;
+	global $mydb;
 	return mysqli_fetch_array($result); // 获取查询结果的下一行，并以数组形式返回
 }
 
@@ -83,7 +83,7 @@ function dbarray($result) {
  * @return array 返回查询结果的下一行数据，以关联数组形式返回
  */
 function dbassoc($result) {
-	global $db;
+	global $mydb;
 	return mysqli_fetch_assoc($result); // 获取查询结果的下一行，并以关联数组形式返回
 }
 
@@ -93,8 +93,8 @@ function dbassoc($result) {
  * @return int 返回最近插入数据的自增 ID
  */
 function dbinsertid() {
-	global $db;
-	return mysqli_insert_id($db); // 获取最后一次插入的 ID
+	global $mydb;
+	return mysqli_insert_id($mydb); // 获取最后一次插入的 ID
 }
 
 // 设置数据库时区
@@ -118,4 +118,4 @@ function db_optimize() {
 	}
 }
 
-require 'classes/class_db.php'; // 引入数据库操作类
+require __DIR__ . '/classes/class_db.php'; // 引入数据库操作类
