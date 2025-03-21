@@ -57,12 +57,7 @@ class Database {
 			// 设置数据库会话时区为为 PHP 时区
 			$this->pdo->exec("SET time_zone = '" . date('P') . "';");
 		} catch (PDOException $e) {
-			// 连接失败时，输出错误信息并终止脚本执行
-			http_response_code(506);
-			die(json_encode([
-				'status' => 'error',
-				'error' => "Database connection failed: " . $e->getMessage()
-			]));
+			throw new Exception("Database connection failed: " . $e->getMessage());
 		}
 	}
 
@@ -133,7 +128,17 @@ class Database {
 		$stmt = $this->pdo->prepare($sql);	// 准备 SQL 语句
 		return $stmt->execute($params);		// 执行删除操作
 	}
-}
 
-// 初始化全局变量
-$db = new Database($set['mysql_host'], $set['mysql_db_name'], $set['mysql_user'], $set['mysql_pass']);
+
+	// 执行查询并返回 PDOStatement 对象
+	public function dbquery($sql, $params = []) {
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute($params);
+		return $stmt;
+	}
+
+	// 获取最后插入的 ID
+	public function lastInsertId() {
+		return $this->pdo->lastInsertId();
+	}
+}

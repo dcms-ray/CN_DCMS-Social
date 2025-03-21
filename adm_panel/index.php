@@ -75,6 +75,8 @@ if (isset($_SESSION['adm_auth']) && $_SESSION['adm_auth'] > $time || isset($_SES
 	if (user_access('adm_mysql')) echo "<div class='main'><img src='/style/icons/str.gif' alt=''/> <a href='tables.php'>上传表格</a></div>\n";
 	if (user_access('adm_themes')) echo "<div class='main'><img src='/style/icons/str.gif' alt=''/> <a href='themes.php'>主题样式</a></div>\n";
 
+	if (user_access('adm_set_sys')) echo "<div class='main'><img src='/style/icons/str.gif' alt=''/> <a href='dev_options.php'>开发者选项</a></div>\n";
+
 	// 加载插件的设置项
 	$directory = H . 'sys/add/admin';
 	if (is_dir($directory)) {

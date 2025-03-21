@@ -17,10 +17,10 @@ mysqli_query($mydb, 'set character_set_connection="utf8mb4"');
 if (isset($_SESSION['adm_reg_ok']) && $_SESSION['adm_reg_ok'] == true) {
 	if (isset($_GET['step']) && $_GET['step'] == '5') {
 		$tmp_set['title'] = strtoupper($_SERVER['HTTP_HOST']) . ' - 社区系统';
-		$tmp_set['mysql_host'] = $_SESSION['host'];
-		$tmp_set['mysql_user'] = $_SESSION['user'];
-		$tmp_set['mysql_pass'] = $_SESSION['pass'];
-		$tmp_set['mysql_db_name'] = $_SESSION['db'];
+		$tmp_set['sql_host'] = $_SESSION['host'];
+		$tmp_set['sql_user'] = $_SESSION['user'];
+		$tmp_set['sql_pass'] = $_SESSION['pass'];
+		$tmp_set['sql_db_name'] = $_SESSION['db'];
 		$tmp_set['shif'] = $_SESSION['shif'];
 		if (save_settings($tmp_set)) {
 			unset($_SESSION['install_step'], $_SESSION['host'], $_SESSION['user'], $_SESSION['pass'], $_SESSION['db'], $_SESSION['adm_reg_ok'], $_SESSION['mysql_ok']);

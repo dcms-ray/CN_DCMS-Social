@@ -21,10 +21,10 @@ if (isset($_SESSION['mysql_ok']) && $_SESSION['mysql_ok'] == true) {
 	if (!($mydb = @mysqli_connect($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['db']))) {
 		$err[] = '无法连接到服务器 ';
 	} else {
-		$set['mysql_db_name'] = $_SESSION['db'] = $_POST['db'];
-		$set['mysql_host'] = $_SESSION['host'] = $_POST['host'];
-		$set['mysql_user'] = $_SESSION['user'] = $_POST['user'];
-		$set['mysql_pass'] = $_SESSION['pass'] = $_POST['pass'];
+		$set['sql_db_name'] = $_SESSION['db'] = $_POST['db'];
+		$set['sql_host'] = $_SESSION['host'] = $_POST['host'];
+		$set['sql_user'] = $_SESSION['user'] = $_POST['user'];
+		$set['sql_pass'] = $_SESSION['pass'] = $_POST['pass'];
 		mysqli_set_charset($mydb, 'utf8mb4');
 		$mydb_tables = array();
 		$res = mysqli_query($mydb,'SHOW TABLES');
@@ -77,13 +77,13 @@ if (isset($_SESSION['mysql_ok']) && $_SESSION['mysql_ok'] == true) {
 	}
 	echo "<form method=\"post\" action=\"index.php?$passgen\">";
 	echo "数据库地址：<br />";
-	echo "<input name=\"host\" value=\"$set[mysql_host]\" type=\"text\" /><br />";
+	echo "<input name=\"host\" value=\"$set[sql_host]\" type=\"text\" /><br />";
 	echo "数据库用户：<br />";
-	echo "<input name=\"user\" value=\"$set[mysql_user]\" type=\"text\" /><br />";
+	echo "<input name=\"user\" value=\"$set[sql_user]\" type=\"text\" /><br />";
 	echo "数据库密码：<br />";
-	echo "<input name=\"pass\" value=\"$set[mysql_pass]\" type=\"text\" /><br />";
+	echo "<input name=\"pass\" value=\"$set[sql_pass]\" type=\"text\" /><br />";
 	echo "数据库名称：<br />";
-	echo "<input name=\"db\" value=\"$set[mysql_db_name]\" type=\"text\" /><br />";
+	echo "<input name=\"db\" value=\"$set[sql_db_name]\" type=\"text\" /><br />";
 	if (isset($mydb_not_null))
 		echo "<label><input type='checkbox' checked='checked' name='rename' value='1' /> 重命名现有表<br /></label>";
 	echo "<br /><input value=\"保存\" type=\"submit\" />";

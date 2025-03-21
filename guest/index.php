@@ -18,6 +18,7 @@ if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` 
 // 清除回复通知
 if (isset($user)) {
 	dbquery("UPDATE `notification` SET `read` = '1' WHERE `type` = 'guest' AND `id_user` = '$user[id]'");
+	$db->query("UPDATE `notification` SET `read` = '1' WHERE `type` = 'guest' AND `id_user` = ?", [$user['id']]);
 }
 
 // 注释操作
