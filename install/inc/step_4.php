@@ -7,20 +7,20 @@ $set['title'] = '注册管理员';
 include_once 'inc/head.php'; // 设计主题的顶部
 if (!isset($_SESSION['shif'])) $_SESSION['shif'] = $passgen;
 $set['shif'] = $_SESSION['shif'];
-$db = mysqli_connect($_SESSION['host'], $_SESSION['user'], $_SESSION['pass'], $_SESSION['db']);
-mysqli_query($db, 'set charset utf8mb4');
-mysqli_query($db, 'SET names utf8mb4');
-mysqli_query($db, 'set character_set_client="utf8mb4"');
-mysqli_query($db, 'set character_set_connection="utf8mb4"');
+$mydb = mysqli_connect($_SESSION['host'], $_SESSION['user'], $_SESSION['pass'], $_SESSION['db']);
+mysqli_query($mydb, 'set charset utf8mb4');
+mysqli_query($mydb, 'SET names utf8mb4');
+mysqli_query($mydb, 'set character_set_client="utf8mb4"');
+mysqli_query($mydb, 'set character_set_connection="utf8mb4"');
 //mysql_query('set character_set_result="utf8mb4"');
 
 if (isset($_SESSION['adm_reg_ok']) && $_SESSION['adm_reg_ok'] == true) {
 	if (isset($_GET['step']) && $_GET['step'] == '5') {
 		$tmp_set['title'] = strtoupper($_SERVER['HTTP_HOST']) . ' - 社区系统';
-		$tmp_set['mysql_host'] = $_SESSION['host'];
-		$tmp_set['mysql_user'] = $_SESSION['user'];
-		$tmp_set['mysql_pass'] = $_SESSION['pass'];
-		$tmp_set['mysql_db_name'] = $_SESSION['db'];
+		$tmp_set['sql_host'] = $_SESSION['host'];
+		$tmp_set['sql_user'] = $_SESSION['user'];
+		$tmp_set['sql_pass'] = $_SESSION['pass'];
+		$tmp_set['sql_db_name'] = $_SESSION['db'];
 		$tmp_set['shif'] = $_SESSION['shif'];
 		if (save_settings($tmp_set)) {
 			unset($_SESSION['install_step'], $_SESSION['host'], $_SESSION['user'], $_SESSION['pass'], $_SESSION['db'], $_SESSION['adm_reg_ok'], $_SESSION['mysql_ok']);
@@ -42,7 +42,7 @@ if (isset($_SESSION['adm_reg_ok']) && $_SESSION['adm_reg_ok'] == true) {
 			$err[] = '短于 3 个字符的用户名';
 		} elseif (strlen2($_POST['nick']) > 16) {
 			$err[] = '长于 16 个字符的用户名';
-		} elseif (mysqli_fetch_assoc(mysqli_query($db, "SELECT COUNT(*) AS cnt FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "' LIMIT 1"))['cnt'] != 0) {
+		} elseif (mysqli_fetch_assoc(mysqli_query($mydb, "SELECT COUNT(*) AS cnt FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "' LIMIT 1"))['cnt'] != 0) {
 			$err[] = '所选的用户名已经被另一个用户占用了';
 		} else {
 			$nick = $_POST['nick'];
@@ -73,23 +73,23 @@ if (isset($_SESSION['adm_reg_ok']) && $_SESSION['adm_reg_ok'] == true) {
 	}
 
 	if (!isset($err)) {	// 如果没有错误
-		mysqli_query($db, "INSERT INTO `user` (`nick`, `pass`, `date_reg`, `pol`, `level`, `group_access`, `balls`, `money`)
+		mysqli_query($mydb, "INSERT INTO `user` (`nick`, `pass`, `date_reg`, `pol`, `level`, `group_access`, `balls`, `money`)
 		                   VALUES('$nick', '" . password_hash($password, PASSWORD_DEFAULT) . "', $time, '$pol', '4', '15', '5000', '500')");
-		$user = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM `user` WHERE `nick` = '$nick' LIMIT 1"));
-		$q = mysqli_query($db, "SELECT `type` FROM `all_accesses`");
+		$user = mysqli_fetch_assoc(mysqli_query($mydb, "SELECT * FROM `user` WHERE `nick` = '$nick' LIMIT 1"));
+		$q = mysqli_query($mydb, "SELECT `type` FROM `all_accesses`");
 
 		// 意义不明的循环，根本没有用到 $ac 和 user_acсess 表
-		//while ($ac = mysqli_fetch_assoc($q)) {mysqli_query($db, "INSERT INTO `user_acсess` (`id_user`, `type`) VALUES ('$user[id]','$ac[type]')");}
+		//while ($ac = mysqli_fetch_assoc($q)) {mysqli_query($mydb, "INSERT INTO `user_acсess` (`id_user`, `type`) VALUES ('$user[id]','$ac[type]')");}
 		
 		/*
 		========================================
 		创建用户设置
 		========================================
 		*/
-		mysqli_query($db, "INSERT INTO `user_set` (`id_user`) VALUES ('$user[id]')");
-		mysqli_query($db, "INSERT INTO `discussions_set` (`id_user`) VALUES ('$user[id]')");
-		mysqli_query($db, "INSERT INTO `tape_set` (`id_user`) VALUES ('$user[id]')");
-		mysqli_query($db, "INSERT INTO `notification_set` (`id_user`) VALUES ('$user[id]')");
+		mysqli_query($mydb, "INSERT INTO `user_set` (`id_user`) VALUES ('$user[id]')");
+		mysqli_query($mydb, "INSERT INTO `discussions_set` (`id_user`) VALUES ('$user[id]')");
+		mysqli_query($mydb, "INSERT INTO `tape_set` (`id_user`) VALUES ('$user[id]')");
+		mysqli_query($mydb, "INSERT INTO `notification_set` (`id_user`) VALUES ('$user[id]')");
 		$_SESSION['id_user'] = $user['id'];
 		$_SESSION['adm_reg_ok'] = true;
 	}

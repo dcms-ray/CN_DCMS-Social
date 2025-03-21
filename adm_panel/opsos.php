@@ -24,12 +24,12 @@ if (isset($_POST['min']) && isset($_POST['max']) && isset($_POST['opsos'])) {
 	$min = ip2long($_POST['min']);
 	$max = ip2long($_POST['max']);
 	$opsos = my_esc(stripcslashes(htmlspecialchars($_POST['opsos'])));
-	dbquery("INSERT INTO `opsos` (`min`, `max`, `opsos`) values('$min', '$max', '$opsos')", $db);
+	dbquery("INSERT INTO `opsos` (`min`, `max`, `opsos`) values('$min', '$max', '$opsos')");
 	msg ('范围成功添加');
 }
 
 // 删除运营商
-if (isset($_GET['delmin']) && isset($_GET['delmax']) && dbresult(dbquery("SELECT COUNT(*) FROM `opsos` WHERE `min` = '" . $_GET['delmin'] . "' AND `max` = '" . $_GET['delmax'] . "' LIMIT 1", $db), 0) != 0) {
+if (isset($_GET['delmin']) && isset($_GET['delmax']) && dbresult(dbquery("SELECT COUNT(*) FROM `opsos` WHERE `min` = '" . $_GET['delmin'] . "' AND `max` = '" . $_GET['delmax'] . "' LIMIT 1"), 0) != 0) {
 	dbquery("DELETE FROM `opsos` WHERE `min` = '" . $_GET['delmin'] . "' AND `max` = '" . $_GET['delmax'] . "' LIMIT 1");
 	dbquery("OPTIMIZE TABLE `opsos`");
 	msg('范围成功删除');

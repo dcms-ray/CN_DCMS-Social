@@ -262,7 +262,7 @@ if (!isset($hard_process)) {
 				dbquery("DELETE FROM `mail` WHERE `id_user` = '{$deleted['id_user']}' AND `id_kont` = '{$deleted['id_kont']}' OR `id_kont` = '{$deleted['id_user']}' AND `id_user` = '{$deleted['id_kont']}'");
 			}
 		}
-		$tab = dbquery('SHOW TABLES FROM ' . $set['mysql_db_name']);
+		$tab = dbquery('SHOW TABLES FROM ' . $set['sql_db_name']);
 		while ($table = mysqli_fetch_row($tab)) {
 			dbquery("OPTIMIZE TABLE `{$table[0]}`"); // 表的优化
 		}

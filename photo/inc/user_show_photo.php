@@ -108,11 +108,11 @@ if (isset($user) && $user['id'] != $ank['id'] && dbresult(dbquery("SELECT COUNT(
 		$c = dbresult(dbquery("SELECT COUNT(*) FROM `user_set` WHERE `id_user` = '$user[id]' AND `ocenka` > '$time'"), 0);
 		if ($c == 0 && $_GET['rating'] == 6) {
 			$_SESSION['message'] = '您需要激活服务';
-			header("Location: /user/money/plus5.php");
+			header("Location: ../user/money/plus5.php");
 			exit;
 		}
-		dbquery("INSERT INTO `gallery_rating` (`id_user`, `id_photo`, `like`, `time`, `avtor`) values('$user[id]', '$photo[id]', '" . intval($_GET['rating']) . "', '$time', $photo[id_user])", $db);
-		dbquery("UPDATE `gallery_photo` SET `rating` = '" . ($photo['rating'] + intval($_GET['rating'])) . "' WHERE `id` = '$photo[id]' LIMIT 1", $db);
+		dbquery("INSERT INTO `gallery_rating` (`id_user`, `id_photo`, `like`, `time`, `avtor`) values('$user[id]', '$photo[id]', '" . intval($_GET['rating']) . "', '$time', $photo[id_user])");
+		dbquery("UPDATE `gallery_photo` SET `rating` = '" . ($photo['rating'] + intval($_GET['rating'])) . "' WHERE `id` = '$photo[id]' LIMIT 1");
 		$_SESSION['message'] = '你的积分被接受';
 		header("Location: ?");
 		exit;

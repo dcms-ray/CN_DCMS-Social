@@ -71,7 +71,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 		// 注册邮箱验证
 		if ($set['reg_select'] == 'open_mail') {
 			$activation = md5(passgen());
-			dbquery("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `group_access`,`pol`, `activation`, `email`) values('" . $_SESSION['reg_nick'] . "', '" . password_hash($_POST['pass1'], PASSWORD_DEFAULT) . "', '$time', '1', '" . intval($_POST['pol']) . "', '$activation', '" . my_esc($_POST['email']) . "')", $db);
+			dbquery("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `group_access`,`pol`, `activation`, `email`) values('" . $_SESSION['reg_nick'] . "', '" . password_hash($_POST['pass1'], PASSWORD_DEFAULT) . "', '$time', '1', '" . intval($_POST['pol']) . "', '$activation', '" . my_esc($_POST['email']) . "')");
 			$id_reg = dbinsertid();
 			$subject = "帐户激活";
 			$regmail = "你好！ {$_SESSION['reg_nick']}<br />
@@ -91,7 +91,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 			}
 		} else {
 			// 未开启邮箱验证，直接注册
-			dbquery("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `group_access`, `pol`) values('" . $_SESSION['reg_nick'] . "', '" . password_hash($_POST['pass1'], PASSWORD_DEFAULT) . "', '$time', '1', '" . intval($_POST['pol']) . "')", $db);
+			dbquery("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `group_access`, `pol`) values('" . $_SESSION['reg_nick'] . "', '" . password_hash($_POST['pass1'], PASSWORD_DEFAULT) . "', '$time', '1', '" . intval($_POST['pol']) . "')");
 
 			// 登录
 			$user['id'] = dbinsertid();
@@ -168,11 +168,11 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 err();
 
 if (isset($_SESSION['step']) && $_SESSION['step'] == 1) {
-	echo "<form method='post' action='/user/reg.php?{$passgen}'>";
+	echo "<form method='post' action='reg.php?{$passgen}'>";
 	echo "你的用户名[A-z0-9 -_]:<br /><input type='text' name='nick' maxlength='32' value='{$_SESSION['reg_nick']}' /><br />";
 	echo "<input type='submit' value='另一个' />";
 	echo "</form><br />";
-	echo "<form method='post' action='/user/reg.php?{$passgen}'>";
+	echo "<form method='post' action='reg.php?{$passgen}'>";
 	echo "你的性别:<br /><select name='pol'><option value='1'>男</option><option value='0'>女</option></select><br />";
 
 	if ($set['reg_select'] == 'open_mail') {
@@ -182,17 +182,17 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1) {
 
 	echo "输入密码（6-32个字符）:<br /><input type='password' name='pass1' maxlength='32' /><br />";
 	echo "重复密码:<br /><input type='password' name='pass2' maxlength='32' /><br />";
-	echo "<img src='/captcha.php?{$passgen}&amp;SESS={$sess}' width='100' height='30' alt='验证码图像' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
+	echo "<img src='../captcha.php?{$passgen}&amp;SESS={$sess}' width='100' height='30' alt='验证码图像' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
 	echo "通过注册，即代表您同意网站管理条例</a><br />";
 	echo "<input type='submit' value='继续' />";
 	echo "</form><br />";
 } else {
-	echo "<form class='mess' method='post' action='/user/reg.php?{$passgen}'>";
+	echo "<form class='mess' method='post' action='reg.php?{$passgen}'>";
 	echo "你的用户名 [A-z0-9 -_]:<br /><input type='text' name='nick' maxlength='32' /><br />";
 	echo "通过注册，即代表您同意网站管理条例</a> <br />";
 	echo "<input type='submit' value='继续' />";
 	echo "</form><br />";
 }
-echo "<div class = 'foot'>已经注册？<br />&raquo;<a href='/user/aut.php'>登录账号</a></div>
-      <div class = 'foot'>不记得密码？<br />&raquo;<a href='/user/pass.php'>找回密码</a></div>";
+echo "<div class = 'foot'>已经注册？<br />&raquo;<a href='aut.php'>登录账号</a></div>
+      <div class = 'foot'>不记得密码？<br />&raquo;<a href='pass.php'>找回密码</a></div>";
 include_once '../sys/inc/tfoot.php';

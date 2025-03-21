@@ -8,9 +8,9 @@ include_once '../../sys/inc/db_connect.php';
 include_once '../../sys/inc/ipua.php';
 include_once '../../sys/inc/fnc.php';
 include_once '../../sys/inc/user.php';
-/* Бан пользователя */
+/* 用户封禁 */
 if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
-    header('Location: /user/ban.php?' . session_id());
+    header('Location: ../../user/ban.php?' . session_id());
     exit;
 }
 only_reg();
@@ -18,10 +18,12 @@ $set['title'] = '日记';
 include_once '../../sys/inc/thead.php';
 title();
 aut();
-if (dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1", $db), 0) == 0) {
+
+if (dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1"), 0) == 0) {
     header("Location: index.php?" . session_id());
     exit;
 }
+
 $notes = dbarray(dbquery("select * from `notes` where `id` = '" . intval($_GET['id']) . "'"));
 if (user_access('notes_edit') || $user['id'] == $notes['id_user']) {
     $avtor = user::get_user($notes['id_user']);
@@ -46,15 +48,15 @@ if (user_access('notes_edit') || $user['id'] == $notes['id_user']) {
     }
     err();
     echo "<div class=\"foot\">";
-    echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | " . user::nick($avtor['id'], 1, 0, 0);
+    echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | " . user::nick($avtor['id'], 1, 0, 0);
     echo " | <a href='list.php?id=$notes[id]'>" . text($notes['name']) . "</a> | <b>编辑</b>";
     echo "</div>";
     $notes = dbarray(dbquery("select * from `notes` where `id`='" . intval($_GET['id']) . "';"));
     echo "<form method='post' name='message' action='?id=" . intval($_GET['id']) . "&amp;edit'>";
     echo "标题:<br /><input type=\"text\" name=\"name\" value=\""  . text($notes['name']) . "\" /><br />";
     $msg2 = text($notes['msg']);
-    if ($set['web'] && is_file(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
-        include_once H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php';
+    if ($set['web'] && is_file('../../style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
+        include_once '../../style/themes/' . $set['set_them'] . '/altername_post_form.php';
     } else {
         echo "消息:$tPanel<textarea name=\"msg\">"  . text($notes['msg']) . "</textarea><br />";
     }
@@ -74,7 +76,7 @@ if (user_access('notes_edit') || $user['id'] == $notes['id_user']) {
     echo "<input value=\"应用\" type=\"submit\" />";
     echo "</form>";
     echo "<div class=\"foot\">";
-    echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | " . user::nick($avtor['id'], 1, 0, 0);
+    echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | " . user::nick($avtor['id'], 1, 0, 0);
     echo " | <a href='list.php?id=$notes[id]'>" . text($notes['name']) . "</a> | <b>编辑</b>";
     echo "</div>";
 }

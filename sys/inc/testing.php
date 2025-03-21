@@ -10,7 +10,7 @@ if ($php_ver1 == 8) {
 	$err[] = "测试php版本 {$php_ver1}.{$php_ver2}.{$php_ver3} 未实施";
 }
 
-if (!empty($set['mysql_host']) && !empty($set['mysql_user']) && !empty($set['mysql_pass']) && !empty($set['mysql_db_name'])) {
+if (!empty($set['sql_host']) && !empty($set['sql_user']) && !empty($set['sql_pass']) && !empty($set['sql_db_name'])) {
 	$db_time = dbresult(dbquery("SELECT NOW() AS db_time"), 0, 'db_time');
 	echo 'PHP 时间: ' . date('Y-m-d H:i:s') . '<br>';
 	echo "数据库时间: $db_time<br>";

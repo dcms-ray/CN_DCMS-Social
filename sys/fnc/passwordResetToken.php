@@ -1,7 +1,5 @@
 <?php
 function validatePasswordResetToken($token, $userId) {
-	global $db;
-
 	// 查询数据库，检查 token 是否存在且有效
 	$result = dbassoc(dbquery("SELECT * FROM `password_reset_tokens` WHERE `token` = '$token' AND `user_id` = '$userId' AND `status` = 'active' LIMIT 1"));
 
@@ -21,6 +19,5 @@ function validatePasswordResetToken($token, $userId) {
 }
 
 function markValidatePasswordResetTokenAsUsed($token) {
-	global $db;
 	dbquery("UPDATE `password_reset_tokens` SET `status` = 'used' WHERE `token` = '$token'");
 }

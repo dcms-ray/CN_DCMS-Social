@@ -186,7 +186,7 @@ class Database {
 
 // 初始化全局变量
 $set = setget();
-$db = new Database($set['mysql_host'], $set['mysql_db_name'], $set['mysql_user'], $set['mysql_pass']);
+$db = new Database($set['sql_host'], $set['sql_db_name'], $set['sql_user'], $set['sql_pass']);
 
 // 检测是否启用了 API
 if (empty($set['api']) || $set['api'] == '0') {

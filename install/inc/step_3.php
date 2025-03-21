@@ -18,31 +18,31 @@ if (isset($_SESSION['mysql_ok']) && $_SESSION['mysql_ok'] == true) {
 		exit;
 	}
 } elseif (isset($_POST['host']) && isset($_POST['user']) && isset($_POST['pass']) && isset($_POST['db'])) {
-	if (!($db = @mysqli_connect($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['db']))) {
+	if (!($mydb = @mysqli_connect($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['db']))) {
 		$err[] = '无法连接到服务器 ';
 	} else {
-		$set['mysql_db_name'] = $_SESSION['db'] = $_POST['db'];
-		$set['mysql_host'] = $_SESSION['host'] = $_POST['host'];
-		$set['mysql_user'] = $_SESSION['user'] = $_POST['user'];
-		$set['mysql_pass'] = $_SESSION['pass'] = $_POST['pass'];
-		mysqli_set_charset($db, 'utf8mb4');
-		$db_tables = array();
-		$res = mysqli_query($db,'SHOW TABLES');
+		$set['sql_db_name'] = $_SESSION['db'] = $_POST['db'];
+		$set['sql_host'] = $_SESSION['host'] = $_POST['host'];
+		$set['sql_user'] = $_SESSION['user'] = $_POST['user'];
+		$set['sql_pass'] = $_SESSION['pass'] = $_POST['pass'];
+		mysqli_set_charset($mydb, 'utf8mb4');
+		$mydb_tables = array();
+		$res = mysqli_query($mydb,'SHOW TABLES');
 		while($name = mysqli_fetch_array($res)) {
-			$db_tables[] = $name[0];  //就是table 名字，接下去就用mysqi 的写法写下去就是了
+			$mydb_tables[] = $name[0];  //就是table 名字，接下去就用mysqi 的写法写下去就是了
 		}
 		$opdirtables = opendir(H . 'install/db_tables');
 		while ($filetables = readdir($opdirtables)) {
 			if (preg_match('#\.sql$#i', $filetables)) {
 				$table_name = preg_replace('#\.sql$#i', '', $filetables);
-				if (in_array($table_name, $db_tables)) {
+				if (in_array($table_name, $mydb_tables)) {
 					if (isset($_POST['rename']) && $_POST['rename'] == 1) {
-						mysqli_query($db,"ALTER TABLE `$table_name` RENAME `~" . $time . "_$table_name`");
-					} else $db_not_null = true;
+						mysqli_query($mydb,"ALTER TABLE `$table_name` RENAME `~" . $time . "_$table_name`");
+					} else $mydb_not_null = true;
 				}
 			}
 		}
-		if (isset($db_not_null)) {
+		if (isset($mydb_not_null)) {
 			$err[] = '在所选数据库中 (' . $_SESSION['db'] . ') 包含具有相同名称的表。清除或选择其他数据库。';
 		} else {
 			include_once H . 'install/inc/ver_tables.php';
@@ -77,14 +77,14 @@ if (isset($_SESSION['mysql_ok']) && $_SESSION['mysql_ok'] == true) {
 	}
 	echo "<form method=\"post\" action=\"index.php?$passgen\">";
 	echo "数据库地址：<br />";
-	echo "<input name=\"host\" value=\"$set[mysql_host]\" type=\"text\" /><br />";
+	echo "<input name=\"host\" value=\"$set[sql_host]\" type=\"text\" /><br />";
 	echo "数据库用户：<br />";
-	echo "<input name=\"user\" value=\"$set[mysql_user]\" type=\"text\" /><br />";
+	echo "<input name=\"user\" value=\"$set[sql_user]\" type=\"text\" /><br />";
 	echo "数据库密码：<br />";
-	echo "<input name=\"pass\" value=\"$set[mysql_pass]\" type=\"text\" /><br />";
+	echo "<input name=\"pass\" value=\"$set[sql_pass]\" type=\"text\" /><br />";
 	echo "数据库名称：<br />";
-	echo "<input name=\"db\" value=\"$set[mysql_db_name]\" type=\"text\" /><br />";
-	if (isset($db_not_null))
+	echo "<input name=\"db\" value=\"$set[sql_db_name]\" type=\"text\" /><br />";
+	if (isset($mydb_not_null))
 		echo "<label><input type='checkbox' checked='checked' name='rename' value='1' /> 重命名现有表<br /></label>";
 	echo "<br /><input value=\"保存\" type=\"submit\" />";
 	echo "</form>";

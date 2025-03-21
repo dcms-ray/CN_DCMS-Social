@@ -24,7 +24,7 @@ if (isset($_POST['write']) && isset($_POST['write2'])) {
 	} else {
 		$err[] = '未选择期间';
 	}
-	$q = dbquery("SELECT * FROM `user` WHERE `date_last` < '$timeclear1'", $db);
+	$q = dbquery("SELECT * FROM `user` WHERE `date_last` < '$timeclear1'");
 	$del_th = 0;
 	while ($post = dbassoc($q)) {
 		$ank['id'] = $post['id'];
@@ -71,7 +71,7 @@ if (isset($_POST['write']) && isset($_POST['write2'])) {
 		dbquery("DELETE FROM `votes_user` WHERE `u_id` = '$ank[id]'");
 		$del_th++;
 	}
-	dbquery("OPTIMIZE TABLE `user`", $db);
+	dbquery("OPTIMIZE TABLE `user`");
 	msg ("已删除 $del_th 用户");
 }
 err();

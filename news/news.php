@@ -16,7 +16,7 @@ if (!isset($_GET['id']) && !is_numeric($_GET['id'])) {
 }
 
 // 获取新闻
-if (dbresult(dbquery("SELECT COUNT(*) FROM `news` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1", $db), 0) == 0) {
+if (dbresult(dbquery("SELECT COUNT(*) FROM `news` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1"), 0) == 0) {
 	header("Location: index.php?" . session_id());
 	exit;
 }
@@ -35,7 +35,7 @@ if (
 ) {
 	dbquery("INSERT INTO `like_object` (`id_user`, `id_object`, `type`, `like`) VALUES ('$user[id]', '$news[id]', 'news', '" . abs(intval($_GET['like'])) . "')");
 	// 活动积分的累积
-	include_once H . 'sys/add/user.active.php';
+	include_once '../sys/add/user.active.php';
 }
 /*------------------------------------------------------------*/
 // 旨趣 
@@ -52,7 +52,7 @@ if (isset($_POST['msg']) && isset($user)) {
 	} elseif (!isset($err)) {
 		dbquery("INSERT INTO `news_komm` (`id_user`, `time`, `msg`, `id_news`) values('$user[id]', '$time', '" . my_esc($msg) . "', '" . intval($_GET['id']) . "')");
 		// 活动积分的累积
-		include_once H . 'sys/add/user.active.php';
+		include_once '../sys/add/user.active.php';
 		/*
 		==========================
 		回复通知
@@ -75,7 +75,7 @@ aut();
 err();
 // 名字
 echo '<div class="nav1" id="news_title">';
-echo '<img src="/style/icons/news.png" alt="*" /> ' . text($news['title']);
+echo '<img src="../style/icons/news.png" alt="*" /> ' . text($news['title']);
 echo '</div>';
 // 新闻文本
 echo '<div class="nav2" id="news_content">';
@@ -84,11 +84,11 @@ echo "</div>";
 // 我也喜欢这位作者
 echo '<div class="nav2" id="like">';
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `like_object` WHERE `id_object` = '$news[id]' AND `type` = 'news' AND `id_user` = '$user[id]'"), 0) == 0) {
-	echo '[<img src="/style/icons/like.gif" alt="*"> <a href="?id=' . $news['id'] . '&amp;like=1">我喜欢</a>] ';
-	echo '[<a href="?id=' . $news['id'] . '&amp;like=0"><img src="/style/icons/dlike.gif" alt="*"></a>]';
+	echo '[<img src="../style/icons/like.gif" alt="*"> <a href="?id=' . $news['id'] . '&amp;like=1">我喜欢</a>] ';
+	echo '[<a href="?id=' . $news['id'] . '&amp;like=0"><img src="../style/icons/dlike.gif" alt="*"></a>]';
 } else {
-	echo '[<img src="/style/icons/like.gif" alt="*"> ' . dbresult(dbquery("SELECT COUNT(*) FROM `like_object` WHERE `id_object` = '$news[id]' AND `type` = 'news' AND `like` = '1'"), 0) . '] ';
-	echo '[<img src="/style/icons/dlike.gif" alt="*"> ' . dbresult(dbquery("SELECT COUNT(*) FROM `like_object` WHERE `id_object` = '$news[id]' AND `type` = 'news' AND `like` = '0'"), 0) . ']';
+	echo '[<img src="../style/icons/like.gif" alt="*"> ' . dbresult(dbquery("SELECT COUNT(*) FROM `like_object` WHERE `id_object` = '$news[id]' AND `type` = 'news' AND `like` = '1'"), 0) . '] ';
+	echo '[<img src="../style/icons/dlike.gif" alt="*"> ' . dbresult(dbquery("SELECT COUNT(*) FROM `like_object` WHERE `id_object` = '$news[id]' AND `type` = 'news' AND `like` = '0'"), 0) . ']';
 }
 echo '<br />';
 // 作者 
@@ -101,8 +101,8 @@ echo '</div>';
 // 控制面板
 if (user_access('adm_news')) {
 	echo '<div class="nav1" id="news_edit">';
-	echo '[<img src="/style/icons/edit.gif" alt="*"> <a href="edit.php?id=' . $news['id'] . '">编辑</a>] ';
-	echo '[<img src="/style/icons/delete.gif" alt="*"> <a href="delete.php?news_id=' . $news['id'] . '">删除</a>] ';
+	echo '[<img src="../style/icons/edit.gif" alt="*"> <a href="edit.php?id=' . $news['id'] . '">编辑</a>] ';
+	echo '[<img src="../style/icons/delete.gif" alt="*"> <a href="delete.php?news_id=' . $news['id'] . '">删除</a>] ';
 	echo '</div>';
 }
 
@@ -163,7 +163,7 @@ if ($k_post == 0) {
 		if (isset($user)) {
 			if (isset($user) && (($user['level'] > $ank['level'] || $user['level'] != 0 && $user['id'] == $ank['id'])) || $user['id'] == $post['id_user']) {
 				echo '<div class="right">';
-				echo '<a href="delete.php?id=' . $post['id'] . '"><img src="/style/icons/delete.gif" alt="*"></a>';
+				echo '<a href="delete.php?id=' . $post['id'] . '"><img src="../style/icons/delete.gif" alt="*"></a>';
 				echo '</div>';
 			}
 		}
@@ -178,16 +178,17 @@ if ($k_page > 1) str("news.php?id=" . intval($_GET['id']) . '&amp;', $k_page, $p
 // 方式评论表单
 if (isset($user)) {
 	echo '<form method="post" name="message" action="?id=' . intval($_GET['id']) . '&amp;page=' . $page . REPLY . '">';
-	if (is_file(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php'))
-		include_once H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php';
-	else
+	if (is_file('../style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
+		include_once '../style/themes/' . $set['set_them'] . '/altername_post_form.php';
+	} else {
 		echo $tPanel . '<textarea name="msg">' . $insert . '</textarea><br />';
+	}
 	echo '<input value="发送" type="submit" />';
 	echo '</form>';
 }
 
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="*"> <a href="index.php">新闻中心</a><br />';
+echo '<img src="../style/icons/str2.gif" alt="*"> <a href="index.php">新闻中心</a><br />';
 echo '</div>';
 
 include_once '../sys/inc/tfoot.php';

@@ -10,7 +10,7 @@ include_once '../../sys/inc/fnc.php';
 include_once '../../sys/inc/user.php';
 /* 用户封禁 */
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `id_user` = '{$user['id']}' AND (`time` > '{$time}' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
-	header('Location: /user/ban.php?' . session_id());
+	header('Location: ../../user/ban.php?' . session_id());
 	exit;
 }
 
@@ -85,15 +85,18 @@ while ($post = dbassoc($q)) {
 		$num = 0;
 	}
 	/*---------------------------*/
-	echo "<img src='/style/icons/dnev.png' alt='*'> ";
+	echo "<img src='../../style/icons/dnev.png' alt='*'> ";
 	echo "<a href='list.php?id={$post['id']}'>" . text($post['name']) . "</a>";
 	echo " <span style='time'>(" . vremja($post['time']) . ")</span> <br />";
-	$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = '{$post['id']}' AND `time` > '" . $ftime . "'", $db), 0);
+	$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = '{$post['id']}' AND `time` > '" . $ftime . "'"), 0);
 	echo "   </div>";
 }
 echo "</table>";
 
-if (isset($_GET['sort'])) $dop = "sort={$_GET['sort']}&amp;";
-else $dop = '';
+if (isset($_GET['sort'])) {
+	$dop = "sort={$_GET['sort']}&amp;";
+} else {
+	$dop = '';
+}
 if ($k_page > 1) str('?id=' . $ank['id'] . '&amp;' . $dop . '', $k_page, $page); // 输出页数
 include_once '../../sys/inc/tfoot.php';

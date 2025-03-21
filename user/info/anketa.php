@@ -39,8 +39,7 @@ if ($ank['id'] == 0) {
 			echo user::avatar($ank['id'], true, 128, 128);
 			echo "<br />";
 		}
-		if ($uSet['privat_str'] == 2 && $frend != 2) // 如果只是为了朋友
-		{
+		if ($uSet['privat_str'] == 2 && $frend != 2) {	// 如果只是为了朋友
 			echo '<div class="mess">';
 			echo '只有他的朋友才能查看用户的页面！';
 			echo '</div>';
@@ -57,15 +56,12 @@ if ($ank['id'] == 0) {
 				echo "</div>";
 			}
 			include_once '../../sys/inc/tfoot.php';
-			exit;
 		}
-		if ($uSet['privat_str'] == 0) // Если закрыта
-		{
+		if ($uSet['privat_str'] == 0) {	// 如果关闭
 			echo '<div class="mess">';
 			echo '用户已禁止查看他的页面！';
 			echo '</div>';
 			include_once '../../sys/inc/tfoot.php';
-			exit;
 		}
 	}
 	echo "<span class=\"err\">$ank[group_name]</span><br />";
@@ -73,7 +69,6 @@ if ($ank['id'] == 0) {
 	if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL && otkuda($_SESSION['refer']))
 		echo "<div class='foot'>&laquo;<a href='$_SESSION[refer]'>" . otkuda($_SESSION['refer']) . "</a><br /></div>";
 	include_once '../../sys/inc/tfoot.php';
-	exit;
 }
 
 // 检查用户是否存在
@@ -83,7 +78,7 @@ if (!$ank) {
 	exit;
 }
 //----------------------//
-$timediff = dbresult(dbquery("SELECT `time` FROM `user` WHERE `id` = '$ank[id]' LIMIT 1", $db), 0);
+$timediff = dbresult(dbquery("SELECT `time` FROM `user` WHERE `id` = '$ank[id]' LIMIT 1"), 0);
 $oneMinute = 60;
 $oneHour = 60 * 60;
 $hourfield = floor(($timediff) / $oneHour);

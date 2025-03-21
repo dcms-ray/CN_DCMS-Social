@@ -8,23 +8,25 @@ include_once '../sys/inc/db_connect.php';
 include_once '../sys/inc/ipua.php';
 include_once '../sys/inc/fnc.php';
 include_once '../sys/inc/user.php';
-if (dbresult(dbquery("SELECT COUNT(*) FROM `news` LIMIT 1", $db), 0) == 0) exit;
+if (dbresult(dbquery("SELECT COUNT(*) FROM `news` LIMIT 1"), 0) == 0) exit;
 header("Content-type: application/rss+xml");
+
 echo "<rss version=\"2.0\">";
 echo "<channel>";
 echo "<title>新闻 " . htmlentities($_SERVER['SERVER_NAME']) . "</title>";
-echo "<link>http://" . htmlentities($_SERVER['SERVER_NAME']) . "</link>";
+echo "<link>" . get_http_type() . "://" . htmlentities($_SERVER['SERVER_NAME']) . "</link>";
 echo "<description>新闻 " . htmlentities($_SERVER['SERVER_NAME']) . "</description>";
 echo "<language>zh-CN</language>";
 //echo "<webMaster>$set[adm_mail]</webMaster>";
-echo "<lastBuildDate>" . date("r", dbresult(dbquery("SELECT MAX(time) FROM `news`", $db), 0)) . "</lastBuildDate>";
+echo "<lastBuildDate>" . date("r", dbresult(dbquery("SELECT MAX(time) FROM `news`"), 0)) . "</lastBuildDate>";
+
 $q = dbquery("SELECT * FROM `news` ORDER BY `id` DESC LIMIT {$set['p_str']}");
 while ($post = dbassoc($q)) {
 	echo "<item>";
 	echo "<title>{$post['title']}</title>";
 	if ($post['link'] != NULL) {
 		if (!preg_match('#^https?://#', $post['link'])) {
-			echo "<link>" . htmlentities("http://{$_SERVER['SERVER_NAME']}{$post['link']}", ENT_QUOTES, 'UTF-8') . "</link>";
+			echo "<link>" . htmlentities(get_http_type() . "://{$_SERVER['SERVER_NAME']}{$post['link']}", ENT_QUOTES, 'UTF-8') . "</link>";
 		} else {
 			echo "<link>" . htmlentities($post['link'], ENT_QUOTES, 'UTF-8') . "</link>";
 		}
@@ -35,5 +37,6 @@ while ($post = dbassoc($q)) {
 	echo "<pubDate>" . date("r", $post['time']) . "</pubDate>";
 	echo "</item>";
 }
+
 echo "</channel>";
 echo "</rss>";

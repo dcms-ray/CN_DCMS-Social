@@ -10,7 +10,7 @@ include_once '../../sys/inc/fnc.php';
 include_once '../../sys/inc/user.php';
 /* 用户封禁 */
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
-	header('Location: /user/ban.php?' . session_id());
+	header('Location: ../../user/ban.php?' . session_id());
 	exit;
 }
 $set['title'] = '日记';
@@ -68,11 +68,11 @@ if (isset($_GET['go'])) {
 			$num = 0;
 		}
 		/*---------------------------*/
-		echo "<img src='/style/icons/dnev.png' alt='*'> ";
+		echo "<img src='../../style/icons/dnev.png' alt='*'> ";
 		echo "<a href='list.php?id=$post[id]'>" . text($post['name']) . "</a> ";
 		echo " <span style='time'>(" . vremja($post['time']) . ")</span>";
-		$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = $post[id] AND `time` > '" . $ftime . "'", $db), 0);
-		if ($k_n != 0) echo " <img src='/style/icons/new.gif' alt='*'>";
+		$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = $post[id] AND `time` > '" . $ftime . "'"), 0);
+		if ($k_n != 0) echo " <img src='../../style/icons/new.gif' alt='*'>";
 		echo "  </div>";
 	}
 	echo "</table>";

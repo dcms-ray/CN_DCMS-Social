@@ -93,26 +93,27 @@ function get_ip_address($ip) {
  * 
  * @param string $ip 需要检查的IP地址
  * 
- * @return string 如果IP被封禁返回封禁信息，否则返回空字符串
+ * @return bool 如果IP被封禁返回 true，否则返回 false
  */
 function checkBanIp($ip) {
+	global $db; // 使用全局的 Database 实例
+
 	// 查询封禁IP段
-	$result = dbquery("SELECT `min`, `max` FROM `ban_ip`");
-	if (dbrows($result) > 0) {
-		if ($result) {
-			// 遍历每个封禁IP段
-			while ($row = mysqli_fetch_assoc($result)) {
-				// 使用函数判断IP是否在该范围内
-				if (isIpInRangeBetweenBounds($ip, $row['min'], $row['max'])) {
-					return true;
-				}
+	$result = $db->queryAll("SELECT `min`, `max` FROM `ban_ip`");
+
+	// 检查是否有结果
+	if (!empty($result)) {
+		// 遍历每个封禁IP段
+		foreach ($result as $row) {
+			// 使用函数判断IP是否在该范围内
+			if (isIpInRangeBetweenBounds($ip, $row['min'], $row['max'])) {
+				return true;
 			}
 		}
-		return false;
-	} else {
-		return false;
 	}
+	return false;
 }
+
 
 if (checkBanIp($ip)) {
 	header('Location: /user/ban_ip.php');
