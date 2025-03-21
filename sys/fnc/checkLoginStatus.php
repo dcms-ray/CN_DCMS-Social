@@ -1,5 +1,5 @@
 <?php
-function jwt_get_user_info($jwt, $set, $db) {
+function jwt_get_user_info($jwt, $set) {
 	// 解码 JWT，验证其签名和有效性
 	try {
 		$decoded = \Firebase\JWT\JWT::decode($jwt, new \Firebase\JWT\Key($set['shif'], 'HS256'));
@@ -14,9 +14,9 @@ function jwt_get_user_info($jwt, $set, $db) {
 		return ['status' => 'false', 'message' => 'JWT expired'];
 	}
 	// 查询用户是否存在并检测登录记录是否可用
-	return get_user_info($decoded->user_id, $decoded->jwt_id, $db);
+	return get_user_info($decoded->user_id, $decoded->jwt_id);
 }
-function get_user_info($user_id, $log_id, $db) {
+function get_user_info($user_id, $log_id) {
 	// 查询用户是否存在
 	$result = dbquery("SELECT * FROM `user` WHERE `id` = '$user_id' LIMIT 1");
 	$user_data = dbassoc($result);
@@ -51,11 +51,10 @@ function get_user_info($user_id, $log_id, $db) {
  */
 function checkLoginStatus() {
 	global $set;
-	global $db;
 
 	if (isset($_SESSION['id_user'], $_SESSION['login_id'])) {
 		// 使用 session 检测登录状态
-		$user = get_user_info($_SESSION['id_user'], $_SESSION['login_id'], $db);
+		$user = get_user_info($_SESSION['id_user'], $_SESSION['login_id']);
 		if ($user['status'] === 'true') {
 			$user['info']['type_input'] = 'session';
 			return ['status' => 'true', 'data' => $user['info']];
@@ -65,7 +64,7 @@ function checkLoginStatus() {
 	}
 
 	if (isset($_COOKIE['auth_token'])) {    // 从Cookie获取Tocken
-		$user = jwt_get_user_info($_COOKIE['auth_token'], $set, $db);
+		$user = jwt_get_user_info($_COOKIE['auth_token'], $set);
 		if ($user['status'] === 'true') {
 			$_SESSION['id_user'] = $user['info']['id'];
 			$_SESSION['login_id'] = $user['info']['login_id'];
@@ -78,7 +77,7 @@ function checkLoginStatus() {
 
 	if (!empty($_SERVER['HTTP_AUTHORIZATION']) && strpos($_SERVER['HTTP_AUTHORIZATION'], 'Bearer ') === 0) {    // 检查 Authorization 头部中是否有 Bearer Token
 		$jwt = preg_split('/\s+/', $_SERVER['HTTP_AUTHORIZATION'])[1];
-		$user = jwt_get_user_info($jwt, $set, $db);
+		$user = jwt_get_user_info($jwt, $set);
 		if ($user['status'] === 'true') {
 			$user['info']['type_input'] = 'authorization';
 			return ['status' => 'true', 'data' => $user['info']];

@@ -21,7 +21,7 @@ if (isset($_POST['min']) && isset($_POST['max'])) {
 		if (isIpInRangeBetweenBounds($ip, $_POST['min'], $_POST['max'])) {
 			$err[] = '您的IP在指定范围内';
 		} elseif (!isset($err)) {
-			dbquery("INSERT INTO `ban_ip` (`min`, `max`) values('$min', '$max')", $db);
+			dbquery("INSERT INTO `ban_ip` (`min`, `max`) values('$min', '$max')");
 			msg ('范围已成功被禁止');
 		}
 	} else {
@@ -31,7 +31,7 @@ if (isset($_POST['min']) && isset($_POST['max'])) {
 }
 
 // 删除禁止IP范围
-if (isset($_GET['delmin']) && isset($_GET['delmax']) && dbresult(dbquery("SELECT COUNT(*) FROM `ban_ip` WHERE `min` = '" . $_GET['delmin'] . "' AND `max` = '" . $_GET['delmax'] . "' LIMIT 1", $db), 0) != 0) {
+if (isset($_GET['delmin']) && isset($_GET['delmax']) && dbresult(dbquery("SELECT COUNT(*) FROM `ban_ip` WHERE `min` = '" . $_GET['delmin'] . "' AND `max` = '" . $_GET['delmax'] . "' LIMIT 1"), 0) != 0) {
 	dbquery("DELETE FROM `ban_ip` WHERE `min` = '" . $_GET['delmin'] . "' AND `max` = '" . $_GET['delmax'] . "' LIMIT 1");
 	dbquery("OPTIMIZE TABLE `ban_ip`");
 	msg('范围成功删除');

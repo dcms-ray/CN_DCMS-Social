@@ -117,3 +117,5 @@ function db_optimize() {
 		dbquery("OPTIMIZE TABLE `$tables[0]`"); // 对每个表进行优化
 	}
 }
+
+require 'classes/class_db.php'; // 引入数据库操作类
