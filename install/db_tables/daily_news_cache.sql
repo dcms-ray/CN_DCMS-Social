@@ -1,5 +1,6 @@
-CREATE TABLE `daily_news_cache` (
+CREATE TABLE `daily_news_data` (
 	`id` INT PRIMARY KEY AUTO_INCREMENT,
-	`data` TEXT NOT NULL,
+	`url` varchar(128) NOT NULL DEFAULT 'https://60s-api.viki.moe/v2/60s',
+	`cache` TEXT NOT NULL,
 	`time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);

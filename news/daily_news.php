@@ -18,33 +18,32 @@ aut();
  */
 function getCachedData($forceRefresh = false) {
 	$cacheValidity = 3600; // 缓存有效时间：1小时
-	$url = "https://60s.viki.moe/60s?v2=1";
+	$url = "https://60s-api.viki.moe/v2/60s";
+	global $db;
 
 	// 查询缓存数据
-	$result = dbquery("SELECT data, time FROM daily_news_cache LIMIT 1");
+	$cachedData = $db->query('SELECT cache, time, url FROM daily_news_data LIMIT 1');
 
 	// 使用封装好的函数处理查询结果
-	if ($row = dbassoc($result)) { // dbassoc 返回关联数组
-		$cachedData = $row;
+	if ($cachedData) { // dbassoc 返回关联数组
 		$cachedTime = strtotime($cachedData['time']);
 
 		// 检查缓存是否有效
 		if (!$forceRefresh && time() - $cachedTime < $cacheValidity) {
 			// 缓存有效，直接返回缓存的原始数据
-			return $cachedData['data'];
+			return $cachedData['cache'];
 		}
 	}
 
 	// 缓存无效或不存在，调用API
 	try {
-		$response = fetchFromAPI($url);
-
-		if (empty($response)) {
-			throw new Exception("Invalid API response.");
+		$response = execute_curl_request($cachedData['url'] ?? $url);
+		if (isset($response['error'])) {
+			throw new Exception('API Error: ' . $response['error']);
 		}
 
 		// 更新缓存
-		dbquery("REPLACE INTO daily_news_cache (id, data, time) VALUES (1, '$response', CURRENT_TIMESTAMP)");
+		$db->query("REPLACE INTO daily_news_data (id, cache, time) VALUES (1, ?, CURRENT_TIMESTAMP)", [$response]);
 
 		return $response;
 	} catch (Exception $e) {
@@ -52,30 +51,11 @@ function getCachedData($forceRefresh = false) {
 
 		// 如果API请求失败，返回过期缓存
 		if (!empty($cachedData)) {
-			return $cachedData['data'];
+			return $cachedData['cache'];
 		}
 
-		throw new Exception("Failed to fetch data and no valid cache available.");
+		throw new Exception("Failed to fetch data and no valid cache available: " . $e->getMessage());
 	}
-}
-
-/**
- * 通过cURL请求API
- */
-function fetchFromAPI($url) {
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 10); // 设置超时时间
-	$response = curl_exec($ch);
-
-	if (curl_errno($ch)) {
-		throw new Exception('cURL Error: ' . curl_error($ch));
-	}
-
-	curl_close($ch);
-
-	return $response;
 }
 
 if ($set['daily_news'] == '1') {
@@ -90,7 +70,7 @@ if ($set['daily_news'] == '1') {
 		$data = json_decode(getCachedData($forceRefresh), true);
 
 		// 确认数据正常加载
-		if ($data['status'] !== 200) {
+		if ($data['code'] !== 200) {
 			$err = '无法加载新闻数据，请稍后重试！';
 		}
 
@@ -101,7 +81,7 @@ if ($set['daily_news'] == '1') {
 	$newsList = $data['data']['news'];
 	$tip = $data['data']['tip'];
 	$cover = $data['data']['cover'];
-	$updateTime = date("Y-m-d H:i:s", $data['data']['updated'] / 1000);
+	$updateTime = date("Y-m-d H:i:s", $data['data']['updated_at'] / 1000);
 
 	err();
 
@@ -165,7 +145,7 @@ if ($set['daily_news'] == '1') {
 	</div>
 	<?php if (user_access('adm_news')): ?><div class="refresh-form"><form method="POST"><button type="submit" name="force_refresh">强制刷新</button></form></div><?php endif; ?>
 	<div class="footer">
-		<div class="sourceUrl">来源：<?php if (filter_var($data['data']['url'], FILTER_VALIDATE_URL)): ?><a href="<?= htmlspecialchars($data['data']['url']) ?>" target="_blank">知乎文章</a></div><?php endif; ?>
+		<div class="sourceUrl">来源：<?php if (filter_var($data['data']['link'], FILTER_VALIDATE_URL)): ?><a href="<?= htmlspecialchars($data['data']['link']) ?>" target="_blank">微信公众号文章</a></div><?php endif; ?>
 		数据来源于公共API | <a href="https://github.com/vikiboss/60s" target="_blank">开源地址</a>
 	</div>
 <?php
