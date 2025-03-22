@@ -34,8 +34,8 @@ echo "使用MySQLi：<br />
 <select name='use_mysqli'>
 	<option " . (setget('use_mysqli', 1) == 1 ? " selected " : null) . " value='1'>启用</option>
 	<option " . (setget('use_mysqli', 1) == 0 ? " selected " : null) . " value='0'>禁用</option>
-</select>
-<br />";
+</select><br />";
+echo "* 如果选择了禁用，dbquery、dbrows、dbresult等DCMS内置的过时接口会使用PDO来执行而不是MySQLi，这可能会造成一些兼容问题<br />";
 echo "<input value=\"修改\" name='save' type=\"submit\" />";
 echo "</form>";
 

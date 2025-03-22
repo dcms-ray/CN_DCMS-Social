@@ -72,9 +72,11 @@ while ($post = dbassoc($q)) {
 	echo '</div>';
 }
 echo '</table>';
+
 if (isset($user) && $user['level'] > 2) {
 	echo '<div class="foot"><img src="../../style/icons/ok.gif" alt="*" /> <a href="new.php?msg">添加一段文本</a></div>';
 	echo '<div class="foot"><img src="../../style/icons/ok.gif" alt="*" /> <a href="new.php?post">添加一个项目</a></div>';
 	echo '<div class="foot"><img src="../../style/icons/ok.gif" alt="*" /> <a href="new.php?url">添加一个链接</a></div>';
 }
+
 include_once '../../sys/inc/tfoot.php';

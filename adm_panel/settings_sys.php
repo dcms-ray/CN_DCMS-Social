@@ -61,6 +61,7 @@ if (isset($_POST['save'])) {
 		$temp_set['timeadmin'] = intval($_POST['timeadmin']);
 		$temp_set['job'] = intval($_POST['job']);
 		$temp_set['replace'] = intval($_POST['replace']);
+		$temp_set['hacker_attacks'] = intval($_POST['hacker_attacks']);
 		$temp_set['main'] = esc(stripcslashes(htmlspecialchars(($_POST['main']))));
 		$temp_set['header'] = esc(stripcslashes(htmlspecialchars(($_POST['header']))));
 		if (save_settings($temp_set)) {
@@ -141,9 +142,9 @@ echo "  通过文件夹安装插件 /Replace/:<br />
 echo "网站默认主题 (WAP移动端):<br /><select name='set_them'>";
 $opendirthem = opendir(H . 'style/themes');
 while ($themes = readdir($opendirthem)) {
-	// пропускаем корневые папки и файлы
+	// 跳过根文件夹和文件
 	if ($themes == '.' || $themes == '..' || !is_dir(H . "style/themes/{$themes}")) continue;
-	// пропускаем темы для web браузеров
+	// 跳过 Web 浏览器的主题
 	if (test_file2(H . "style/themes/{$themes}/.only_for_web"))continue;
 	echo "<option value='{$themes}'" . ($temp_set['set_them'] == $themes ? " selected='selected'" : null) . ">" . trim(file_get_contents(H . 'style/themes/' . $themes . '/them.name')) . "</option>";
 }
@@ -153,9 +154,9 @@ echo "</select><br />";
 echo "网站默认主题 (PC端):<br /><select name='set_them2'>";
 $opendirthem = opendir(H . 'style/themes');
 while ($themes = readdir($opendirthem)){
-	// пропускаем корневые папки и файлы
+	// 跳过根文件夹和文件
 	if ($themes == '.' || $themes == '..' || !is_dir(H . "style/themes/{$themes}")) continue;
-	// пропускаем темы для wap браузеров
+	// 跳过 WAP 浏览器的主题
 	if (file_exists(H . "style/themes/{$themes}/.only_for_wap")) continue;
 	echo "<option value='{$themes}'" . ($temp_set['set_them2'] == $themes ? " selected='selected'" : null) . ">" . trim(file_get_contents(H . 'style/themes/' . $themes . '/them.name')) . "</option>";
 }
@@ -172,6 +173,9 @@ echo "<label><input type='checkbox'" . ($temp_set['antidos'] ? " checked='checke
 echo "* 防止Dos攻击 - 防范来自同一IP地址的频繁请求<br />";
 
 echo "<label><input type='checkbox'" . ($temp_set['antimat'] ? " checked='checked'" : null) . " name='antimat' value='1' /> 反CC</label><br />";
+
+echo "<label><input type='checkbox'" . ($temp_set['hacker_attacks'] ? " checked='checked'" : null) . " name='hacker_attacks' value='1' /> 反黑客攻击行为</label><br />";
+echo "* 可在一定程度上防止 SQL 注入、XSS 攻击等<br />";
 
 echo "php解释器错误:<br /><select name=\"show_err_php\">";
 echo "<option value='0'" . ($temp_set['show_err_php'] == 0 ? " selected='selected'" : null) . ">隐藏</option>";

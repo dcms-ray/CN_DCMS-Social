@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 =======================================
 DCMS-Social 的日记
@@ -24,7 +24,7 @@ include_once '../../sys/inc/ipua.php';
 include_once '../../sys/inc/fnc.php';
 include_once '../../sys/inc/adm_check.php';
 include_once '../../sys/inc/user.php';
-/* Бан пользователя */
+/* 用户封禁 */
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
 	header('Location: ../../user/ban.php?' . session_id());
 	exit;
@@ -32,6 +32,7 @@ if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` 
 $set['title'] = '类别';
 include_once '../../sys/inc/thead.php';
 title();
+
 if (isset($_POST['title']) && user_access('notes_edit')) {
 	$title = my_esc($_POST['title'], 1);
 	$msg = my_esc($_POST['msg']);

@@ -1,13 +1,13 @@
 <?php
 /**
- * Database 类用于简化与 MySQL 数据库的交互。
- * 通过 PDO (PHP Data Objects) 提供的 API 提供常见的数据库操作方法，
- * 包括查询单条记录、查询多条记录、插入、更新和删除操作。
+ * Database 类用于简化与数据库的交互。
+ * 
+ * 该类封装了PDO的常用操作，包括查询、插入、更新、删除等。
  * 
  * 使用示例：
  * 
  * // 创建数据库连接
- * $db = new Database('localhost', 'test_db', 'root', 'password');
+ * $db = new Database(['driver' => 'mysql', 'host' => 'localhost', 'dbname' => 'test_db', 'username' => 'root', 'password' => 'password123', 'timezone' => date('P')]);
  * 
  * // 查询单条记录
  * $result = $db->query('SELECT * FROM users WHERE id = ?', [1]);
@@ -30,114 +30,146 @@
  * echo $deleted ? 'Delete successful' : 'Delete failed';
  */
 class Database {
-	// PDO 实例，负责与数据库的实际连接
+	/** @var PDO PDO实例 */
 	private $pdo;
 
 	/**
-	 * 构造函数，用于建立数据库连接
+	 * 构造函数
 	 * 
-	 * @param string $host 数据库主机地址
-	 * @param string $dbname 数据库名
-	 * @param string $username 数据库用户名
-	 * @param string $password 数据库密码
+	 * 根据配置初始化PDO连接，并设置相关属性。
 	 * 
-	 * 构造函数会在类实例化时尝试连接数据库，若连接失败则抛出异常并终止执行。
+	 * @param array $config 数据库配置数组，包含以下键：
+	 *                      - driver: 数据库驱动，默认'mysql'
+	 *                      - host: 数据库主机地址
+	 *                      - dbname: 数据库名称
+	 *                      - username: 数据库用户名
+	 *                      - password: 数据库密码
+	 *                      - timezone: 时区设置（可选）
+	 * @throws Exception 如果数据库连接失败，抛出异常
 	 */
-	public function __construct($host, $dbname, $username, $password) {
+	public function __construct(array $config) {
 		try {
-			// 创建 PDO 实例并进行数据库连接
-			$this->pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-			
-			// 设置 PDO 错误模式为异常
+			$dsn = sprintf("%s:host=%s;dbname=%s", $config['driver'] ?? 'mysql', $config['host'], $config['dbname']);
+			$this->pdo = new PDO($dsn, $config['username'], $config['password']);
 			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			
-			// 设置默认的查询结果获取模式为关联数组
 			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-			// 设置数据库会话时区为为 PHP 时区
-			$this->pdo->exec("SET time_zone = '" . date('P') . "';");
+			if (isset($config['timezone'])) {
+				$this->pdo->exec("SET time_zone = '" . $config['timezone'] . "';");
+			}
 		} catch (PDOException $e) {
 			throw new Exception("Database connection failed: " . $e->getMessage());
 		}
 	}
 
 	/**
-	 * 执行查询并返回单个结果。
+	 * 执行SQL语句
 	 * 
-	 * @param string $sql SQL 查询语句
-	 * @param array $params 查询时的参数，默认为空数组
-	 * 
-	 * @return mixed 返回查询结果，如果没有结果则返回 false
+	 * @param string $sql SQL语句
+	 * @param array $params 绑定参数数组
+	 * @return PDOStatement 返回PDOStatement对象
+	 * @throws Exception 如果执行失败，抛出异常
 	 */
-	public function query($sql, $params = []) {
-		$stmt = $this->pdo->prepare($sql);	// 准备 SQL 语句
-		$stmt->execute($params);			// 执行查询，传入参数
-		return $stmt->fetch();				// 获取单行结果
+	public function executeStatement($sql, $params = []) {
+		try {
+			$stmt = $this->pdo->prepare($sql);
+			$stmt->execute($params);
+			return $stmt;
+		} catch (PDOException $e) {
+			throw new Exception("Statement execution failed: " . $e->getMessage());
+		}
 	}
 
 	/**
-	 * 执行查询并返回多个结果。
+	 * 执行查询并返回单条记录
 	 * 
-	 * @param string $sql SQL 查询语句
-	 * @param array $params 查询时的参数，默认为空数组
-	 * 
-	 * @return array 返回查询结果的数组，如果没有结果则返回空数组
+	 * @param string $sql SQL查询语句
+	 * @param array $params 绑定参数数组
+	 * @param int $fetchMode 获取模式，默认PDO::FETCH_ASSOC
+	 * @return array|null 返回查询结果数组，如果没有结果返回null
 	 */
-	public function queryAll($sql, $params = []) {
-		$stmt = $this->pdo->prepare($sql);	// 准备 SQL 语句
-		$stmt->execute($params);			// 执行查询，传入参数
-		return $stmt->fetchAll();			// 获取所有结果
+	public function query($sql, $params = [], $fetchMode = PDO::FETCH_ASSOC) {
+		$result = $this->executeStatement($sql, $params)->fetch($fetchMode);
+		return $result === false ? null : $result;
 	}
 
 	/**
-	 * 插入数据到数据库，并返回插入的记录的 ID。
+	 * 执行查询并返回所有记录
 	 * 
-	 * @param string $sql 插入数据的 SQL 语句
-	 * @param array $params 插入时的参数，默认为空数组
+	 * @param string $sql SQL查询语句
+	 * @param array $params 绑定参数数组
+	 * @param int $fetchMode 获取模式，默认PDO::FETCH_ASSOC
+	 * @return array 返回查询结果数组
+	 */
+	public function queryAll($sql, $params = [], $fetchMode = PDO::FETCH_ASSOC) {
+		return $this->executeStatement($sql, $params)->fetchAll($fetchMode);
+	}
+
+	/**
+	 * 执行插入操作并返回最后插入的ID
 	 * 
-	 * @return string 返回插入数据的最后插入 ID
+	 * @param string $sql SQL插入语句
+	 * @param array $params 绑定参数数组
+	 * @return string 返回最后插入的ID
 	 */
 	public function insert($sql, $params = []) {
-		$stmt = $this->pdo->prepare($sql);	// 准备 SQL 语句
-		$stmt->execute($params);			// 执行插入操作，传入参数
-		return $this->pdo->lastInsertId();	// 返回最后插入记录的 ID
+		$this->executeStatement($sql, $params);
+		return $this->pdo->lastInsertId();
 	}
 
 	/**
-	 * 更新数据库中的数据。
+	 * 执行更新操作
 	 * 
-	 * @param string $sql 更新数据的 SQL 语句
-	 * @param array $params 更新时的参数，默认为空数组
-	 * 
-	 * @return bool 返回执行成功与否，成功则返回 true，失败返回 false
+	 * @param string $sql SQL更新语句
+	 * @param array $params 绑定参数数组
+	 * @return bool 如果更新成功返回true，否则返回false
 	 */
 	public function update($sql, $params = []) {
-		$stmt = $this->pdo->prepare($sql);	// 准备 SQL 语句
-		return $stmt->execute($params);		// 执行更新操作
+		return $this->executeStatement($sql, $params)->rowCount() > 0;
 	}
 
 	/**
-	 * 删除数据库中的数据。
+	 * 执行删除操作
 	 * 
-	 * @param string $sql 删除数据的 SQL 语句
-	 * @param array $params 删除时的参数，默认为空数组
-	 * 
-	 * @return bool 返回执行成功与否，成功则返回 true，失败返回 false
+	 * @param string $sql SQL删除语句
+	 * @param array $params 绑定参数数组
+	 * @return bool 如果删除成功返回true，否则返回false
 	 */
 	public function delete($sql, $params = []) {
-		$stmt = $this->pdo->prepare($sql);	// 准备 SQL 语句
-		return $stmt->execute($params);		// 执行删除操作
+		return $this->executeStatement($sql, $params)->rowCount() > 0;
 	}
 
-
-	// 执行查询并返回 PDOStatement 对象
-	public function dbquery($sql, $params = []) {
-		$stmt = $this->pdo->prepare($sql);
-		$stmt->execute($params);
-		return $stmt;
+	/**
+	 * 开启事务
+	 * 
+	 * @return bool 如果事务开启成功返回true，否则返回false
+	 */
+	public function beginTransaction() {
+		return $this->pdo->beginTransaction();
 	}
 
-	// 获取最后插入的 ID
+	/**
+	 * 提交事务
+	 * 
+	 * @return bool 如果事务提交成功返回true，否则返回false
+	 */
+	public function commit() {
+		return $this->pdo->commit();
+	}
+
+	/**
+	 * 回滚事务
+	 * 
+	 * @return bool 如果事务回滚成功返回true，否则返回false
+	 */
+	public function rollBack() {
+		return $this->pdo->rollBack();
+	}
+
+	/**
+	 * 获取最后插入的ID
+	 * 
+	 * @return string 返回最后插入的ID
+	 */
 	public function lastInsertId() {
 		return $this->pdo->lastInsertId();
 	}
