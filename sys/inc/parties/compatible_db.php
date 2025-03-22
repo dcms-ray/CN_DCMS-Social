@@ -10,7 +10,7 @@
  */
 function dbquery($query, $params = []) {
 	global $db;
-	return $db->dbquery($query, $params);
+	return $db->executeStatement($query, $params);
 }
 
 /**
