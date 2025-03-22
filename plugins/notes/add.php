@@ -9,7 +9,7 @@ include_once '../../sys/inc/ipua.php';
 include_once '../../sys/inc/fnc.php';
 include_once '../../sys/inc/adm_check.php';
 include_once '../../sys/inc/user.php';
-/* Бан пользователя */ 
+/* 用户封禁 */ 
 if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0)!=0) {
 	header('Location: ../../user/ban.php?' . session_id());
 	exit;
@@ -17,7 +17,7 @@ if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `i
 $set['title']='新日记';
 include_once '../../sys/inc/thead.php';
 title();
-if (!isset($user)) {header("location: index.php?");}
+if (!isset($user)) header("location: index.php?");
 
 if (isset($_POST['title']) && isset($_POST['msg'])) {
 	if (($user['rating'] < 2 || $user['group_access'] < 6 )) {
@@ -36,33 +36,48 @@ if (isset($_POST['title']) && isset($_POST['msg'])) {
 		$msg = my_esc($_POST['msg']);
 		$id_dir = intval($_POST['id_dir']);
 		if (isset($_POST['private'])) {
-			$privat=intval($_POST['private']);
+			$privat = intval($_POST['private']);
 		} else {
-			$privat=0;
+			$privat = 0;
 		}
 		if (isset($_POST['private_komm'])) {
-			$privat_komm=intval($_POST['private_komm']);
+			$privat_komm = intval($_POST['private_komm']);
 		} else {
-			$privat_komm=0;
+			$privat_komm = 0;
 		}
-		$type=0;
-		if (strlen2($title)>32) {$err='名称不能超过32个字符';}
-		if (strlen2($msg)>30000) {$err='内容不能超过30,000个字符';}
-		if (strlen2($msg)<2 && $type == 0) {$err='内容太短';}
+		$type = 0;
+		if (strlen2($title) > 32) $err = '名称不能超过32个字符';
+		if (strlen2($msg) > 30000) $err = '内容不能超过30,000个字符';
+		if (strlen2($msg) < 2 && $type == 0) $err = '内容太短';
 		if (!isset($err)) {
-			dbquery("INSERT INTO `notes` (`time`, `msg`, `name`, `id_user`, `private`, `private_komm`, `id_dir`, `type`) values('$time', '$msg', '$title', '{$user['id']}', '$privat', '$privat_komm', '$id_dir', '$type')");
-			$st = dbinsertid();
-			if($privat!=2) {
-				dbquery("insert into `stena`(`id_stena`,`id_user`,`time`,`info`,`info_1`,`type`) values('".$user['id']."','".$user['id']."','".$time."','новый дневник','".$st."','note')");
+			$st = $db->insert('INSERT INTO `notes` (`time`, `msg`, `name`, `id_user`, `private`, `private_komm`, `id_dir`, `type`) values(?, ?, ?, ?, ?, ?, ?, ?)', [
+				$time,
+				$msg,
+				$title,
+				$user['id'],
+				$privat,
+				$privat_komm,
+				$id_dir,
+				$type
+			]);
+			if($privat != 2) {
+				$db->query('insert into `stena`(`id_stena`,`id_user`,`time`,`info`,`info_1`,`type`) values(?, ?, ?, ?, ?, ?)', [
+					$user['id'],
+					$user['id'],
+					$time,
+					'新日记',
+					$st,
+					'note'
+				]);
 			}
 			/*
 			===================================
 			乐队
 			===================================
 			*/
-			$q = dbquery("SELECT * FROM `frends` WHERE `user` = '".$user['id']."' AND `i` = '1'");
+			$q = dbquery("SELECT * FROM `frends` WHERE `user` = '" . $user['id'] . "' AND `i` = '1'");
 			while ($f = dbarray($q)) {
-				$a=user::get_user($f['frend']);
+				$a = user::get_user($f['frend']);
 				$lentaSet = dbarray(dbquery("SELECT * FROM `tape_set` WHERE `id_user` = '".$a['id']."' LIMIT 1")); // 常规功能区设置
 				if ($f['lenta_notes'] == 1 && $lentaSet['lenta_notes'] == 1 ) // 邮件过滤器
 				if (dbresult(dbquery("SELECT COUNT(*) FROM `tape` WHERE `id_user` = '$a[id]' AND `type` = 'notes' AND `id_file` = '$st' LIMIT 1"), 0) == 0) {
@@ -75,22 +90,22 @@ if (isset($_POST['title']) && isset($_POST['msg'])) {
 			dbquery("OPTIMIZE TABLE `notes`");
 			$_SESSION['message'] = '日记创建成功';
 			header("Location: list.php?id=$st");
-			$_SESSION['captcha']=NULL;
+			$_SESSION['captcha'] = NULL;
 			exit;
 		}
 	}
 }
 
 if (isset($_GET['id_dir'])) {
-	$id_dir=intval($_GET['id_dir']);
+	$id_dir = intval($_GET['id_dir']);
 } else {
-	$id_dir=0;
+	$id_dir = 0;
 }
 
 err();
 aut();
 
-if (isset($_POST["msg"])) {$msg = output_text($_POST["msg"]);}
+if (isset($_POST["msg"])) $msg = output_text($_POST["msg"]);
 
 echo "<form method=\"post\" name=\"message\" action=\"add.php\">";
 echo "标题:<br /><input name=\"title\" size=\"16\" maxlength=\"32\" value=\"\" type=\"text\" /><br />";

@@ -17,7 +17,6 @@ if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` 
 
 // 清除回复通知
 if (isset($user)) {
-	dbquery("UPDATE `notification` SET `read` = '1' WHERE `type` = 'guest' AND `id_user` = '$user[id]'");
 	$db->query("UPDATE `notification` SET `read` = '1' WHERE `type` = 'guest' AND `id_user` = ?", [$user['id']]);
 }
 
@@ -37,7 +36,7 @@ if (isset($_POST['msg']) && isset($user)) {
 	}
 
 	// 获取该用户的上一条消息
-	$lastMessage = dbassoc(dbquery("SELECT `msg`, `time` FROM `guest` WHERE `id_user` = '$user[id]' ORDER BY `time` DESC LIMIT 1"));
+	$lastMessage = $db->query('SELECT `msg`, `time` FROM `guest` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [$user['id']]);
 	if ($lastMessage && $lastMessage['msg'] == $msg && (time() - $lastMessage['time']) < 300) {
 		$err = '您的信息重复上一条信息';
 	} elseif (!isset($err)) {
@@ -53,7 +52,7 @@ if (isset($_POST['msg']) && isset($user)) {
 			if ($notifiacation['komm'] == 1 && $ank_reply['id'] != $user['id'])
 				dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$ank_reply[id]', 0, 'guest', '$time')");
 		}
-		dbquery("INSERT INTO `guest` (id_user, time, msg) values('$user[id]', '$time', '" . my_esc($msg) . "')");
+		$db->query('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [$user['id'], $time, my_esc($msg)]);
 		$_SESSION['message'] = '留言添加成功';
 		header('Location: index.php');
 		exit;
@@ -137,7 +136,7 @@ while ($post = dbassoc($q)) {
 	echo '<br />' . output_text($post['msg']) . '<br />';
 	if (isset($user) && (((empty($ank['id']) || $user['level'] > $ank['level']) && $user['level'] != 0) || $user['id'] == $post['id_user'] || user_access('guest_delete'))) {
 		echo '<div class="right">';
-		echo '<a href="delete.php?id=' . $post['id'] . '"><img src="/style/icons/delete.gif" alt="*"></a>';
+		echo '<a href="delete.php?id=' . $post['id'] . '"><img src="../style/icons/delete.gif" alt="*"></a>';
 		echo '</div>';
 	}
 	echo '</div>';

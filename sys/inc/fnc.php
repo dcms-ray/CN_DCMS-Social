@@ -21,22 +21,48 @@ if (!function_exists('file_put_contents')) {
 	}
 }
 
-// DOS攻击防护
+// DOS 攻击防护
 if ($set['antidos']) {
-	// 插入当前请求记录
-	dbquery("INSERT INTO ip_requests (`ip`) VALUES ('$ip')");
+	try {
+		// 插入当前请求记录
+		$db->insert(
+			"INSERT INTO ip_requests (`ip`, `time`) VALUES (:ip, NOW())",
+			['ip' => $ip]
+		);
 
-	// 查询该 IP 在过去 5 秒内的请求次数，如果请求次数超过 100，则封禁 IP
-	if (dbresult(dbquery("SELECT COUNT(*) FROM ip_requests WHERE ip = '$ip' AND time > FROM_UNIXTIME('$time' - 5)"), 0) > 100) {
+		// 查询该 IP 在过去 5 秒内的请求次数
+		$requestCount = $db->query(
+			"SELECT COUNT(*) as count FROM ip_requests WHERE ip = :ip AND time > :time_limit",
+			[
+				'ip' => $ip,
+				'time_limit' => date('Y-m-d H:i:s', $time - 5)
+			]
+		)['count'];
+
 		// 如果请求次数超过 100，则封禁 IP
-		if (dbresult(dbquery("SELECT COUNT(*) FROM `ban_ip` WHERE `min` <= '$ip' AND `max` >= '$ip'"), 0) == 0) {
-			dbquery("INSERT INTO `ban_ip` (`min`, `max`, `prich`) values('$ip', '$ip', 'AntiDos')");
+		if ($requestCount > 100) {
+			$banExists = $db->query(
+				"SELECT COUNT(*) as count FROM `ban_ip` WHERE `min` <= :ip AND `max` >= :ip",
+				['ip' => $ip]
+			)['count'];
+
+			if ($banExists == 0) {
+				$db->insert(
+					"INSERT INTO `ban_ip` (`min`, `max`, `prich`) VALUES (:min, :max, 'AntiDos')",
+					['min' => $ip, 'max' => $ip]
+				);
+			}
 		}
+
+		// 定期清理过期的请求记录（1 小时前）
+		$db->delete(
+			"DELETE FROM ip_requests WHERE time < :time_limit",
+			['time_limit' => date('Y-m-d H:i:s', $time - 3600)]
+		);
+	} catch (Exception $e) {
+		// 处理异常，例如记录日志或返回错误信息
+		error_log("Anti-DOS error: " . $e->getMessage());
 	}
-
-	// 定期清理过期的请求记录
-	dbquery("DELETE FROM ip_requests WHERE time < '" . date('Y-m-d H:i:s', $time - 3600) . "'");  // 删除 1 小时之前的记录
-
 }
 
 /**
@@ -92,21 +118,6 @@ function delete_dir($dir) {
 	} else {
 		chmod("$dir", 0777);
 		unlink("$dir");
-	}
-}
-
-//反黑客攻击行为
-if (!defined("ADMIN")) {
-	$hackparam = htmlspecialchars((string) ($_SERVER['QUERY_STRING'] ?? ''));
-
-	$hackcmd = array('chr(', 'r57shell', 'remview', '%27', 'config=', 'OUTFILE%20', 'spnuke_authors', 'spnuke_admins', 'uname%20', 'netstat%20', 'rpm%20', 'passwd', '%20', 'del%20', 'deltree%20', 'format%20', 'start%20', 'wget', 'group_access', '%3E', '%3С',  'select%20', 'SELECT', 'cmd=', 'rush=', 'union', 'javascript:', 'UNION', 'echr(', 'esystem(', 'cp%20', 'mdir%20', 'mcd%20', 'mrd%20', 'rm%20', 'mv%20', 'rmdir%20', 'chmod(', 'chmod%20', 'chown%20', 'chgrp%20', 'locate%20', 'diff%20', 'kill%20', 'kill(', 'killall', 'cmd', 'command', 'fetch', 'whereis', 'grep%20', 'ls -', 'lynx', 'su%20root', 'test', 'etc/passwd',  "'", '%60', '%00', '%F20', 'echo', 'write(', 'killall', 'passwd%20', 'telnet%20', 'vi(', 'vi%20', 'INSERT%20INTO', 'SELECT%20', 'javascript', 'fopen', 'fwrite', '$_REQUEST', '$_GET', '<script>', 'alert', '&lt', '&gt'); //禁用参数和值
-
-	$checkcmd = str_replace($hackcmd, 'X', $hackparam);
-
-	if ($hackparam != $checkcmd) {
-		dbquery("INSERT INTO ban_ip (min, max, prich) VALUES(\"$ip\", \"$ip\", \"Inject\");");
-		dbquery('INSERT INTO mail (id_user, id_kont, msg, time) VALUES("0", "1", "IP: '.$ip.' UA: '.$ua.' 位置: '.get_ip_address($ip).' 正在进行黑客攻击", "'.$time.'");');
-		die('<h2>检测到攻击！</h2><br>你的浏览器：<b>'.$ua.'</b><br>你的IP： <b>'.$ip.'</b><br><b>已被记录，不要尝试违法操作！</b><br><br>有这时间多休息吧！！！');
 	}
 }
 
@@ -369,6 +380,21 @@ while ($filebase = readdir($opdirbase)) {
 
 // 参观记录
 dbquery("INSERT INTO `visit_today` (`ip`, `ua`, `ua_hash`, `time`) VALUES ('$ip', '" . my_esc(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '" . md5(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '$time')");
+
+// 反黑客攻击行为
+if (!defined("ADMIN") && isset($set['hacker_attacks']) && $set['hacker_attacks'] == 1) {
+	$hackparam = htmlspecialchars((string) ($_SERVER['QUERY_STRING'] ?? ''));
+
+	$hackcmd = array('chr(', 'r57shell', 'remview', '%27', 'config=', 'OUTFILE%20', 'spnuke_authors', 'spnuke_admins', 'uname%20', 'netstat%20', 'rpm%20', 'passwd', '%20', 'del%20', 'deltree%20', 'format%20', 'start%20', 'wget', 'group_access', '%3E', '%3С',  'select%20', 'SELECT', 'cmd=', 'rush=', 'union', 'javascript:', 'UNION', 'echr(', 'esystem(', 'cp%20', 'mdir%20', 'mcd%20', 'mrd%20', 'rm%20', 'mv%20', 'rmdir%20', 'chmod(', 'chmod%20', 'chown%20', 'chgrp%20', 'locate%20', 'diff%20', 'kill%20', 'kill(', 'killall', 'cmd', 'command', 'fetch', 'whereis', 'grep%20', 'ls -', 'lynx', 'su%20root', 'test', 'etc/passwd',  "'", '%60', '%00', '%F20', 'echo', 'write(', 'killall', 'passwd%20', 'telnet%20', 'vi(', 'vi%20', 'INSERT%20INTO', 'SELECT%20', 'javascript', 'fopen', 'fwrite', '$_REQUEST', '$_GET', '<script>', 'alert', '&lt', '&gt'); //禁用参数和值
+
+	$checkcmd = str_replace($hackcmd, 'X', $hackparam);
+
+	if ($hackparam != $checkcmd) {
+		dbquery("INSERT INTO ban_ip (min, max, prich) VALUES(\"$ip\", \"$ip\", \"Inject\");");
+		dbquery('INSERT INTO mail (id_user, id_kont, msg, time) VALUES("0", "1", "IP: ' . $ip . ' UA: ' . $ua . ' 位置: ' . get_ip_address($ip) . ' 正在进行黑客攻击", "' . $time . '");');
+		die('<h2>检测到攻击！</h2><br>你的浏览器：<b>' . $ua . '</b><br>你的IP： <b>' . $ip . '</b><br><b>已被记录，不要尝试违法操作！</b><br><br>有这时间多休息吧！！！');
+	}
+}
 
 // 确保所有通过 GET/POST 方法传入的数据都被清理和转义（没卵用）
 /*
