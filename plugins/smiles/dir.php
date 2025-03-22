@@ -12,7 +12,7 @@ include_once '../../sys/inc/user.php';
 if(isset($_GET['id'])) {
 	$id = intval($_GET['id']);
 } else {
-	header("Location: /index.php");
+	header("Location: ../../index.php");
 }
 
 $dir = dbarray(dbquery("SELECT * FROM `smile_dir` WHERE `id` = '" . $id . "'"));

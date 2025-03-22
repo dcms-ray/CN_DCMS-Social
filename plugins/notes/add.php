@@ -11,7 +11,7 @@ include_once '../../sys/inc/adm_check.php';
 include_once '../../sys/inc/user.php';
 /* Бан пользователя */ 
 if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0)!=0) {
-	header('Location: /ban.php?'.session_id());
+	header('Location: ../../user/ban.php?' . session_id());
 	exit;
 }
 $set['title']='新日记';
@@ -116,12 +116,12 @@ echo "<input name='private_komm' type='radio'  value='1' />朋友 ";
 echo "<input name='private_komm' type='radio'  value='2' />只有我</div>";
 
 if ($user['rating'] < 6 || $user['group_access'] < 6) {
-	echo "验证码:<img src='/captcha.php?SESS=$sess' width='100' height='30' alt='核证号码' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
+	echo "验证码:<img src='../../captcha.php?SESS=$sess' width='100' height='30' alt='核证号码' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
 }
 echo "<input value=\"创建\" type=\"submit\" />";
 echo "</form>";
 
 echo "<div class='foot'>";
-echo "<img src='/style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a><br />";
+echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a><br />";
 echo "</div>";
 include_once '../../sys/inc/tfoot.php';
