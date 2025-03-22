@@ -36,19 +36,30 @@ if (isset($user)) dbquery("UPDATE `notification` SET `read` = '1' WHERE `type` =
 因分区不同而不同
 ================================
 */
-if (isset($_GET['spam'])  &&  isset($user)) {
+if (isset($_GET['spam']) && isset($user)) {
 	$mess = dbassoc(dbquery("SELECT * FROM `notes_komm` WHERE `id` = '" . intval($_GET['spam']) . "' limit 1"));
-	$spamer = user::get_user($mess['id_user']);
-	if (dbresult(dbquery("SELECT COUNT(*) FROM `spamus` WHERE `id_user` = '$user[id]' AND `id_spam` = '$spamer[id]' AND `razdel` = 'notes_komm' AND `spam` = '" . $mess['msg'] . "'"), 0) == 0) {
+	if (dbresult(dbquery("SELECT COUNT(*) FROM `spamus` WHERE `id_user` = '$user[id]' AND `id_spam` = '$mess[id_user]' AND `razdel` = 'notes_komm' AND `spam` = '" . $mess['msg'] . "'"), 0) == 0) {
 		if (isset($_POST['msg'])) {
 			if ($mess['id_user'] != $user['id']) {
 				$msg = my_esc($_POST['msg']);
 				if (strlen2($msg) < 3) $err = '更加详细地说明举报的原因';
 				if (strlen2($msg) > 1512) $err = '文本长度超过1512个字';
-				if (isset($_POST['types'])) $types = intval($_POST['types']);
-				else $types = '0';
+				if (isset($_POST['types'])) {
+					$types = intval($_POST['types']);
+				} else {
+					$types = '0';
+				}
 				if (!isset($err)) {
-					dbquery("INSERT INTO `spamus` (`id_object`, `id_user`, `msg`, `id_spam`, `time`, `types`, `razdel`, `spam`) values('$notes[id]', '$user[id]', '$msg', '$spamer[id]', '$time', '$types', 'notes_komm', '" . my_esc($mess['msg']) . "')");
+					$db->query('INSERT INTO `spamus` (`id_object`, `id_user`, `msg`, `id_spam`, `time`, `types`, `razdel`, `spam`) values(:notes_id, :user_id, :msg, :spam_id, :time, :types, :razdel, :spam)', [
+						':notes_id' => $notes['id'],
+						':user_id' => $user['id'],
+						':msg' => $msg,
+						':spam_id' => $mess['id_user'],
+						':time' => $time,
+						':types' => $types,
+						':razdel' => 'notes_komm',
+						':spam' => $mess['msg']
+					]);
 					$_SESSION['message'] = '举报成功,管理员将火速处理';
 					header("Location: ?id=$notes[id]&page=" . intval($_GET['page']) . "&spam=$mess[id]");
 					exit;
@@ -61,13 +72,13 @@ if (isset($_GET['spam'])  &&  isset($user)) {
 	title();
 	aut();
 	err();
-	if (dbresult(dbquery("SELECT COUNT(*) FROM `spamus` WHERE `id_user` = '$user[id]' AND `id_spam` = '$spamer[id]' AND `razdel` = 'notes_komm'"), 0) == 0) {
+	if (dbresult(dbquery("SELECT COUNT(*) FROM `spamus` WHERE `id_user` = '$user[id]' AND `id_spam` = '$mess[id_user]' AND `razdel` = 'notes_komm'"), 0) == 0) {
 		echo "<div class='mess'>若你认为某条言论不合适、违反了网站规则，可以举报，管理员收到后会尽快处理。
 		但是，请不要瞎举报给管理添乱，若多次发出无意义的举报，将同样会按网站规则进行处罚。
 		如果你真的很讨厌某位用户的言论，你可以选择将其拉黑，而不是将消息逐条举报。逐条举报会大大降低管理员处理举报的效率，甚至导致举报处理任务大量积压</div>";
 		echo "<form class='nav1' method='post' action='?id=$notes[id]&amp;page=" . intval($_GET['page']) . "&amp;spam=$mess[id]'>";
 		echo "<b>用户:</b> ";
-		echo " " . user::nick($spamer['id'],1,1,0) . " (" . vremja($mess['time']) . ")<br />";
+		echo " " . user::nick($mess['id_user'], 1, 1, 0) . " (" . vremja($mess['time']) . ")<br />";
 		echo "<b>违规：</b> <font color='green'>" . output_text($mess['msg']) . "</font><br />";
 		echo "原因：<br /><select name='types'>";
 		echo "<option value='1' selected='selected'>垃圾邮件/广告/日记/帖子</option>";
@@ -81,7 +92,8 @@ if (isset($_GET['spam'])  &&  isset($user)) {
 		echo "<input value=\"发送\" type=\"submit\" />";
 		echo "</form>";
 	} else {
-		echo "<div class='mess'>举报有关<font color='green'>$spamer[nick]</font> 它将在不久的将来考虑。</div>";
+		$spamer = user::get_user($mess['id_user']);
+		echo "<div class='mess'>举报有关<font color='green'>" . (isset($spamer['nick']) ? $spamer['nick'] : "[已删除]") . "</font> 它将在不久的将来考虑。</div>";
 	}
 	echo "<div class='foot'>";
 	echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='?id=$notes[id]&amp;page=" . intval($_GET['page']) . "'>返回</a><br />";

@@ -44,7 +44,7 @@ if (user_access('adm_panel_show')) {
 		echo "</div>";
 	} else {
 		echo "<div class='mess'>";
-		echo "注意！审查投诉后，否定忘记删除它！";
+		echo "注意！审查投诉后，不要忘记删除它！";
 		echo "</div>";
 	}
 
@@ -113,12 +113,12 @@ if (user_access('adm_panel_show')) {
 		if ($post['razdel'] == 'mail' || $post['razdel'] == 'guest' || $post['razdel'] == 'forum' || $post['razdel'] == 'stena')
 			echo "<b>通信:</b> <font color='red' style='border-bottom: 1px solid green;'>" . output_text($post['spam']) . "<br /></font>";
 		echo "<b>评论:</b> " . output_text($post['msg']) . "<br />";
-		echo "<b>违法者:</b>  <a href='../../../user/info.php?id=$spamer[id]'>$spamer[nick]</a>";
-		echo "" . medal($spamer['id']) . " " . online($spamer['id']) . "<br />";
+		echo "<b>被举报者:</b>  <a href='../../../user/info.php?id={$post['id_spam']}'>" . (isset($spamer['nick']) ? $spamer['nick'] : "[已删除]") . "</a>";
+		echo "" . medal($post['id_spam']) . " " . online($post['id_spam']) . "<br />";
 		echo "   </div>";
-		if (($user['id'] != $spamer['id'] && $user['group_access'] >= $spamer['group_access']) || ($user['id'] == 1)) {
-			echo "<div class='mess'>[<a href='../../../adm_panel/ban.php?id=$spamer[id]'><img src='../../../style/icons/blicon.gif' alt='*'> 举报</a>] [<a href='delete.php?id=$post[id]&amp;otkl'><img src='../../../style/icons/delete.gif' alt='*'> 拒绝</a>] [<a href='delete.php?id=$post[id]'><img src='../../../style/icons/ok.gif' alt='*'> 通过</a>] </div>";
-		} else if ($user['id'] == $spamer['id']) {
+		if (($user['id'] != $post['id_spam'] && $user['group_access'] >= (isset($spamer['group_access']) ? $spamer['group_access'] : 0)) || ($user['id'] == 1)) {
+			echo "<div class='mess'>[<a href='../../../adm_panel/ban.php?id={$post['id_spam']}'><img src='../../../style/icons/blicon.gif' alt='*'> 举报</a>] [<a href='delete.php?id={$post['id']}&amp;otkl'><img src='../../../style/icons/delete.gif' alt='*'> 拒绝</a>] [<a href='delete.php?id={$post['id']}'><img src='../../../style/icons/ok.gif' alt='*'> 通过</a>] </div>";
+		} else if ($user['id'] == $post['id_spam']) {
 			echo "<div class='mess'>你被投诉了 <font color='green'>$ank[nick]</font> 请等接管理员查看情况。</div>";
 		} else {
 			echo "<div class='mess'>你没有足够的权力处理这个投诉。</div>";
