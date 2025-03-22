@@ -21,7 +21,7 @@ if (!isset($notes['id'])) {
 }
 $query_result = dbquery("SELECT id FROM `user` WHERE id = {$notes['id_user']} LIMIT 1");
 if (dbrows($query_result) > 0) {
-    $avtor = user::get_user($notes['id_user']);
+	$avtor = user::get_user($notes['id_user']);
 }
 if (isset($user)) $count = dbresult(dbquery("SELECT COUNT(*) FROM `notes_count` WHERE `id_user` = '" . $user['id'] . "' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0);
 // 书签
@@ -100,67 +100,191 @@ if (isset($user)) {
 	dbquery("UPDATE `discussions` SET `count` = '0' WHERE `id_user` = '$user[id]' AND `type` = 'notes' AND `id_sim` = '$notes[id]' LIMIT 1");
 }
 /*---------------------------------------------------------*/
+
 $set['title'] = '日记 - ' . text($notes['name']) . '';
 $set['meta_description'] = text($notes['msg']);
 include_once '../../sys/inc/thead.php';
+
 if (isset($_POST['msg']) && isset($user)) {
 	$msg = $_POST['msg'];
+	
+	// 验证消息长度
 	if (strlen2($msg) > 1024) {
 		$err = '消息过长';
 	} elseif (strlen2($msg) < 2) {
 		$err = '短消息';
-	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `notes_komm` WHERE `id_notes` = '" . intval($_GET['id']) . "' AND `id_user` = '$user[id]' AND `msg` = '" . my_esc($msg) . "' LIMIT 1"), 0) != 0) {
-		$err = '你的留言重复了上一条';
-	} elseif (!isset($err)) {
-		/*
-		==========================
-		回复通知
-		==========================
-		*/
-		if (isset($user) && $respons == TRUE) {
-			$notifiacation = dbassoc(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $ank_otv['id'] . "' LIMIT 1"));
-			if ($notifiacation['komm'] == 1 && $ank_otv['id'] != $user['id'])
-				dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$ank_otv[id]', '$notes[id]', 'notes_komm', '$time')");
-		}
-		/*
-		====================================
-		评论
-		====================================
-		*/
-		$q = dbquery("SELECT * FROM `frends` WHERE `user` = '" . $notes['id_user'] . "' AND `i` = '1'");
-		while ($f = dbarray($q)) {
-			$a = user::get_user($f['frend']);
-			$discSet = dbarray(dbquery("SELECT * FROM `discussions_set` WHERE `id_user` = '" . $a['id'] . "' LIMIT 1")); // 设置全部讨论
-			if ($f['disc_notes'] == 1 && $discSet['disc_notes'] == 1)
-			/* 邮件列表 */ {
-				//---------作者朋友--------------//
-				if (dbresult(dbquery("SELECT COUNT(*) FROM `discussions` WHERE `id_user` = '$a[id]' AND `type` = 'notes' AND `id_sim` = '$notes[id]' LIMIT 1"), 0) == 0) {
-					if ($notes['id_user'] != $a['id']  || $a['id'] != $user['id'])
-						dbquery("INSERT INTO `discussions` (`id_user`, `avtor`, `type`, `time`, `id_sim`, `count`) values('$a[id]', '$notes[id_user]', 'notes', '$time', '$notes[id]', '1')");
-				} else {
-					$disc = dbarray(dbquery("SELECT * FROM `discussions` WHERE `id_user` = '$a[id]' AND `type` = 'notes' AND `id_sim` = '$notes[id]' LIMIT 1"));
-					if ($notes['id_user'] != $a['id'] || $a['id'] != $user['id'])
-						dbquery("UPDATE `discussions` SET `count` = '" . ($disc['count'] + 1) . "', `time` = '$time' WHERE `id_user` = '$a[id]' AND `type` = 'notes' AND `id_sim` = '$notes[id]' LIMIT 1");
+	} else {
+		// 检查是否重复留言
+		$checkSql = "SELECT COUNT(*) as count FROM `notes_komm` WHERE `id_notes` = :id_notes AND `id_user` = :id_user AND `msg` = :msg LIMIT 1";
+		$checkResult = $db->query($checkSql, [
+			':id_notes' => intval($_GET['id']),
+			':id_user' => $user['id'],
+			':msg' => $msg
+		]);
+		
+		if ($checkResult['count'] != 0) {
+			$err = '你的留言重复了上一条';
+		} elseif (!isset($err)) {
+			/*
+			==========================
+			回复通知部分
+			==========================
+			*/
+			if (isset($user) && $respons == TRUE) {
+				// 获取目标用户的通知设置
+				$notification = $db->query(
+					"SELECT * FROM `notification_set` WHERE `id_user` = :id_user LIMIT 1",
+					[':id_user' => $ank_otv['id']]
+				);
+				
+				// 如果用户开启了评论通知且不是自己回复自己
+				if ($notification['komm'] == 1 && $ank_otv['id'] != $user['id']) {
+					// 插入通知记录
+					$db->insert(
+						"INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES (:avtor, :id_user, :id_object, 'notes_komm', :time)", [
+							':avtor' => $user['id'],
+							':id_user' => $ank_otv['id'],
+							':id_object' => $notes['id'],
+							':time' => $time
+						]
+					);
 				}
-				//-------------------------------------//
 			}
+
+			/*
+			====================================
+			评论和讨论处理部分
+			====================================
+			*/
+			// 获取笔记作者的好友列表
+			$friends = $db->queryAll(
+				"SELECT * FROM `frends` WHERE `user` = :user AND `i` = '1'",
+				[':user' => $notes['id_user']]
+			);
+
+			// 遍历所有好友
+			foreach ($friends as $f) {
+				$a = user::get_user($f['frend']);
+				// 获取好友的讨论设置
+				$discSet = $db->query(
+					"SELECT * FROM `discussions_set` WHERE `id_user` = :id_user LIMIT 1",
+					[':id_user' => $a['id']]
+				);
+
+				// 检查好友是否订阅了笔记讨论
+				if ($f['disc_notes'] == 1 && $discSet['disc_notes'] == 1) {
+					// 检查是否已有讨论记录
+					$discCount = $db->query(
+						"SELECT COUNT(*) as count FROM `discussions` WHERE `id_user` = :id_user AND `type` = 'notes' AND `id_sim` = :id_sim LIMIT 1", [
+							':id_user' => $a['id'],
+							':id_sim' => $notes['id']
+						]
+					)['count'];
+
+					if ($discCount == 0) {
+						// 如果不是作者本人或当前用户，创建新讨论记录
+						if ($notes['id_user'] != $a['id'] || $a['id'] != $user['id']) {
+							$db->insert(
+								"INSERT INTO `discussions` (`id_user`, `avtor`, `type`, `time`, `id_sim`, `count`) VALUES (:id_user, :avtor, 'notes', :time, :id_sim, '1')", [
+									':id_user' => $a['id'],
+									':avtor' => $notes['id_user'],
+									':time' => $time,
+									':id_sim' => $notes['id']
+								]
+							);
+						}
+					} else {
+						// 获取现有讨论记录
+						$disc = $db->query(
+							"SELECT * FROM `discussions` WHERE `id_user` = :id_user AND `type` = 'notes' AND `id_sim` = :id_sim LIMIT 1", [
+								':id_user' => $a['id'],
+								':id_sim' => $notes['id']
+							]
+						);
+						
+						// 更新讨论计数和时间
+						if ($notes['id_user'] != $a['id'] || $a['id'] != $user['id']) {
+							$db->update(
+								"UPDATE `discussions` SET `count` = :count, `time` = :time WHERE `id_user` = :id_user AND `type` = 'notes' AND `id_sim` = :id_sim LIMIT 1", [
+									':count' => $disc['count'] + 1,
+									':time' => $time,
+									':id_user' => $a['id'],
+									':id_sim' => $notes['id']
+								]
+							);
+						}
+					}
+				}
+			}
+
+			// 处理作者的讨论记录
+			$authorDiscCount = $db->query(
+				"SELECT COUNT(*) as count FROM `discussions` WHERE `id_user` = :id_user AND `type` = 'notes' AND `id_sim` = :id_sim LIMIT 1", [
+					':id_user' => $notes['id_user'],
+					':id_sim' => $notes['id']
+				]
+			)['count'];
+
+			if ($authorDiscCount == 0) {
+				// 如果不是自己评论自己，创建作者的讨论记录
+				if ($notes['id_user'] != $user['id']) {
+					$db->insert(
+						"INSERT INTO `discussions` (`id_user`, `avtor`, `type`, `time`, `id_sim`, `count`) VALUES (:id_user, :avtor, 'notes', :time, :id_sim, '1')", [
+							':id_user' => $notes['id_user'],
+							':avtor' => $notes['id_user'],
+							':time' => $time,
+							':id_sim' => $notes['id']
+						]
+					);
+				}
+			} else {
+				// 获取作者现有讨论记录
+				$disc = $db->query(
+					"SELECT * FROM `discussions` WHERE `id_user` = :id_user AND `type` = 'notes' AND `id_sim` = :id_sim LIMIT 1", [
+						':id_user' => $notes['id_user'],
+						':id_sim' => $notes['id']
+					]
+				);
+
+				// 更新作者的讨论计数和时间
+				if ($notes['id_user'] != $user['id']) {
+					$db->update(
+						"UPDATE `discussions` SET `count` = :count, `time` = :time WHERE `id_user` = :id_user AND `type` = 'notes' AND `id_sim` = :id_sim LIMIT 1", [
+							':count' => $disc['count'] + 1,
+							':time' => $time,
+							':id_user' => $notes['id_user'],
+							':id_sim' => $notes['id']
+						]
+					);
+				}
+			}
+
+			// 插入新评论
+			$db->insert(
+				"INSERT INTO `notes_komm` (`id_user`, `time`, `msg`, `id_notes`) VALUES (:id_user, :time, :msg, :id_notes)", [
+					':id_user' => $user['id'],
+					':time' => $time,
+					':msg' => $msg,
+					':id_notes' => intval($_GET['id'])
+				]
+			);
+
+			// 更新用户积分
+			$db->update(
+				"UPDATE `user` SET `balls` = :balls WHERE `id` = :id LIMIT 1", [
+					':balls' => $user['balls'] + 1,
+					':id' => $user['id']
+				]
+			);
+
+			// 设置成功消息并重定向
+			$_SESSION['message'] = '消息已成功发送';
+			header("Location: list.php?id={$notes['id']}&page=" . intval($_GET['page']));
+			exit;
 		}
-		//-------------发送给作者------------//
-		if (dbresult(dbquery("SELECT COUNT(*) FROM `discussions` WHERE `id_user` = '$notes[id_user]' AND `type` = 'notes' AND `id_sim` = '$notes[id]' LIMIT 1"), 0) == 0) {
-			if ($notes['id_user'] != $user['id'])
-				dbquery("INSERT INTO `discussions` (`id_user`, `avtor`, `type`, `time`, `id_sim`, `count`) values('$notes[id_user]', '$notes[id_user]', 'notes', '$time', '$notes[id]', '1')");
-		} else {
-			$disc = dbarray(dbquery("SELECT * FROM `discussions` WHERE `id_user` = '$notes[id_user]' AND `type` = 'notes' AND `id_sim` = '$notes[id]' LIMIT 1"));
-			if ($notes['id_user'] != $user['id'])
-				dbquery("UPDATE `discussions` SET `count` = '" . ($disc['count'] + 1) . "', `time` = '$time' WHERE `id_user` = '$notes[id_user]' AND `type` = 'notes' AND `id_sim` = '$notes[id]' LIMIT 1");
-		}
-		dbquery("INSERT INTO `notes_komm` (`id_user`, `time`, `msg`, `id_notes`) values('$user[id]', '$time', '" . my_esc($msg) . "', '" . intval($_GET['id']) . "')");
-		dbquery("UPDATE `user` SET `balls` = '" . ($user['balls'] + 1) . "' WHERE `id` = '$user[id]' LIMIT 1");
-		$_SESSION['message'] = '消息已成功发送';
-		header("Location: list.php?id=$notes[id]&page=" . intval($_GET['page']) . "");
-		exit;
 	}
 }
+
 if (isset($user) && isset($avtor['id'])) $frend = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE (`user` = '$user[id]' AND `frend` = '$avtor[id]') OR (`user` = '$avtor[id]' AND `frend` = '$user[id]') LIMIT 1"), 0);
 title();
 aut(); // 授权表格
