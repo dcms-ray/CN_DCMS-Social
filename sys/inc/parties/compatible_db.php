@@ -49,13 +49,20 @@ function dbresult($result, $row, $field = 0) {
 }
 
 function dbarray($result) {
-	return $result->fetch(PDO::FETCH_BOTH); // 返回索引和关联数组
+	// 返回索引和关联数组
+	return $result->fetch(PDO::FETCH_BOTH);
 }
 
 function dbassoc($result) {
-	return $result->fetch(PDO::FETCH_ASSOC); // 返回关联数组
+	// 返回关联数组
+	return $result->fetch(PDO::FETCH_ASSOC);
 }
 
+/**
+ * 获取最近插入数据的 ID
+ * 
+ * @return int 返回最近插入数据的自增 ID
+ */
 function dbinsertid() {
 	global $db;
 	return $db->lastInsertId();
@@ -80,6 +87,6 @@ function db_optimize() {
 }
 
 
-// 初始化查询计数器和时间变量（与原代码保持一致）
+// 意义不明的全局变量
 $query_number = 0;
 $tpassed = 0;
