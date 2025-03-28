@@ -1,17 +1,4 @@
 <?php
-# 处理 [img] 标签的内容
-function img_preg($arr) {
-	global $set;
-	if (preg_match('#^http://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $arr[1]) || !preg_match('#://#', $arr[1]) || $set['bb_external_img'] == '1') {
-		if (true) {	// 意义不明而且毫无作用的判断
-			return '<a href="/go.php?go=' . base64_encode(html_entity_decode($arr[1])) . '"><img decoding=async style="max-width:240px; max-height:320px;" src="' . text($arr[1]) . '" alt="img" /></a>';
-		} else {
-			return '<img style="max-width:240px;" src="/style/no_image.png" alt="No Image" />';
-		}
-	} else {
-		return '<a target="_blank" href="/go.php?go=' . base64_encode(html_entity_decode($arr[1])) . '">外部站点的图像</a>';
-	}
-}
 
 function links_preg1($arr) {
 	global $set;
@@ -36,7 +23,6 @@ function links_preg2($arr) {
 
 function links($msg) {
 	global $set;
-	if ($set['bb_img']) $msg = preg_replace_callback('/\[img\]((?!javascript:|data:|document.cookie).+)\[\/img\]/isU', 'img_preg', $msg);
 	if ($set['bb_url']) $msg = preg_replace_callback('/\[url=((?!javascript:|data:|document.cookie).+)\](.+)\[\/url\]/isU', 'links_preg1', $msg);
 	if ($set['bb_http']) $msg = preg_replace_callback('~(^|\s)([a-z]+://([^ \r\n\t`\'"]+))(\s|$)~iu', 'links_preg2', $msg);
 	return $msg;

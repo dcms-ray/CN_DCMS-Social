@@ -34,7 +34,7 @@ function output_text($str, $br = 1, $html = 1, $smiles = 1, $links = 1, $bbcode 
 	// 解析BBCode标记（如 [b]文本[/b] → <strong>文本</strong>）
 	if ($bbcode) {
 		$tmp_str = $str; // 保存原始字符串（当前未使用，可能需要调试）
-		$str = bbcode($str); // 假设bbcode()是BBCode解析函数
+		$str = bbcode($str); // BBCode解析函数
 	}
 	
 	// 转换换行符为HTML换行标签
