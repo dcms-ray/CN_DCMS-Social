@@ -1,0 +1,42 @@
+/* 用于暗色模式的样式 */
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: #121212; /* 舒适的暗色背景 */
+		color: rgba(255, 255, 255, 0.87); /* 设置文字透明度 */
+	}
+
+	/* 链接 */
+	a:link {
+		color: #4A90E2; /* 未访问链接 */
+		text-decoration: none; /* 去除默认下划线 */
+	}
+	a:visited {
+		color: #7A6FBF; /* 已访问链接 */
+	}
+	a:hover {
+		color: #66B3FF; /* 悬停时 */
+		text-decoration: underline; /* 悬停时添加下划线 */
+	}
+	a:active {
+		color: #357ABD; /* 激活时 */
+	}
+
+	/* 输入框 */
+	input[type="text"] {
+		width: 100%;
+		padding: 10px;
+		background-color: #333333;
+		border: 1px solid #555555;
+		color: #E0E0E0;
+		border-radius: 4px;
+		outline: none;
+		font-size: 16px;
+	}
+	input[type="text"]::placeholder {
+		color: #A0A0A0;
+	}
+	input[type="text"]:focus {
+		border-color: #4A90E2;
+		box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+	}
+}
