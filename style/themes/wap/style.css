@@ -597,3 +597,15 @@ table {
 .off {
 	color: #FF0000;
 }
+
+.user-count-online-link {
+	text-decoration: none;
+}
+
+.user-count {
+	color: #ffffff;
+}
+
+.user-count-small-text {
+	color: #fee300;
+}

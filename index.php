@@ -24,28 +24,28 @@ if (!$set['web']) {
 	$ol_user = dbresult(dbquery("SELECT COUNT(DISTINCT ul.id_user) AS online_users FROM `user_log` ul WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0)"), 0);
 	// 在线游客数量
 	$ol_guest = dbresult(dbquery("SELECT COUNT(*) FROM `guests` WHERE `date_last` > ".(time()-600)." AND `pereh` > '0'"), 0);
-	echo '<div class="title">
-	      <center>
-	      <a href="/user/online.php" title="在线" style="color:#cdcecf; text-decoration: none">
-	      <font color="#fee300" size="2">在线 </font>
-	      <font color="#ffffff">'.$ol_user.'</font>
+	echo '<div class="title" sytle="text-align: center;>
+	      <a href="./user/online.php" title="查看在线用户" class="user-count-online-link">
+	          <span class="user-count-small-text">在线 </span>
+	          <span class="user-count">' . $ol_user . '</span>
 	      </a>
-	      <font color="#fee300" size="2"> (</font>
-	      <font color="#ffffff">+'.$ol_guest.'</font>
-	      <font color="#fee300" size="2"> 游客 )</font>
-	      </center>
+	      <a href="./user/online_g.php" title="查看在线游客" class="user-count-online-link">
+	          <span class="user-count-small-text"> (</span>
+	          <span class="user-count">+' . $ol_guest . '</span>
+	          <span class="user-count-small-text"> 游客 )</span>
+	      </a>
 	      </div>
 	      <div class="main_menu">';
 
 	if (isset($user)) {
 		echo '<div align="right">
-		<img src="/style/icons/icon_stranica.gif" alt="DS" />
-		'.user::nick($user['id'],1,0,0).' | <a href="/user/exit.php"><font color="#ff0000">退出</font></a>
+		<img src="./style/icons/icon_stranica.gif" alt="DS" />
+		'.user::nick($user['id'],1,0,0).' | <a href="./user/exit.php"><font color="#ff0000">退出</font></a>
 		</div>';
 	
 	} else {
 		echo '<div align="right">
-		<a href="/user/aut.php">登录</a> | <a href="/user/reg.php">注册</a>
+		<a href="./user/aut.php">登录</a> | <a href="./user/reg.php">注册</a>
 		</div>';
 		
 	}
