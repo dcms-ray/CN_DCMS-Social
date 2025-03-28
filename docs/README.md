@@ -111,3 +111,4 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 - [x] 修复 user\info\web.php 的图片展示不受相册隐私设置控制
 - [ ] OAuth 支持
 - [x] 支持 PDO 操作数据库
+- [ ] 适配不支持Cookie的浏览器

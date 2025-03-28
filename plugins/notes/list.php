@@ -301,14 +301,12 @@ if (isset($user) && isset($avtor['id'])) $frend = dbresult(dbquery("SELECT COUNT
 title();
 aut(); // 授权表格
 err();
-if (empty($user) && $notes['private'] == 1 && $user['id'] != $notes['id_user'] && $frend != 2  && !user_access('notes_delete')) {
+if (empty($user) || ($notes['private'] == 1 && $user['id'] != $notes['id_user'] && $frend != 2  && !user_access('notes_delete'))) {
 	msg('日记只提供给朋友');
-	echo "  <div class='foot'>";
-	echo "<a href='index.php'>返回</a><br />";
-	echo "   </div>";
+	echo "  <div class='foot'><a href='index.php'>返回</a><br /></div>";
 	include_once '../../sys/inc/tfoot.php';
 }
-if (empty($user) && $notes['private'] == 2 && $user['id'] != $notes['id_user']  && !user_access('notes_delete')) {
+if (empty($user) || ($notes['private'] == 2 && $user['id'] != $notes['id_user']  && !user_access('notes_delete'))) {
 	msg('用户已禁止查看日记');
 	echo "  <div class='foot'>";
 	echo "<a href='index.php'>返回</a><br />";

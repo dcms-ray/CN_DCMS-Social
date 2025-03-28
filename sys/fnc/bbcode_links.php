@@ -3,7 +3,7 @@
 /**
  * 处理带有 [url] 标签的链接并生成 HTML 锚标签
  *
- * 该函数通过正则表达式匹配处理传入的数组，判断链接是否为当前主机地址，
+ * 该函数通过正则表达式匹配处理传入的数组，判断链接是否为当前主机地址或 http(s) 协议，
  * 并根据全局配置 $set['web'] 决定是否添加 target="_blank" 属性。
  *
  * @param array $arr 包含链接和文本的数组，$arr[1] 为链接地址，$arr[2] 为链接文本
@@ -11,10 +11,24 @@
  */
 function links_preg1($arr) {
 	global $set;
-	if (preg_match('#^https://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $arr[1]) || !preg_match('#://#', $arr[1])) {
-		return '<a href="' . $arr[1] . '">' . $arr[2] . '</a>';
+	$url = $arr[1];
+
+	// 检查是否为 http 或 https 协议
+	$is_http = preg_match('#^https?://#i', $url);
+
+	// 判断是否为当前主机地址
+	$is_current_host = (
+		preg_match('#^https?://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $url) ||  // http:// 或 https://
+		preg_match('#^//' . preg_quote($_SERVER['HTTP_HOST']) . '#', $url) ||         // 协议相对 URL
+		!preg_match('#^[a-z]+://#i', $url)                                            // 相对路径 URL
+	);
+
+	if ($is_current_host || !$is_http) {
+		// 如果是当前主机或非 http(s) 协议，直接生成普通链接
+		return '<a href="' . $url . '">' . $arr[2] . '</a>';
 	} else {
-		return '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?go=' . base64_encode(html_entity_decode($arr[1])) . '">' . $arr[2] . '</a>';
+		// 如果是外部 http(s) 链接，通过 /go.php 跳转
+		return '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?go=' . base64_encode(html_entity_decode($url)) . '">' . $arr[2] . '</a>';
 	}
 }
 
@@ -25,18 +39,17 @@ function links_preg1($arr) {
  * 并根据全局配置 $set['web'] 决定是否添加 target="_blank" 属性。
  * 对于外部链接，会使用 base64 编码并跳转到 /go.php。
  *
- * @param array $arr 包含匹配文本的数组，$arr[1] 为前置文本，$arr[2] 为链接地址，$arr[4] 为后置文本
+ * @param array $arr 包含匹配文本的数组，$arr[1] 为前置文本，$arr[2] 为链接地址，$arr[3] 为后置文本
  * @return string 返回生成的 HTML 字符串
  */
 function links_preg2($arr) {
 	global $set;
-	if (preg_match('#^https://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $arr[2])) {
-		return $arr[1] . '<a href="' . $arr[2] . '">' . $arr[2] . '</a>' . $arr[4];
-	}
-	else if (preg_match('#^http://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $arr[2])) {
-		return $arr[1] . '<a href="' . $arr[2] . '">' . $arr[2] . '</a>' . $arr[4];
+	$url = $arr[2];
+
+	if (preg_match('#^https?://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $url)) {
+		return $arr[1] . '<a href="' . $url . '">' . $url . '</a>' . $arr[3];
 	} else {
-		return $arr[1] . '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?go=' . base64_encode(html_entity_decode($arr[2])) . '">' . $arr[2] . '</a>' . $arr[4];
+		return $arr[1] . '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?go=' . base64_encode(html_entity_decode($url)) . '">' . $url . '</a>' . $arr[3];
 	}
 }
 
@@ -51,7 +64,19 @@ function links_preg2($arr) {
  */
 function links($msg) {
 	global $set;
-	if ($set['bb_url']) $msg = preg_replace_callback('/\[url=((?!javascript:|data:|document.cookie).+)\](.+)\[\/url\]/isU', 'links_preg1', $msg);
-	if ($set['bb_http']) $msg = preg_replace_callback('~(^|\s)([a-z]+://([^ \r\n\t`\'"]+))(\s|$)~iu', 'links_preg2', $msg);
+	if ($set['bb_url']) {
+		$msg = preg_replace_callback(
+			'/\[url=((?!javascript:|data:|document\.cookie)[^\]]+)\](.+)\[\/url\]/isU',
+			'links_preg1',
+			$msg
+		);
+	}
+	if ($set['bb_http']) {
+		$msg = preg_replace_callback(
+			'~(^|\s)((?:https?://)[^ \r\n\t`\'"]+)(\s|$)~iu',
+			'links_preg2',
+			$msg
+		);
+	}
 	return $msg;
 }
