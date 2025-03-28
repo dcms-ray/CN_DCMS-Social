@@ -301,14 +301,13 @@ if (isset($user) && isset($avtor['id'])) $frend = dbresult(dbquery("SELECT COUNT
 title();
 aut(); // 授权表格
 err();
-if (empty($user) && $notes['private'] == 1 && $user['id'] != $notes['id_user'] && $frend != 2  && !user_access('notes_delete')) {
+
+if ($notes['private'] == 1 && (empty($user) || ($user['id'] != $notes['id_user'] && $frend != 2  && !user_access('notes_delete')))) {
 	msg('日记只提供给朋友');
-	echo "  <div class='foot'>";
-	echo "<a href='index.php'>返回</a><br />";
-	echo "   </div>";
+	echo "  <div class='foot'><a href='index.php'>返回</a><br /></div>";
 	include_once '../../sys/inc/tfoot.php';
 }
-if (empty($user) && $notes['private'] == 2 && $user['id'] != $notes['id_user']  && !user_access('notes_delete')) {
+if ($notes['private'] == 2 && (empty($user) || ($user['id'] != $notes['id_user']  && !user_access('notes_delete')))) {
 	msg('用户已禁止查看日记');
 	echo "  <div class='foot'>";
 	echo "<a href='index.php'>返回</a><br />";
@@ -358,16 +357,19 @@ if (isset($user)) {
 		}
 	}
 }
+
 echo "<div class=\"foot\">";
 echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ";
 echo user::nick($notes['id_user'], 1, 0, 0);
 echo ' | <b>' . output_text($notes['name']) . '</b>';
 echo "</div>";
+
 echo "<div class='main'>";
 echo "<table style='width:110%;'><td style='width:4%;'>" . (empty($avtor['id']) ? '<img class="avatar" src="../../style/user/avatar.gif" height="50" width="50" alt="No Avatar">' : user::avatar($avtor['id'])) . "</td>";
 echo "<td style='width:96%;'> 作者: " . user::nick($notes['id_user'], 1, 1, 0) . " ";
 echo "(<img src='../../style/icons/them_00.png'>  " . vremja($notes['time']) . ")<br/>";
 echo "<img src='../../style/icons/eye.png'> 预览: " . $notes['count'] . "</td></table></div>";
+
 $stat1 = $notes['msg'];
 if (!$set['web']) $mn = 20;
 else $mn = 90; // 按浏览器显示的词数
