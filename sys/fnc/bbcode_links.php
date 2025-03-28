@@ -36,7 +36,7 @@ function links_preg2($arr) {
 	else if (preg_match('#^http://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $arr[2])) {
 		return $arr[1] . '<a href="' . $arr[2] . '">' . $arr[2] . '</a>' . $arr[4];
 	} else {
-		 return $arr[1] . '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?go=' . base64_encode(html_entity_decode($arr[2])) . '">外部链接</a>' . $arr[4];
+		return $arr[1] . '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?go=' . base64_encode(html_entity_decode($arr[2])) . '">' . $arr[2] . '</a>' . $arr[4];
 	}
 }
 
