@@ -20,9 +20,9 @@ function bbcodeplayvideo($data){
 		$iframeUrl = "https://player.bilibili.com/player.html?bvid={$arr[1]}&page={$arr[2]}";
 	}
 	if (empty($iframeUrl)) {
-		echo "视频解析错误";
+		return "视频解析错误";
 	} else {
-		echo '<a target="_blank" href="' . $url . '">视频链接</a><br/><iframe src="' . $iframeUrl . '" seamless allowfullscreen sandbox="allow-scripts allow-forms allow-same-origin allow-popups"><a href="' . $url . '">' . $url . '</a></iframe>';
+		return '<a target="_blank" href="' . $url . '">视频链接</a><br/><iframe src="' . $iframeUrl . '" seamless allowfullscreen sandbox="allow-scripts allow-forms allow-same-origin allow-popups"><a href="' . $url . '">' . $url . '</a></iframe>';
 	}
 }
 
