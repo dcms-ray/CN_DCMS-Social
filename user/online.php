@@ -1,13 +1,13 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 // 显示模式
 if (isset($_GET['admin']) && user_access('user_collisions')) {
 	if ($_GET['admin'] == 'close') {
@@ -17,7 +17,7 @@ if (isset($_GET['admin']) && user_access('user_collisions')) {
 	}
 }
 $set['title'] = '在线用户'; //网页标题
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 
 title();
 aut();
@@ -157,4 +157,4 @@ if (user_access('user_collisions')) {
 	echo '</div>';
 }
 
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';

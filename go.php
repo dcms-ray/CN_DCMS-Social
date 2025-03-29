@@ -1,18 +1,18 @@
 <?php
-include_once 'sys/inc/start.php';
-include_once 'sys/inc/compress.php';
-include_once 'sys/inc/sess.php';
-include_once 'sys/inc/home.php';
-include_once 'sys/inc/settings.php';
-include_once 'sys/inc/db_connect.php';
-include_once 'sys/inc/ipua.php';
-include_once 'sys/inc/fnc.php';
-include_once 'sys/inc/user.php';
+require_once 'sys/inc/start.php';
+require_once 'sys/inc/compress.php';
+require_once 'sys/inc/sess.php';
+require_once 'sys/inc/home.php';
+require_once 'sys/inc/settings.php';
+require_once 'sys/inc/db_connect.php';
+require_once 'sys/inc/ipua.php';
+require_once 'sys/inc/fnc.php';
+require_once 'sys/inc/user.php';
 $set['title'] = '外部链接跳转';
-include_once 'sys/inc/thead.php';
+require_once 'sys/inc/thead.php';
 title();
 
-$decoded_url = @base64_decode($_GET['go'] ?? '');
+$decoded_url = base64_decode($_GET['go'] ?? '');
 
 if (!isset($_GET['go']) || (dbresult(dbquery("SELECT COUNT(*) FROM `rekl` WHERE `id` = '" . intval($_GET['go']) . "'"), 0) == 0 && !preg_match('#^(https?://|//)#', $decoded_url))) {
 	header("Location: index.php?" . session_id());
@@ -33,4 +33,4 @@ if (!isset($_GET['go']) || (dbresult(dbquery("SELECT COUNT(*) FROM `rekl` WHERE 
 	echo "访问次数: {$rekl['count']}<br />";
 }
 
-include_once 'sys/inc/tfoot.php';
+require_once 'sys/inc/tfoot.php';

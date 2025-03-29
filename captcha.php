@@ -14,7 +14,7 @@ function setget() {
 	$set_replace = $default['REPLACE'];
 
 	if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/settings.php')) {
-		$set_dynamic = include_once($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/settings.php');
+		$set_dynamic = require_once($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/settings.php');
 	} else {
 		http_response_code(506);
 		exit;

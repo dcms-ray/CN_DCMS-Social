@@ -1,19 +1,17 @@
 <?php
-//include_once '../sys/inc/mp3.php';
-//include_once '../sys/inc/zip.php';
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
 $show_all = true; // 为游客开放
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/user.php';
 only_unreg();
 $set['title'] = '注册账号';
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 title();
 aut();
 
@@ -33,7 +31,7 @@ if ($set['reg_select'] == 'close') {
 	$err = '已关闭注册';
 	err();
 	echo "<a href='aut.php'>已注册?点击此处登录账号</a><br />";
-	include_once '../sys/inc/tfoot.php';
+	require_once '../sys/inc/tfoot.php';
 } elseif ($set['reg_select'] == 'open_mail' && isset($_GET['id']) && isset($_GET['activation']) && $_GET['activation'] != NULL) {	// 激活帐户
 	if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `id` = '" . intval($_GET['id']) . "' AND `activation` = '" . my_esc($_GET['activation']) . "'"), 0) == 1) {
 		dbquery("UPDATE `user` SET `activation` = null WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1");
@@ -41,7 +39,7 @@ if ($set['reg_select'] == 'close') {
 		dbquery("INSERT INTO `reg_mail` (`id_user`,`mail`) VALUES ('$user[id]','$user[email]')");
 		msg('您的帐户已成功启动');
 		$_SESSION['id_user'] = $user['id'];
-		include_once '../sys/inc/tfoot.php';
+		require_once '../sys/inc/tfoot.php';
 	}
 }
 
@@ -144,7 +142,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 		echo "&raquo;<a href='info/settings.php'>我的设置</a><br />";
 		echo "&raquo;<a href='umenu.php'>我的菜单</a><br />";
 		echo "</div>";
-		include_once '../sys/inc/tfoot.php';
+		require_once '../sys/inc/tfoot.php';
 	}
 } elseif (isset($_POST['nick']) && $_POST['nick'] != NULL) {
 	// 检查昵称
@@ -193,6 +191,8 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1) {
 	echo "<input type='submit' value='继续' />";
 	echo "</form><br />";
 }
+
 echo "<div class = 'foot'>已经注册？<br />&raquo;<a href='aut.php'>登录账号</a></div>
       <div class = 'foot'>不记得密码？<br />&raquo;<a href='pass.php'>找回密码</a></div>";
-include_once '../sys/inc/tfoot.php';
+
+require_once '../sys/inc/tfoot.php';

@@ -1,24 +1,24 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 if (isset($user)) $ank['id'] = $user['id'];
 only_reg();
 $set['title'] = '个人中心';
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 title();
 aut();
 
-	echo "<div class='main'>";
-	echo user::avatar($ank['id']);
-	echo "	" . user::nick($ank['id'], 0);
-	echo "</div>";
+echo "<div class='main'>";
+echo user::avatar($ank['id']);
+echo "	" . user::nick($ank['id'], 0);
+echo "</div>";
 
 
 // 检查用户是否成功登录
@@ -55,7 +55,7 @@ if (isset($_GET['nick']) && isset($_GET['pass'])) {
 </div>
 
 
-<?
+<?php
 // 管理权限
 if (user_access('adm_panel_show')) {
 	echo '<div class="main" id="umenu">';
@@ -69,4 +69,4 @@ if ($set['web'] == false) {
 	echo '<a href="/user/exit.php"><img src="/style/icons/delete.gif" /> 退出登录 ' . user::nick($user['id'],0,0,0) . '</a><br />';
 	echo '</div>';
 }
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';

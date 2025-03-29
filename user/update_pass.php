@@ -1,15 +1,15 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
 $show_all = true;
-include_once '../sys/inc/user.php';
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/user.php';
+require_once '../sys/inc/thead.php';
 title();
 aut();
 
@@ -74,4 +74,4 @@ if (isset($_POST['nick'])&& isset($_POST['pass'])) {
 ?>
 <form method='post'>输入昵称：<input name='nick' type='text' /><br/>输入密码：<input name='pass' type='password' /><br/><input type='submit' value='更新' /></form>
 <?php
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';
