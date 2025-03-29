@@ -5,7 +5,7 @@ if (file_exists(H . "style/themes/$set[set_them]/foot.php")) {
 	list($msec, $sec) = explode(chr(32), microtime());
 	echo "<div class='foot'>";
 	echo "<a href='/'>主要的</a><br />";
-	echo "<a href='/users.php'>注册用户: " . dbresult(dbquery("SELECT COUNT(*) FROM `user`"), 0) . "</a><br />";
+	echo "<a href='/user/users.php'>注册用户: " . dbresult(dbquery("SELECT COUNT(*) FROM `user`"), 0) . "</a><br />";
 	echo "<a href='/user/online.php'>在线用户: " . dbresult(dbquery("SELECT COUNT(DISTINCT ul.id_user) AS online_users FROM `user_log` ul WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0)"), 0) . "</a><br />";
 	echo "<a href='/user/online_g.php'>在线游客: " . dbresult(dbquery("SELECT COUNT(*) FROM `guests` WHERE `date_last` > " . (time() - 600) . " AND `pereh` > '0'"), 0) . "</a><br />";
 	$page_size = ob_get_length();

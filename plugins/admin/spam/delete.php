@@ -63,9 +63,9 @@ if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `spamus` WHERE 
 
 		// 发送消息
 		if (isset($_GET['otkl'])) {
-			$msg = "用户投诉事项 [b]" . (isset($spamer['nick']) ? $spamer['nick'] : "[已删除]") . "[/b] 被 {$adm} [b]{$user['nick']}[/b]拒绝，[br][red]如果滥用举报账号可能会被封禁，请注意！[/red]";
+			$msg = "用户投诉事项 [b]" . (isset($spamer['nick']) ? $spamer['nick'] : "[已删除]") . "[/b] 被 {$adm} [b]{$user['nick']}[/b] 拒绝，[br][red]如果滥用举报账号可能会被封禁，请注意！[/red]";
 		} else {
-			$msg = "用户投诉事项 [b]" . (isset($spamer['nick']) ? $spamer['nick'] : "[已删除]") . "[/b] 已由 {$adm} [b]{$user['nick']}[/b]处理，[br][b]{$ank['nick']}[/b] 谢谢你的注意！";
+			$msg = "用户投诉事项 [b]" . (isset($spamer['nick']) ? $spamer['nick'] : "[已删除]") . "[/b] 已由 {$adm} [b]{$user['nick']}[/b] 处理，[br][b]{$ank['nick']}[/b] 谢谢你的注意！";
 		}
 		dbquery("INSERT INTO `mail` (`id_user`, `id_kont`, `msg`, `time`) values('0', '{$ank['id']}', '" . my_esc($msg) . "', '{$time}')");
 		dbquery("DELETE FROM `spamus` WHERE `id` = '{$post['id']}'");

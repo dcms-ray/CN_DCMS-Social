@@ -108,10 +108,10 @@ if ($ank['group_access'] > 1) {
 			echo "<img src='/style/icons/anketa.gif' alt='*' /> <a href='/user/info/anketa.php?id=$ank[id]'>个人资料</a> ";
 			if (isset($user) && $user['id'] == $ank['id']) {
 				echo "[<img src='/style/icons/edit.gif' alt='*' /> <a href='/user/info/edit.php'>编辑</a>]";
-				echo "<br />"; 
-				echo "<img src='/style/icons/apply14.png' alt='' /> <a href='/user/daily_checkin.php'>每日签到</a>";
+				echo "<br />";
+				echo "<a href='../news/daily_news.php'>📰 每日新闻</a>";
+				echo "<a href='daily_checkin.php'>📅 每日签到</a>";
 			}
-			echo "<img src='/style/icons/anketa.png' alt='' /> <a href='/news/daily_news.php'>每日新闻</a>";
 			echo "</div>";
 			/*---------------------------------------*/
 			/*------------------------客人---------------------------*/
@@ -557,7 +557,7 @@ if ($ank['group_access'] > 1) {
 				      <div class='accordion-heading'>";
 				if ($user['wall'] == 1) {
 					echo '<a class="accordion-toggle decoration-none collapsed" href="/user/info.php?id=' . $ank['id'] . '&amp;wall=0"><img src="/style/icons/stena.gif" alt="*" /> 动态</a>';
-					include_once H.'user/stena/index.php';
+					include_once H . 'user/stena/index.php';
 				} else {
 					echo '<a class="accordion-toggle decoration-none collapsed" href="/user/info.php?id=' . $ank['id'] . '&amp;wall=1"><img src="/style/icons/stena.gif" alt="*" /> 动态</a>';
 				}
