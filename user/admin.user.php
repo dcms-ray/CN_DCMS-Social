@@ -105,7 +105,7 @@ if ($s == 1) {
 	$page = page($k_page);
 	$start = $set['p_str'] * $page - $set['p_str'];
 
-	$data_querySQL = "SELECT * FROM `user` WHERE $gr ORDER BY `date_last` DESC LIMIT $start, $set[p_str]";
+	$data_querySQL = "SELECT * FROM `user` WHERE $gr LIMIT $start, $set[p_str]";
 }
 
 $q = dbquery($data_querySQL);
