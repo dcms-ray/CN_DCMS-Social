@@ -98,7 +98,7 @@ if (isset($user) && $user['id'] == $ank['id']) {
 	echo "[<img src='../style/icons/edit.gif' alt='*' /> <a href='info/edit.php'>编辑</a>]";
 	echo "<br />";
 	echo "<a href='../news/daily_news.php'>📰 每日新闻</a>";
-	echo "<a href='daily_checkin.php'>📅 每日签到</a>";
+	echo " | <a href='daily_checkin.php'>📅 每日签到</a>";
 }
 echo "</div>";
 
