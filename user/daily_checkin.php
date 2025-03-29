@@ -16,45 +16,56 @@ err();
 aut();
 
 // 查询今天是否已经签到
-if (dbresult(dbquery("SELECT * FROM checkin_records WHERE user_id = '{$user['id']}' AND DATE(checkin_date) = CURDATE()"), 0) > 0) {
-	echo "<div class=\"mess\">";
-	echo "今天已经签到过啦";
-	echo "</div>";
-} else {
+if (empty($db->query('SELECT * FROM checkin_records WHERE user_id = ? AND DATE(checkin_date) = CURDATE()', [$user['id']]))) {
 	// 查询昨天是否签到
-	$yesterday = date('Y-m-d', strtotime('-1 day'));
-	$yesterday_checkin = dbresult(dbquery("SELECT * FROM checkin_records WHERE user_id = '{$user['id']}' AND DATE(checkin_date) = '$yesterday'"), 0);
+	$yesterday_checkin = $db->query('SELECT * FROM checkin_records WHERE user_id = ? AND DATE(checkin_date) = ?', [
+		$user['id'],
+		date('Y-m-d', strtotime('-1 day'))
+	]);
 
-	if ($yesterday_checkin > 0) {
-		// 获取连续签到次数
-		$streak = dbresult(dbquery("SELECT streak FROM checkin_records WHERE user_id = '{$user['id']}'"), 0);
-		$streak++;
-	} else {
+	if (empty($yesterday_checkin)) {
+		// 如果昨天没有签到，重置连续签到次数
 		$streak = 1;
+	} else {
+		// 获取并设置连续签到次数
+		$streak = $yesterday_checkin['streak'] + 1;
 	}
 
 	// 奖励逻辑
-	if ($streak > 30) {
+	if ($streak == 30) {
 		$points = 500;
 		$coins = 10;
-		dbquery("UPDATE `user` SET `balls` = `balls` + $points, `money` = `money` + $coins WHERE `id` = '{$user['id']}' LIMIT 1");
+		$db->update('UPDATE `user` SET `balls` = `balls` + ?, `money` = `money` + ? WHERE `id` = ? LIMIT 1', [
+			$points,
+			$coins,
+			$user['id']
+		]);
 	} else {
 		$points = ($streak > 1) ? 200 : 100;
-		dbquery("UPDATE `user` SET `balls` = `balls` + $points WHERE `id` = '{$user['id']}' LIMIT 1");
+		$db->update('UPDATE `user` SET `balls` = `balls` + ? WHERE `id` = ? LIMIT 1', [
+			$points,
+			$user['id']
+		]);
 	}
 
 	// 插入签到记录
-	dbquery("INSERT INTO checkin_records (user_id, checkin_date, streak) VALUES ('{$user['id']}', NOW(), $streak) ON DUPLICATE KEY UPDATE checkin_date = VALUES(checkin_date), streak = $streak");
+	$db->query('INSERT INTO checkin_records (user_id, checkin_date, streak) VALUES (?, NOW(), ?) ON DUPLICATE KEY UPDATE checkin_date = VALUES(checkin_date), streak = ?', [
+		$user['id'],
+		$streak,
+		$streak
+	]);
 
 	echo "<div class=\"mess\">";
-	if ($streak > 30) {
-		echo "连续签到 $streak 天，获得 $points 积分和 $coins 金币";
+	if ($streak == 30) {
+		echo "连续签到 $streak 天，获得 $points 积分和 $coins 硬币";
 	} elseif ($streak > 1) {
 		echo "连续签到 $streak 天，获得 $points 积分";
 	} else {
 		echo "签到成功，获得 $points 积分";
 	}
 	echo "</div>";
+} else {
+	echo "<div class=\"mess\">今天已经签到过啦</div>";
 }
 
 include_once '../sys/inc/tfoot.php';
