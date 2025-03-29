@@ -1,19 +1,19 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 only_reg();
 
 if (setget('exit', 1) == 1) {
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if (isset($_POST['confirm_yes'])) {
-			dbquery("UPDATE `user_log` SET `ban` = '1' WHERE `id` = '{$user['login_id']}';");
+			$db->update('UPDATE `user_log` SET `ban` = ? WHERE `id` = ?;', ['1', $user['login_id']]);
 			setcookie('auth_token', '', time() - 3600, '/');
 			session_destroy();
 			header('Location: /?' . session_id());
@@ -31,15 +31,16 @@ if (setget('exit', 1) == 1) {
 }
 
 $set['title']='退出登录';
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 title();
 aut();
 
-echo '<form  method="post">
+?>
+<form  method="post">
 你确定退出登录吗?
-	<input type="hidden" name="return" value="' . $_SERVER['HTTP_REFERER'] . '">
+	<input type="hidden" name="return" value="<?php echo $_SERVER['HTTP_REFERER']; ?>">
 	<input type="submit" name="confirm_yes" value="是的,我确定">
 	<input type="submit" name="confirm_no" value="不是,我手滑了">
-</form>';
+</form>
 
-include_once '../sys/inc/tfoot.php';
+<?php require_once '../sys/inc/tfoot.php';

@@ -1,17 +1,17 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
 $show_all = true; //为大家展示
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/user.php';
 only_unreg();
 $set['title'] = '密码恢复';
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 title();
 
 // 删除过期的 password reset token
@@ -50,8 +50,6 @@ if (isset($_POST['nick']) && isset($_POST['mail']) && $_POST['nick'] != NULL && 
 		}
 	}
 }
-
-
 
 if (isset($_GET['token']) && isset($_GET['id'])) {
 	// 验证 token 是否有效
@@ -101,7 +99,6 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 		err();
 	}
 
-
 } else {
 	err();
 	aut();
@@ -125,5 +122,4 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 		</div>';
 }
 
-
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';

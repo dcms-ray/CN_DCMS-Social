@@ -39,26 +39,22 @@ if (!$set['web']) {
 
 	if (isset($user)) {
 		echo '<div align="right">
-		<img src="./style/icons/icon_stranica.gif" alt="DS" />
-		'.user::nick($user['id'],1,0,0).' | <a href="./user/exit.php"><font color="#ff0000">退出</font></a>
-		</div>';
-	
+		          <img src="./style/icons/icon_stranica.gif" alt="DS" />' . user::nick($user['id'], 1, 0, 0) . ' | <a href="./user/exit.php"><font color="#ff0000">退出</font></a>
+		      </div>';
 	} else {
-		echo '<div align="right">
-		<a href="./user/aut.php">登录</a> | <a href="./user/reg.php">注册</a>
-		</div>';
-		
+		echo '<div align="right"><a href="./user/aut.php">登录</a> | <a href="./user/reg.php">注册</a></div>';
 	}
 	echo '</div>';
-	
+
 	// 新闻&事件 
 	include 'sys/inc/news_main.php'; 
 	// 主菜单
 	include 'sys/inc/main_menu.php'; 
 	include 'sys/inc/main_notes.php';
+
 } else {
 	// 主要网页主题
 	include 'style/themes/' . $set['set_them'] . '/index.php'; 
-	
 }
+
 require_once 'sys/inc/tfoot.php';

@@ -1,16 +1,16 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
 $ban_ip_page = true; // 这样就不会有循环
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 $set['title'] = '你的 IP 被封锁';
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 title();
 $err = "<h1>你的 IP ({$ip}) 已被封锁</h1>";
 err();
@@ -26,4 +26,4 @@ echo '<h2>可能的原因:</h2>
     请立即加入 CN_DCMS-Social 的官方 QQ 群组：310379632，说明来意，并详细提供封锁信息。管理团队会尽快处理。
     <br />';
 
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';
