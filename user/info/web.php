@@ -105,9 +105,9 @@ if ($ank['group_access'] > 1) {
 			echo "</div>";
 			/*---------------个人资料-------------------*/
 			echo "<div class='main2'>";
-			echo "<img src='/style/icons/anketa.gif' alt='*' /> <a href='/user/info/anketa.php?id=$ank[id]'>个人资料</a> ";
+			echo "<img src='../style/icons/anketa.gif' alt='*' /> <a href='info/anketa.php?id=$ank[id]'>个人资料</a> ";
 			if (isset($user) && $user['id'] == $ank['id']) {
-				echo "[<img src='/style/icons/edit.gif' alt='*' /> <a href='/user/info/edit.php'>编辑</a>]";
+				echo "[<img src='../style/icons/edit.gif' alt='*' /> <a href='info/edit.php'>编辑</a>]";
 				echo "<br />";
 				echo "<a href='../news/daily_news.php'>📰 每日新闻</a>";
 				echo " | <a href='daily_checkin.php'>📅 每日签到</a>";
@@ -118,7 +118,7 @@ if ($ank['group_access'] > 1) {
 			if (isset($user) && $user['id'] == $ank['id']) {
 				echo "<div class='main'>";
 				$new_g = dbresult(dbquery("SELECT COUNT(*) FROM `my_guests` WHERE `id_ank` = '$user[id]' AND `read`='1'"), 0);
-				echo "<img src='/style/icons/guests.gif' alt='*' /> ";
+				echo "<img src='../style/icons/guests.gif' alt='*' /> ";
 				if ($new_g != 0) {
 					$color = "<font color='red'>";
 					$color2 = "</font>";
@@ -126,7 +126,7 @@ if ($ank['group_access'] > 1) {
 					$color = null;
 					$color2 = null;
 				}
-				echo "<a href='/user/myguest/index.php'>" . $color . "客人" . $color2 . "</a> ";
+				echo "<a href='myguest/index.php'>" . $color . "客人" . $color2 . "</a> ";
 				if ($new_g != 0) echo "<font color=\"red\">+$new_g</font>";
 				echo "</div>";
 			}
@@ -141,8 +141,8 @@ if ($ank['group_access'] > 1) {
 				*/
 				$k_notif = dbresult(dbquery("SELECT COUNT(`read`) FROM `notification` WHERE `id_user` = '$user[id]' AND `read` = '0'"), 0); // Уведомления
 				if ($k_notif > 0) {
-					echo "<img src='/style/icons/notif.png' alt='*' /> ";
-					echo "<a href='/user/notification/index.php'><font color='red'>通知</font></a> ";
+					echo "<img src='../style/icons/notif.png' alt='*' /> ";
+					echo "<a href='notification/index.php'><font color='red'>通知</font></a> ";
 					echo "<font color=\"red\">+$k_notif</font> ";
 					echo "<br />";
 				}
