@@ -37,10 +37,10 @@ if (isset($_GET['komm']) && dbresult(dbquery("SELECT COUNT(*) FROM `notes_komm` 
 		header("Location: " . htmlspecialchars($_SERVER['HTTP_REFERER']));
 		exit;
 	} else {
-		echo output_text('操作请求无效,请重新尝试');
+		echo output_text('操作请求无效，你没有权限删除此评论');
 	}
 } else {
-	echo output_text('操作请求无效,请重新尝试');
+	echo output_text('操作请求无效');
 }
 
 // 删除类别

@@ -8,7 +8,7 @@ if (isset($user) && isset($_GET['status'])) {
 		echo "<input class=\"submit\" style='' type=\"submit\" value=\"安装\" />";
 		echo " <a href='info.php?id=$ank[id]'>取消</a><br />";
 		echo "</form>";
-		include_once '../sys/inc/tfoot.php';
+		require_once '../sys/inc/tfoot.php';
 	}
 }
 
@@ -30,13 +30,13 @@ if (isset($user) && isset($_GET['like']) && $user['id'] != $ank['id'] && dbresul
 }
 if (isset($user) && $user['id'] == $ank['id']) {
 	if (isset($status['id'])) {
-		if ($status['msg']!=null){
-				echo "<div class='st_1'></div>";
-				echo "<div class='st_2'>";
-				echo output_text($status['msg']) . ' <font style="font-size:11px; color:gray;">' . vremja($status['time']) . '</font>';
-				
-				if ($ank['id'] == $user['id']) echo " [<a href='?id=$ank[id]&amp;status'><img src='/style/icons/edit.gif' alt='*'> 编辑</a>]";
-				echo "</div>";
+		if ($status['msg'] != null) {
+			echo "<div class='st_1'></div>";
+			echo "<div class='st_2'>";
+			echo output_text($status['msg']) . ' <font style="font-size:11px; color:gray;">' . vremja($status['time']) . '</font>';
+			
+			if ($ank['id'] == $user['id']) echo " [<a href='?id=$ank[id]&amp;status'><img src='/style/icons/edit.gif' alt='*'> 编辑</a>]";
+			echo "</div>";
 		}
 		
 	}
@@ -97,9 +97,9 @@ echo "<img src='../style/icons/anketa.gif' alt='*' /> <a href='info/anketa.php?i
 if (isset($user) && $user['id'] == $ank['id']) {
 	echo "[<img src='../style/icons/edit.gif' alt='*' /> <a href='info/edit.php'>编辑</a>]";
 	echo "<br />";
-	echo "<img src='../style/icons/apply14.png' alt='' /> <a href='daily_checkin.php'>每日签到</a>";
+	echo "<a href='../news/daily_news.php'>📰 每日新闻</a>";
+	echo "<a href='daily_checkin.php'>📅 每日签到</a>";
 }
-echo "<img src='../style/icons/anketa.png' alt='' /> <a href='../news/daily_news.php'>每日新闻</a>";
 echo "</div>";
 
 

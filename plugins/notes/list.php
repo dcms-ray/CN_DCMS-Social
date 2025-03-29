@@ -99,7 +99,6 @@ if (isset($_GET['spam']) && isset($user)) {
 	echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='?id=$notes[id]&amp;page=" . intval($_GET['page']) . "'>返回</a><br />";
 	echo "</div>";
 	include_once '../../sys/inc/tfoot.php';
-	exit;
 }
 
 // 查看记录
@@ -314,13 +313,15 @@ if ($notes['private'] == 2 && (empty($user) || ($user['id'] != $notes['id_user']
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
 }
-if (isset($user) && isset($_GET['delete']) && ($user['id'] == $notes['id_user'] || user_access('notes_delete'))) {
+
+if (isset($user) && isset($_GET['delete']) && $_GET['delete'] == 'note' && ($user['id'] == $notes['id_user'] || user_access('notes_delete'))) {
 	echo "<center>";
 	echo "你真的想删除日记吗 " . output_text($notes['name']) . "?<br />";
-	echo "[<a href='delete.php?id=$notes[id]'><img src='/style/icons/ok.gif'> 删除</a>] [<a href='list.php?id=$notes[id]'><img src='/style/icons/delete.gif'> 取消</a>] ";
+	echo "[<a href='delete.php?id={$notes['id']}'><img src='../../style/icons/ok.gif'> 删除</a>] [<a href='list.php?id={$notes['id']}'><img src='../../style/icons/delete.gif'> 取消</a>] ";
 	echo "</center>";
 	include_once '../../sys/inc/tfoot.php';
 }
+
 if (isset($user)) {
 	if (isset($_GET['like']) && $_GET['like'] == 1) {
 		if (dbresult(dbquery("SELECT COUNT(*) FROM `notes_like` WHERE `id_user` = '" . $user['id'] . "' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0) == 0) {
@@ -406,7 +407,7 @@ if (isset($user)) {
 	}
 }
 if (isset($user) && (user_access('notes_delete') || $user['id'] == $notes['id_user'])) {
-	echo "<br/><a href='edit.php?id=$notes[id]'><img src='../../style/icons/edit.gif'> 修改</a> <a href='?id=$notes[id]&amp;delete'><img src='../../style/icons/delete.gif'> 删除</a>";
+	echo "<br/><a href='edit.php?id=$notes[id]'><img src='../../style/icons/edit.gif'> 修改</a> <a href='?id=$notes[id]&amp;delete=note'><img src='../../style/icons/delete.gif'> 删除</a>";
 }
 echo "</div><div class='main'>";
 $l1 = dbresult(dbquery("SELECT COUNT(*) FROM `notes_like` WHERE `like` = '0' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0);
@@ -422,10 +423,11 @@ if (isset($user) && isset($avtor['id']) && $user['id'] != $avtor['id']) {
 //--------------------------移至书签-----------------------------//
 if (isset($user)) {
 	echo "" . ($webbrowser ? "&bull;" : null) . " <img src='../../style/icons/add_fav.gif' alt='*' /> ";
-	if (dbresult(dbquery("SELECT COUNT(*) FROM `bookmarks` WHERE `id_user` = '" . $user['id'] . "' AND `id_object` = '" . $notes['id'] . "' AND `type`='notes' LIMIT 1"), 0) == 0)
+	if (dbresult(dbquery("SELECT COUNT(*) FROM `bookmarks` WHERE `id_user` = '" . $user['id'] . "' AND `id_object` = '" . $notes['id'] . "' AND `type`='notes' LIMIT 1"), 0) == 0) {
 		echo "<a href='list.php?id=$notes[id]&amp;fav=1'>添加到书签</a><br />";
-	else
+	} else {
 		echo "<a href='list.php?id=$notes[id]&amp;fav=0'>删除书签</a><br />";
+	}
 	echo "<img src='../../style/icons/add_fav.gif' alt='*' />  <a href='fav.php?id=" . $notes['id'] . "'>查看收藏者</a> (" . $markinfo . ")";
 }
 echo '</div>';
@@ -439,13 +441,13 @@ $k_post = dbresult(dbquery("SELECT COUNT(*) FROM `notes_komm` WHERE `id_notes` =
 $k_page = k_page($k_post, $set['p_str']);
 $page = page($k_page);
 $start = $set['p_str'] * $page - $set['p_str'];
+
 echo '<div class="foot">';
 echo "<b>评论</b>: (" . dbresult(dbquery("SELECT COUNT(`id`)FROM `notes_komm` WHERE `id_notes`='" . $notes['id'] . "'"), 0) . ")";
 echo '</div>';
+
 if ($k_post == 0) {
-	echo '<div class="mess">';
-	echo "没有评论";
-	echo '</div>';
+	echo '<div class="mess">没有评论</div>';
 } else {
 	/*------------按时间排列--------------*/
 	if (isset($user)) {
@@ -501,6 +503,7 @@ if ($notes['private_komm'] == 1 && $user['id'] != $avtor['id'] && $frend != 2  &
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
 }
+
 if ($notes['private_komm'] == 2 && $user['id'] != $avtor['id'] && !user_access('notes_delete')) {
 	msg('评论区已关闭');
 	echo "  <div class='foot'>";
@@ -508,6 +511,8 @@ if ($notes['private_komm'] == 2 && $user['id'] != $avtor['id'] && !user_access('
 	echo "   </div>";
 	include_once '../../sys/inc/tfoot.php';
 }
+
+// 发送评论表单
 if (isset($user)) {
 	echo "<form method=\"post\" name='message' action=\"?id=" . intval($_GET['id']) . "&amp;page=$page" . $go_otv . "\">";
 	if ($set['web'] && is_file('../../style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
@@ -518,8 +523,10 @@ if (isset($user)) {
 	echo "<input value=\"发送\" type=\"submit\" />";
 	echo "</form>";
 }
+
 echo '<div class="foot">';
 echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ". user::nick($notes['id_user'], 1, 0, 0);
 echo ' | <b>' . output_text($notes['name']) . '</b>';
 echo "</div>";
+
 include_once '../../sys/inc/tfoot.php';
