@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`set_timesdvig` int(11) NOT NULL DEFAULT '0',
 	`set_news_to_mail` enum('0','1') NOT NULL DEFAULT '0',
 	`set_show_mail` enum('0','1') NOT NULL DEFAULT '0',
-	`set_them` varchar(32) DEFAULT 'default',
+	`set_them` varchar(32) DEFAULT 'wap',
 	`set_them2` varchar(32) DEFAULT 'web',
 	`meteo_country` int(11) NOT NULL DEFAULT '0',
 	`autorization` enum('0','1') NOT NULL DEFAULT '0',
