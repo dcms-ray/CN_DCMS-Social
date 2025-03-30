@@ -17,7 +17,7 @@ if (test_file(H . "files/down/screens/48/$size.$name.$ras.png")) {
 	if (empty($icon)) $icon = false;
 	if ($icon) {
 		$content = $zip->extract(PCLZIP_OPT_BY_NAME, $icon, PCLZIP_OPT_EXTRACT_AS_STRING);
-		if ($content[0]['content'] && strpos($content[0]['content'], "\x89PNG") === 0) {
+		if (isset($content[0]['content']) && strpos($content[0]['content'], "\x89PNG") === 0) {
 			$j = fopen(H . "sys/tmp/$sess.png", 'w');
 			fwrite($j, $content[0]['content']);
 			fclose($j);
