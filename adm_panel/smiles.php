@@ -34,7 +34,7 @@ if(isset($_GET['id'])) {
 				dbquery("INSERT INTO `smile` (`smile`,`dir`) values('$smile','" . intval($_GET['id']) . "')");
 				$ID = dbinsertid();
 				if (copy($_FILES["file_{$i}"]['tmp_name'], '../files/smiles/' . $ID . '.gif')) {
-					chmod(H . '../files/smiles/' . $ID . '.gif', 0777);
+					chmod('../files/smiles/' . $ID . '.gif', 0777);
 					$_SESSION['message'] = '上传成功';
 				}
 			} else {
