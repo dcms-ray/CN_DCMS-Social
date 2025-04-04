@@ -1,13 +1,13 @@
 <?php
-$err = NULL;
-$mydb = NULL;
-$time = NULL;
-$passgen = NULL;
-$sess = NULL;
-$ip = NULL;
-$ua = NULL;
-$webbrowser = NULL;
+$err = NULL;	// 报错信息
+$mydb = NULL;	// MySQLi 使用的
+$passgen = NULL;// 随机字符串
+$sess = NULL;	// 当前会话 ID
+$ip = NULL;		// 用户 IP
+$ua = NULL;		// 用户浏览器 UA
+$webbrowser = NULL;	// 用户浏览器类型
 $tpanel = NULL;
+
 
 // DCMS 核心科技😎😎😋，屏蔽报错就没有错误啦
 // if (function_exists('error_reporting')) error_reporting(0); // 禁用错误显示
@@ -23,7 +23,7 @@ if (function_exists('ini_set')) {
 }
 
 
-// 强制削减全局变量
+// 强制削减全局变量（已不再需要）
 if (ini_get('register_globals')) {
 	$allowed = array('_ENV' => 1, '_GET' => 1, '_POST' => 1, '_COOKIE' => 1, '_FILES' => 1, '_SERVER' => 1, '_REQUEST' => 1, 'GLOBALS' => 1);
 	foreach ($GLOBALS as $key => $value) {
@@ -35,10 +35,7 @@ if (ini_get('register_globals')) {
 
 list($msec, $sec) = explode(chr(32), microtime()); // 脚本启动时间
 $conf['headtime'] = $sec + $msec;
-$time = time();
-
-
-
+$time = time();	// 当前时间戳
 
 
 $phpvervion = explode('.', phpversion());

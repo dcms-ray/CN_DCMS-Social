@@ -26,10 +26,20 @@ function output_text($str, $br = true, $html = true, $smiles = true, $links = tr
 	return $str; // 返回已处理的字符串
 }
 
+// 消息输出
 function msg($msg) {
 	echo '<div class="msg">' . $msg . '</div>';
-} // 消息输出
+}
 
+/**
+* 生成随机密码
+*
+* 根据指定的长度和字符类型生成一个随机密码。支持小写字母、大写字母和数字三种字符类型。
+*
+* @param int $k_simb 生成密码的长度，默认为 8
+* @param int $types 可用的字符类型数量，取值范围 1-3，默认为 3（1=数字，2=小写字母，3=大写字母）
+* @return string 返回生成的随机密码
+*/
 function passgen($k_simb = 8, $types = 3) {
 	$password = "";
 	$small = "abcdefghijklmnopqrstuvwxyz";
@@ -50,7 +60,7 @@ function passgen($k_simb = 8, $types = 3) {
 		}
 	}
 	return $password;
-}
+} 
 $passgen = passgen();
 
 // 保存系统设置

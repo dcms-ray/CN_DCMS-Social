@@ -5,19 +5,20 @@ if (test_file(H . "files/down/screens/48/$size.$name.$ras.png")) {
 	include_once H . 'sys/inc/zip.php';
 	$zip = new PclZip($file);
 	$content = $zip->extract(PCLZIP_OPT_BY_NAME, "META-INF/MANIFEST.MF", PCLZIP_OPT_EXTRACT_AS_STRING);
-	$icon = false;
-	if (preg_match("#MIDlet-Icon:[^(\n|\r)]*(\n|\r)#i", $content[0]['content'], $jad) && isset($jad[0])) {
-		$icon = preg_replace("#(MIDlet-Icon:( )*)|(\n|\r)#i", '', $jad[0]);
-	} elseif (preg_match("#MIDlet-1:[^(\n|\r)]*(\n|\r)#i", $content[0]['content'], $jad) && isset($jad[0])) {
-		$icon = preg_replace("#(MIDlet-1:( )*)|(\n|\r)#i", '', $jad[0]);
-		$icon = preg_replace("#(^[^,]*,)|(,[^,]*$)#i", '', $icon);
+	if (!empty($content)) {
+		if (preg_match("#MIDlet-Icon:[^(\n|\r)]*(\n|\r)#i", $content[0]['content'], $jad) && isset($jad[0])) {
+			$icon = preg_replace("#(MIDlet-Icon:( )*)|(\n|\r)#i", '', $jad[0]);
+		} elseif (preg_match("#MIDlet-1:[^(\n|\r)]*(\n|\r)#i", $content[0]['content'], $jad) && isset($jad[0])) {
+			$icon = preg_replace("#(MIDlet-1:( )*)|(\n|\r)#i", '', $jad[0]);
+			$icon = preg_replace("#(^[^,]*,)|(,[^,]*$)#i", '', $icon);
+		}
+		$icon = preg_replace('#^ *| *$#i', '', $icon);
+		$icon = preg_replace("#(^(/){1,})|((/){1,}$)#", "", $icon);
 	}
-	$icon = preg_replace('#^ *| *$#i', '', $icon);
-	$icon = preg_replace("#(^(/){1,})|((/){1,}$)#", "", $icon);
 	if (empty($icon)) $icon = false;
 	if ($icon) {
 		$content = $zip->extract(PCLZIP_OPT_BY_NAME, $icon, PCLZIP_OPT_EXTRACT_AS_STRING);
-		if ($content[0]['content'] && strpos($content[0]['content'], "\x89PNG") === 0) {
+		if (isset($content[0]['content']) && strpos($content[0]['content'], "\x89PNG") === 0) {
 			$j = fopen(H . "sys/tmp/$sess.png", 'w');
 			fwrite($j, $content[0]['content']);
 			fclose($j);
@@ -52,9 +53,6 @@ if (test_file(H . "files/down/screens/48/$size.$name.$ras.png")) {
 		}
 	} elseif (test_file(H . "style/themes/default/loads/48/$ras.png")) {
 		copy(H . "style/themes/default/loads/48/$ras.png", H . "files/down/screens/48/$size.$name.$ras.png");
-		echo "<img src=\"/files/down/screens/48/$size.$name.$ras.png\" alt=\"$ras\" /><br />";
-	} else {
-		copy(H . "style/themes/default/loads/48/file.png", H . "files/down/screens/48/$size.$name.$ras.png");
 		echo "<img src=\"/files/down/screens/48/$size.$name.$ras.png\" alt=\"$ras\" /><br />";
 	}
 }
