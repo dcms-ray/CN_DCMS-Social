@@ -7,6 +7,8 @@
 
 require 'classes/class.user.php';
 
+// 生成一个默认的随机字符串
+$passgen = passgen();
 
 $user = checkLoginStatus();
 if ($user['status'] == 'true') {
