@@ -121,7 +121,7 @@ while ($post = dbassoc($q)) {
 	} elseif ($type == 'status_komm') {	// 状态评论
 		$status = dbassoc(dbquery("SELECT * FROM `status` WHERE `id` = '".$post['id_object']."' LIMIT 1"));
 		$name = '在这个状态的评论中回复了您';
-	} elseif ($type == 'foto_komm') {	// 照片评论
+	} elseif ($type == 'photo_komm') {	// 照片评论
 		$name = '在您的照片评论中回复了您';
 	} elseif ($type == 'notes_komm') {	// 日记评论
 		$name = '在您的日记评论中回复了您';
