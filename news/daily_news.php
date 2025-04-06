@@ -71,17 +71,16 @@ if ($set['daily_news'] == '1') {
 
 		// 确认数据正常加载
 		if ($data['code'] !== 200) {
-			$err = '无法加载新闻数据，请稍后重试！';
+			if (isset($data['message'])) {
+				$err = 'API 报错：' . $data['message'];
+			} else {
+				$err = '无法加载新闻数据，请稍后重试！';
+			}
 		}
 
 	} catch (Exception $e) {
 		$err = $e->getMessage();
 	}
-
-	$newsList = $data['data']['news'];
-	$tip = $data['data']['tip'];
-	$cover = $data['data']['cover'];
-	$updateTime = date("Y-m-d H:i:s", $data['data']['updated_at'] / 1000);
 
 	err();
 
@@ -135,17 +134,17 @@ if ($set['daily_news'] == '1') {
 		}
 	</style>
 	<div class="container">
-		<?php if (filter_var($cover, FILTER_VALIDATE_URL)): ?><img src="<?= htmlspecialchars($cover) ?>" alt="封面图片" class="cover"><?php endif; ?>
-		<h2>今日新闻</h2>
-		<p>更新时间：<?= htmlspecialchars($updateTime) ?>
-		<?php foreach ($data['data']['news'] as $news): ?>
+		<?php if (isset($data['data']['cover']) && filter_var($data['data']['cover'], FILTER_VALIDATE_URL)): ?><img src="<?= htmlspecialchars($data['data']['cover']) ?>" alt="封面图片" class="cover"><?php endif; ?>
+		<?php if (isset($data['data']['news'])): ?><h2>今日新闻</h2><?php endif; ?>
+		<?php if (isset($data['data']['updated_at'])): ?><p>更新时间：<?= htmlspecialchars(date("Y-m-d H:i:s", $data['data']['updated_at'] / 1000)) ?><?php endif; ?>
+		<?php if (isset($data['data']['news'])): foreach ($data['data']['news'] as $news): ?>
 			<div class="news-item"><?= htmlspecialchars($news) ?></div>
-		<?php endforeach; ?>
-		<div class="tip">微语：<?= htmlspecialchars($data['data']['tip']) ?></div>
+		<?php endforeach; endif; ?>
+		<?php if (isset($data['data']['tip'])): ?><div class="tip">微语：<?= htmlspecialchars($data['data']['tip']) ?></div><?php endif; ?>
 	</div>
 	<?php if (user_access('adm_news')): ?><div class="refresh-form"><form method="POST"><button type="submit" name="force_refresh">强制刷新</button></form></div><?php endif; ?>
 	<div class="footer">
-		<div class="sourceUrl">来源：<?php if (filter_var($data['data']['link'], FILTER_VALIDATE_URL)): ?><a href="<?= htmlspecialchars($data['data']['link']) ?>" target="_blank">微信公众号文章</a></div><?php endif; ?>
+		<?php if (isset($data['data']['link']) && filter_var($data['data']['link'], FILTER_VALIDATE_URL)): ?><div class="sourceUrl">来源：<a href="<?= htmlspecialchars($data['data']['link']) ?>" target="_blank">微信公众号文章</a></div><?php endif; ?>
 		数据来源于公共API | <a href="https://github.com/vikiboss/60s" target="_blank">开源地址</a>
 	</div>
 <?php
