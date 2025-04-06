@@ -11,7 +11,7 @@ if (user_access('chat_room') && isset($_GET['set']) && is_numeric($_GET['set']) 
     echo "<option value='2'".(($room['umnik']==0 && $room['shutnik']==1)?' selected="selected"':null).">$set[chat_shutnik]</option>";
     echo "<option value='3'".(($room['umnik']==1 && $room['shutnik']==1)?' selected="selected"':null).">$set[chat_umnik] 和 $set[chat_shutnik]</option>";
     echo "</select><br />";
-    echo "<input class='submit' type='submit' value='申请' /><br />";
+    echo "<input class='submit' type='submit' value='添加' /><br />";
     echo "<a href='?delete=$room[id]'>删除</a><br />";
     echo "<a href='?cancel=$passgen'>取消</a><br />";
     echo "</form>";
@@ -19,8 +19,8 @@ if (user_access('chat_room') && isset($_GET['set']) && is_numeric($_GET['set']) 
 
 if (user_access('chat_clear') && isset($_GET['act']) && $_GET['act']=='clear') {
     echo "<div class=\"err\">";
-    echo "清除聊天？<br />";
-    echo "<a href=\"?act=clear2\">是的</a> ";
+    echo "是否清除聊天室所有信息？<br />";
+    echo "<a href=\"?act=clear2\">清除</a> ";
     echo "<a href=\"?\">取消</a><br />";
     echo "</div>";
 }
