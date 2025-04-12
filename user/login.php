@@ -11,43 +11,20 @@ $show_all = true;
 include_once '../sys/inc/user.php';
 only_unreg();
 
-// 检查用户是否成功登录
-if (isset($_GET['id']) && isset($_GET['pass'])) {
-	// 从数据库获取用户信息
-	$user = dbassoc(dbquery("SELECT `id`, `pass` FROM `user` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1"));
-
-	if ($user && password_verify($_GET['pass'], $user['pass'])) {
-		$_SESSION['id_user'] = $user['id'];
-		dbquery("INSERT INTO `user_log` (`id_user`, `date`, `ua`, `ip`, `method`) values('$user[id]', '" . date('Y-m-d H:i:s') . "', '$ua' , '$ip', '0')");
+if (isset($_POST['nick']) && isset($_POST['pass'])) {    // 检查用户是否已经提交登录表单
+	// 选择了“记住我”
+	if (isset($_POST['aut_save']) && $_POST['aut_save']) {
+		$expiration = time() + 60 * 60 * 24 * 365;
 	} else {
-		$_SESSION['err'] = '用户名或密码不正确';
+		$expiration = time() + 3600 * 24;
 	}
-} elseif (isset($_POST['nick']) && isset($_POST['pass'])) {    // 检查用户是否已经提交登录表单
-	// 从数据库获取用户信息
-	$user = dbassoc(dbquery("SELECT `id`, `pass` FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "' LIMIT 1"));
+	$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['pass'], $expiration);
+	if ($authManagerLoginResult['status']) {
+		$_SESSION['id_user'] = $authManagerLoginResult['data']['user_id'];
+		$_SESSION['login_id'] = $authManagerLoginResult['data']['login_id'];
+		setcookie('auth_token', $authManagerLoginResult['data']['token'], $expiration, '/');
 
-	if ($user && password_verify($_POST['pass'], $user['pass'])) {
-		$_SESSION['id_user'] = $user['id'];
-		$user = user::get_user($user['id']);
-		if (isset($_POST['aut_save']) && $_POST['aut_save']) {
-			$expiration = time() + 60 * 60 * 24 * 365;
-		} else {
-			$expiration = time() + 60 * 60 * 2;
-		}
-		dbquery("INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) values('{$user['id']}', '" . date('Y-m-d H:i:s') . "', '" . date('Y-m-d H:i:s', $expiration) . "', '" . date('Y-m-d H:i:s') . "', '{$ua}' , '{$ip}', '1')");
-		$log_id = dbinsertid();
-		$_SESSION['login_id'] = $log_id;
-
-		// 在COOKIE中保存数据
-		$payload = array(
-			"iat" => time(),
-			"exp" => $expiration,
-			"jwt_id" => $log_id,
-			"user_id" => $user['id'],
-			"username" => $_POST['nick']
-		);
-		$jwt = \Firebase\JWT\JWT::encode($payload, $set['shif'], 'HS256');
-		setcookie('auth_token', $jwt, $expiration, '/');
+		$user = user::get_user($authManagerLoginResult['data']['user_id']);
 	} else {
 		$_SESSION['err'] = '用户名或密码不正确';
 	}
@@ -60,12 +37,6 @@ if (!isset($user)) {
 	header('Location: /user/aut.php');
 	exit;
 }
-
-// 记录用户的 ip
-dbquery("UPDATE `user_log` SET `ip` = '{$ip}' WHERE `id` = '{$log_id}' LIMIT 1");
-
-// 记录用户的 ua
-if ($ua) dbquery("UPDATE `user_log` SET `ua` = '" . my_esc($ua) . "' WHERE `id` = '{$log_id}' LIMIT 1");
 
 // 难以理解的会话
 dbquery("UPDATE `user_log` SET `sess` = '{$sess}' WHERE `id` = '{$log_id}' LIMIT 1");
