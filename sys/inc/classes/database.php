@@ -123,6 +123,19 @@ class Database {
 	}
 
 	/**
+	 * 执行查询并返回单条记录
+	 * 
+	 * @param string $sql SQL查询语句
+	 * @param array $params 绑定参数数组
+	 * @param int $fetchMode 获取模式，默认PDO::FETCH_ASSOC
+	 * @return array|null 返回查询结果数组，如果没有结果返回null
+	 */
+	public function queryColumn($sql, $params = [], $column_number = 0) {
+		$result = $this->executeStatement($sql, $params)->fetchColumn($column_number);
+		return $result === false ? null : $result;
+	}
+
+	/**
 	 * 执行插入操作并返回最后插入的ID
 	 * 
 	 * @param string $sql SQL插入语句
