@@ -50,10 +50,10 @@ function k_page($k_post = 0, $k_p_str = 10) {
  * @param int $page 当前页面编号，默认为1。
  * @return void
  */
-function str($link = '?', $k_page = 1,$page = 1) {
+function str($link = '?', $k_page = 1, $page = 1) {
 	if ($page < 1) $page = 1;
 	echo '<div class="c2">';
-	if ($page != 1) echo '<span class="page"><a href="' . $link . 'page=1" title="第 1 页">&lt;</a></span> ';
+	if ($page != 1) echo '<span class="page"><a href="' . $link . 'page=' . $page - 1 . '" title="上一页">&lt;</a></span> ';
 	if ($page != 1) {
 		echo '<span class="page"><a href="' . $link . 'page=1" title="第 1 页">1</a></span>';
 	} else {
@@ -75,6 +75,6 @@ function str($link = '?', $k_page = 1,$page = 1) {
 	} elseif ($k_page > 1) {
 		echo ' <span class="str"><b>' . $k_page . '</b></span>';
 	}
-	if ($page != $k_page) echo ' <span class="page"><a href="' . $link . 'page=end" title="最后一页">&gt;</a></span>';
+	if ($page != $k_page) echo ' <span class="page"><a href="' . $link . 'page=' . $page + 1 . '" title="下一页">&gt;</a></span>';
 	echo '</div>';
 }

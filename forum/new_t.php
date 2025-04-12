@@ -18,10 +18,12 @@ $set['title'] = '论坛-新主题';
 include_once '../sys/inc/thead.php';
 title();
 aut(); // форма авторизации
+
 // 返回菜单
 echo '<div class="foot">';
 echo '<img src="/style/icons/str2.gif" /> <a href="/forum/">论坛</a> | <b>新课题</b>';
 echo '</div>';
+
 $adm_add = [];
 $adm_add2 = NULL;
 if (!isset($user) || $user['level'] == 0) {
@@ -71,10 +73,13 @@ while ($them = dbassoc($q)) {
 	echo '</div>';
 }
 echo '</table>';
-// 页面输出
+
+// 页面数量输出
 if ($k_page > 1) str("?", $k_page, $page);
+
 // 返回菜单
 echo '<div class="foot">';
 echo '<img src="/style/icons/str2.gif" /> <a href="/forum/">论坛</a> | <b>我的主题</b>';
 echo '</div>';
+
 include_once '../sys/inc/tfoot.php';
