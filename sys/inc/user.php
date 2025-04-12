@@ -6,15 +6,19 @@
 */
 
 require 'classes/class.user.php';
+require 'classes/authManager.php';
 
 // 生成一个默认的随机字符串
 $passgen = passgen();
 
-$user = checkLoginStatus();
-if ($user['status'] == 'true') {
-	$user = $user['data'];
-} else {
-	unset($user);
+$authManager = new AuthManager($db, $set);
+
+// 检查登录状态
+$result = $authManager->checkLoginStatus();
+
+if ($result['status']) {
+	$user = $result['data'];
+	// 处理已认证用户
 }
 
 
@@ -34,18 +38,8 @@ if (!empty($user)) {
 	} else {
 		$user['level'] = 0;
 	}
-	$last_online = dbresult(dbquery("SELECT ul.last_online
-	                                 FROM `user_log` ul
-	                                 WHERE ul.id_user = {$user['id']}
-	                                     AND ul.ban = 0
-	                                 ORDER BY ul.last_online DESC
-	                                 LIMIT 1"), 0);
-	$timeactiv  =  time() - strtotime($last_online);
 
-	if ($timeactiv < 120) {
-		$newtimeactiv = $user['time'] + $timeactiv;
-		dbquery("UPDATE `user` SET `time` ='$newtimeactiv' WHERE `id` = '$user[id]' LIMIT 1");
-	}
+	$processedResult = $authManager->processAuthenticatedUser($user, $clientDetails);
 
 	if (isset($user['type_input']) && isset($_SERVER['HTTP_REFERER']) && !preg_match('#' . preg_quote($_SERVER['HTTP_HOST']) . '#', $_SERVER['HTTP_REFERER']) && preg_match('#^https?://#i', $_SERVER['HTTP_REFERER']) && $ref = @parse_url($_SERVER['HTTP_REFERER'])) {
 		if (isset($ref['host'])) {
