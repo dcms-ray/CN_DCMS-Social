@@ -46,7 +46,7 @@ while ($guest = dbassoc($q)) {
     if (isset($user) && ($user['level'] > 0)) {
         if (user_access('guest_show_ip') && $guest['ip'] != 0) echo "<span class=\"ank_n\">IP:</span> <span class=\"ank_d\">{$guest['ip']}</span><br />";
         if (user_access('guest_show_ip') && opsos($guest['ip'])) echo "<span class=\"ank_n\">UA:</span> <span class=\"ank_d\">" . opsos($guest['ip']) . "</span><br />";
-        if (otkuda($guest['url'])) echo "<span class=\"ank_n\">URL:</span> <span class=\"ank_d\"><a href='$guest[url]'>" . otkuda($guest['url']) . "</a></span><br />";
+        if (otkuda($guest['url'])) echo "<span class=\"ank_n\">URL:</span> <span class=\"ank_d\"> " . otkuda($guest['url']) . " </span><br />";
     }
     echo "  </td>";
     echo "   </tr>";

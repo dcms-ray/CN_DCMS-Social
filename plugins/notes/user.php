@@ -88,7 +88,7 @@ while ($post = dbassoc($q)) {
 	echo "<img src='../../style/icons/dnev.png' alt='*'> ";
 	echo "<a href='list.php?id={$post['id']}'>" . text($post['name']) . "</a>";
 	echo " <span style='time'>(" . vremja($post['time']) . ")</span> <br />";
-	$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = '{$post['id']}' AND `time` > '" . $ftime . "'"), 0);
+	$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = '{$post['id']}' AND `time` > '" . mktime(0, 0, 0) . "'"), 0);
 	echo "   </div>";
 }
 echo "</table>";

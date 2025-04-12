@@ -93,10 +93,10 @@ for ($i = $start; $i < $k_post && $i < $set['p_str'] * $page; $i++) {
 			$q3 = dbquery("SELECT * FROM `downnik_dir` WHERE `dir_osn` like '$post[dir]%'");
 			while ($post2 = dbassoc($q3)) {
 				$k_f = $k_f + dbresult(dbquery("SELECT COUNT(*) FROM `downnik_files` WHERE `id_dir` = '$post2[id]'"), 0);
-				$k_n = $k_n + dbresult(dbquery("SELECT COUNT(*) FROM `downnik_files` WHERE `id_dir` = '$post2[id]' AND `time_go` > '" . $ftime . "'"), 0);
+				$k_n = $k_n + dbresult(dbquery("SELECT COUNT(*) FROM `downnik_files` WHERE `id_dir` = '$post2[id]' AND `time_go` > '" . mktime(0, 0, 0) . "'"), 0);
 			}
 			$k_f = $k_f + dbresult(dbquery("SELECT COUNT(*) FROM `downnik_files` WHERE `id_dir` = '$post[id]'"), 0);
-			$k_n = $k_n + dbresult(dbquery("SELECT COUNT(*) FROM `downnik_files` WHERE `id_dir` = '$post[id]' AND `time_go` > '" . $ftime . "'"), 0);
+			$k_n = $k_n + dbresult(dbquery("SELECT COUNT(*) FROM `downnik_files` WHERE `id_dir` = '$post[id]' AND `time_go` > '" . mktime(0, 0, 0) . "'"), 0);
 			if ($k_n == 0) $k_n = NULL;
 			else $k_n = '<font color="red">+' . $k_n . '</font>';
 			echo ' (' . $k_f . ') ' . $k_n . '<br />';

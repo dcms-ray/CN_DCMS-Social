@@ -340,6 +340,6 @@ if (isset($_GET['set'])) {
 }
 
 echo "<div class='foot'><img src='/style/icons/str.gif' alt='*'> <a href='anketa.php'>查看资料</a><br />";
-if (isset($_SESSION['refer']) && $_SESSION['refer']!=NULL && otkuda($_SESSION['refer'])) echo "<img src='/style/icons/str2.gif' alt='*'> <a href='$_SESSION[refer]'>".otkuda($_SESSION['refer'])."</a><br />";
+if (isset($_SESSION['refer']) && $_SESSION['refer']!=NULL && otkuda($_SESSION['refer'])) echo "<img src='/style/icons/str2.gif' alt='*'> <a href='$_SESSION[refer]'> 上一页</a><br />";
 echo '</div>';
 include_once '../../sys/inc/tfoot.php';
