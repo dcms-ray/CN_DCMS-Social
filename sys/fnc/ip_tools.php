@@ -113,9 +113,3 @@ function checkBanIp($ip) {
 	}
 	return false;
 }
-
-
-if (!(isset($ban_ip_page) && $ban_ip_page == true) && checkBanIp($ip)) {
-	header('Location: /user/ban_ip.php');
-	exit;
-}

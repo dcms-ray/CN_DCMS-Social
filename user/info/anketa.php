@@ -67,7 +67,7 @@ if ($ank['id'] == 0) {
 	echo "<span class=\"err\">$ank[group_name]</span><br />";
 	if ($ank['ank_o_sebe'] != NULL) echo "<span class=\"ank_n\">关于自己:</span> <span class=\"ank_d\">$ank[ank_o_sebe]</span><br />";
 	if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL && otkuda($_SESSION['refer']))
-		echo "<div class='foot'>&laquo;<a href='$_SESSION[refer]'>" . otkuda($_SESSION['refer']) . "</a><br /></div>";
+		echo "<div class='foot'>&laquo;<a href='$_SESSION[refer]'> 上一页</a><br /></div>";
 	include_once '../../sys/inc/tfoot.php';
 }
 
@@ -417,7 +417,7 @@ if (isset($user['level']) && $user['level'] > $ank['level']) {
 			echo "<span class=\"ank_n\">IP:</span> <span class=\"ank_d\">" . opsos($ank['ip']) . "</span><br />";
 		}
 		if ($ank['show_url'] == 1 && !empty($ank['url'])) {
-			if (otkuda($ank['url'])) echo "<span class=\"ank_n\">URL:</span> <span class=\"ank_d\"><a href='$ank[url]'>" . otkuda($ank['url']) . "</a></span><br />";
+			if (otkuda($ank['url'])) echo "<span class=\"ank_n\">URL:</span> <span class=\"ank_d\"> " . otkuda($ank['url']) . " </span><br />";
 		}
 		if (user_access('user_collisions') && $user['level'] > $ank['level']) {
 			$mass[0] = $ank['id'];

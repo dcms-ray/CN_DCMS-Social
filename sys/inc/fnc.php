@@ -21,59 +21,6 @@ if (!function_exists('file_put_contents')) {
 	}
 }
 
-// DOS 攻击防护
-if ($set['antidos']) {
-	try {
-		// 插入当前请求记录
-		$db->insert(
-			"INSERT INTO ip_requests (`ip`, `time`) VALUES (:ip, NOW())",
-			['ip' => $ip]
-		);
-
-		// 查询该 IP 在过去 5 秒内的请求次数
-		$requestCount = $db->query(
-			"SELECT COUNT(*) as count FROM ip_requests WHERE ip = :ip AND time > :time_limit",
-			[
-				'ip' => $ip,
-				'time_limit' => date('Y-m-d H:i:s', $time - 5)
-			]
-		)['count'];
-
-		// 如果请求次数超过 100，则封禁 IP
-		if ($requestCount > 100) {
-			$banExists = $db->query(
-				"SELECT COUNT(*) as count FROM `ban_ip` WHERE `min` <= :ip AND `max` >= :ip",
-				['ip' => $ip]
-			)['count'];
-
-			if ($banExists == 0) {
-				$db->insert(
-					"INSERT INTO `ban_ip` (`min`, `max`, `prich`) VALUES (:min, :max, 'AntiDos')",
-					['min' => $ip, 'max' => $ip]
-				);
-			}
-		}
-
-		// 定期清理过期的请求记录（1 小时前）
-		$db->delete(
-			"DELETE FROM ip_requests WHERE time < :time_limit",
-			['time_limit' => date('Y-m-d H:i:s', $time - 3600)]
-		);
-	} catch (Exception $e) {
-		// 处理异常，例如记录日志或返回错误信息
-		error_log("Anti-DOS error: " . $e->getMessage());
-	}
-}
-
-/**
- * 删除超过一小时的 IP 封禁记录
- * 
- * 仅删除 `prich` 字段为 `AntiDos` 且 `created_at` 早于一天前的记录
- */
-dbquery("DELETE FROM `ban_ip` WHERE `prich` = 'AntiDos' AND `created_at` < '" . date('Y-m-d H:i:s', time() - 3600 * 24) . "'");
-dbquery("DELETE FROM `ban_ip` WHERE `prich` = 'Inject' AND `created_at` < '" . date('Y-m-d H:i:s', time() - 3600 * 24) . "'");
-
-
 // 禁止文字antimat会自动发出警告，然后禁止
 function antimat($str) {
 	global $user, $time, $set;
@@ -119,55 +66,6 @@ function delete_dir($dir) {
 		chmod("$dir", 0777);
 		unlink("$dir");
 	}
-}
-
-// 正在清除临时文件夹
-if (!isset($hard_process)) {
-	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'clear_tmp_dir'");
-	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('clear_tmp_dir', '$time')");
-	$clear_dir = dbassoc($q);
-	if (!isset($clear_dir['time']) || isset($clear_dir['time']) && $clear_dir['time'] < $time - 60 * 60 * 24) {
-		$hard_process = true;
-		dbquery("UPDATE `cron` SET `time` = '$time' WHERE `id` = 'clear_tmp_dir'");
-		// if (function_exists('curl_init')) {
-		// 	$ch = curl_init();
-		// 	curl_setopt($ch, CURLOPT_URL, 'https://dcms-social.ru/curl.php?site=' . $_SERVER['HTTP_HOST'] . '&version=' . $set['dcms_version'] . '&title=' . $set['title']);
-		// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		// 	$data = curl_exec($ch);
-		// 	curl_close($ch);
-		// }
-		$od = opendir(H . 'sys/tmp/');
-		while ($rd = readdir($od)) {
-			if (!preg_match('#^\.#', $rd) && filectime(H . 'sys/tmp/' . $rd) < $time - 60 * 60 * 24) {
-				delete_dir(H . 'sys/tmp/' . $rd);
-			}
-		}
-		closedir($od);
-	}
-}
-// 统计数据汇总
-
-// 每日访问记录
-if (!isset($hard_process)) {
-	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'visit' LIMIT 1");
-	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('visit', '$time')");
-	$visit = dbassoc($q);
-	if (!isset($visit['time']) || isset($visit['time']) && $visit['time'] < time() - 60 * 60 * 24) {
-		if (function_exists('set_time_limit')) @set_time_limit(600); // 将限制设置为 10 分钟
-		$last_day = mktime(0, 0, 0, date('m'), date('d') - 1); // 昨天的开始
-		$today_time = mktime(0, 0, 0); // 今天的开始
-		if (dbresult(dbquery("SELECT COUNT(*) FROM `visit_everyday` WHERE `time` = '$last_day'"), 0) == 0) {
-			$hard_process = true;
-			// 在单独的表中记下昨天的一般数据
-			dbquery("INSERT INTO `visit_everyday` (`host` , `host_ip_ua`, `hit`, `time`) VALUES ((SELECT COUNT(DISTINCT `ip`) FROM `visit_today` WHERE `time` < '$today_time'),(SELECT COUNT(DISTINCT `ip`, `ua_hash`) FROM `visit_today` WHERE `time` < '$today_time'),(SELECT COUNT(*) FROM `visit_today` WHERE `time` < '$today_time'),'$last_day')");
-			dbquery('DELETE FROM `visit_today` WHERE `time` < ' . $today_time);
-		}
-	}
-}
-
-// 现场迁移记录
-if (isset($_SERVER['HTTP_REFERER']) && !preg_match('#' . preg_quote($_SERVER['HTTP_HOST']) . '#', $_SERVER['HTTP_REFERER']) && $ref = @parse_url($_SERVER['HTTP_REFERER'])) {
-	if (isset($ref['host'])) $_SESSION['http_referer'] = $ref['host'];
 }
 
 function br($msg, $br = '<br />') {
@@ -248,39 +146,6 @@ function only_level($level = 0, $link = NULL) {
 	}
 }
 
-if (!isset($hard_process)) {
-	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'everyday'");
-	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('everyday', '" . time() . "')");
-	$everyday = dbassoc($q);
-	if (!isset($everyday['time']) || isset($everyday['time']) && $everyday['time'] < time() - 60 * 60 * 24) {
-		$hard_process = true;
-		if (function_exists('set_time_limit')) set_time_limit(600); // 将限制设置为 10 分钟
-		dbquery("UPDATE `cron` SET `time` = '" . time() . "' WHERE `id` = 'everyday'");
-		dbquery("DELETE FROM `guests` WHERE `date_last` < '" . (time() - 600) . "'");
-		dbquery("DELETE FROM `chat_post` WHERE `time` < '" . (time() - 60 * 60 * 24) . "'"); // 删除旧的聊天帖子
-		dbquery("DELETE FROM `user` WHERE `activation` != null AND `date_reg` < '" . (time() - 60 * 60 * 24) . "'"); // 删除未激活的账户
-
-		// 删除过期的 password reset token
-		dbquery("DELETE FROM `password_reset_tokens` WHERE `created_at` < '" . date('Y-m-d H:i:s') . "'");
-
-		// 删除所有一个多月前标记为删除的联系人
-		$qd = dbquery("SELECT * FROM `users_konts` WHERE `type` = 'deleted' AND `time` < " . ($time - 60 * 60 * 24 * 30));
-		while ($deleted = dbarray($qd)) {
-			dbquery("DELETE FROM `users_konts` WHERE `id_user` = '{$deleted['id_user']}' AND `id_kont` = '{$deleted['id_kont']}'");
-
-			if (dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_kont` = '{$deleted['id_user']}' AND `id_user` = '{$deleted['id_kont']}'"), 0) == 0) {
-				// 如果用户未与其他人联系，则删除所有消息
-				dbquery("DELETE FROM `mail` WHERE `id_user` = '{$deleted['id_user']}' AND `id_kont` = '{$deleted['id_kont']}' OR `id_kont` = '{$deleted['id_user']}' AND `id_user` = '{$deleted['id_kont']}'");
-			}
-		}
-		$tab = dbquery('SHOW TABLES FROM ' . $set['sql_db_name']);
-		while ($table = mysqli_fetch_row($tab)) {
-			dbquery("OPTIMIZE TABLE `{$table[0]}`"); // 表的优化
-		}
-	}
-}
-
-
 // 错误输出
 function err() {
 	global $err;
@@ -296,19 +161,6 @@ function err() {
 function msg($msg) {
 	echo "<div class='msg'>{$msg}</div>";
 } // 消息输出
-
-
-
-
-// 发送预定邮件
-$q = dbquery("SELECT * FROM `mail_to_send` LIMIT 1");
-if (dbrows($q) != 0) {
-	$mail = dbassoc($q);
-	$adds = "From: \"admin@$_SERVER[HTTP_HOST]\" <admin@$_SERVER[HTTP_HOST]>\n";
-	$adds .= "Content-Type: text/html; charset=utf-8\n";
-	mail($mail['mail'], '=?utf-8?B?' . base64_encode($mail['them']) . '?=', $mail['msg'], $adds);
-	dbquery("DELETE FROM `mail_to_send` WHERE `id` = '$mail[id]'");
-}
 
 // 保存系统设置
 function save_settings($set) {
@@ -368,48 +220,73 @@ function fiera($msg) {
 	return $msg;
 }
 
+/**
+ * 获取或设置全局配置变量的值
+ *
+ * @param string $name 配置项名称
+ * @param mixed $default 默认值，默认为 NULL
+ * @return mixed 返回配置项的值
+ */
+function setget($name, $default = NULL) {
+	global $set;
+	// 如果配置项未设置，则初始化为默认值
+	if (!isset($set[$name])) {
+		if ($default === NULL) $set[$name] = NULL;
+		else $set[$name] = $default;
+	}
+	return $set[$name];
+}
 
-// 从文件夹"sys/fnc"加载其余功能 
-$opdirbase = opendir(H . 'sys/fnc');
-while ($filebase = readdir($opdirbase)) {
-	if (preg_match('#\.php$#i', $filebase)) {
-		include_once(H . 'sys/fnc/' . $filebase);
+/**
+ * 检查并返回文件的替换路径或原始路径
+ *
+ * @param string $source2 输入的文件路径
+ * @return string 返回替换后的文件路径或原始路径
+ */
+function check_replace($source2) {
+	// 获取文件的真实路径，如果不存在则使用原始输入
+	$source = realpath($source2);
+	if (!file_exists($source)) $source = $source2;
+	// 将路径中的目录分隔符统一替换为正斜杠
+	$source = str_ireplace(DIRECTORY_SEPARATOR, "/", (string)$source);
+	$h = str_ireplace(DIRECTORY_SEPARATOR, "/", H);
+	$replace = str_ireplace(DIRECTORY_SEPARATOR, "/", REPLACE);
+	// 计算替换路径
+	$replace_file = str_ireplace($h, $replace, (string)$source);
+	// 检查是否启用了替换功能
+	if (setget('replace', 1) == 1) {
+		// 如果替换文件存在，返回替换路径
+		if (file_exists($replace_file)) {
+			return $replace_file;
+		} else {
+			// 否则返回原始路径
+			return $source;
+		}
+	} else {
+		// 未启用替换功能时，返回原始路径
+		return $source;
 	}
 }
 
-
-// 参观记录
-dbquery("INSERT INTO `visit_today` (`ip`, `ua`, `ua_hash`, `time`) VALUES ('$ip', '" . my_esc(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '" . md5(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '$time')");
-
-// 反黑客攻击行为
-if (!defined("ADMIN") && isset($set['hacker_attacks']) && $set['hacker_attacks'] == 1) {
-	$hackparam = htmlspecialchars((string) ($_SERVER['QUERY_STRING'] ?? ''));
-
-	$hackcmd = array('chr(', 'r57shell', 'remview', '%27', 'config=', 'OUTFILE%20', 'spnuke_authors', 'spnuke_admins', 'uname%20', 'netstat%20', 'rpm%20', 'passwd', '%20', 'del%20', 'deltree%20', 'format%20', 'start%20', 'wget', 'group_access', '%3E', '%3С',  'select%20', 'SELECT', 'cmd=', 'rush=', 'union', 'javascript:', 'UNION', 'echr(', 'esystem(', 'cp%20', 'mdir%20', 'mcd%20', 'mrd%20', 'rm%20', 'mv%20', 'rmdir%20', 'chmod(', 'chmod%20', 'chown%20', 'chgrp%20', 'locate%20', 'diff%20', 'kill%20', 'kill(', 'killall', 'cmd', 'command', 'fetch', 'whereis', 'grep%20', 'ls -', 'lynx', 'su%20root', 'test', 'etc/passwd',  "'", '%60', '%00', '%F20', 'echo', 'write(', 'killall', 'passwd%20', 'telnet%20', 'vi(', 'vi%20', 'INSERT%20INTO', 'SELECT%20', 'javascript', 'fopen', 'fwrite', '$_REQUEST', '$_GET', '<script>', 'alert', '&lt', '&gt'); //禁用参数和值
-
-	$checkcmd = str_replace($hackcmd, 'X', $hackparam);
-
-	if ($hackparam != $checkcmd) {
-		dbquery("INSERT INTO ban_ip (min, max, prich) VALUES(\"$ip\", \"$ip\", \"Inject\");");
-		dbquery('INSERT INTO mail (id_user, id_kont, msg, time) VALUES("0", "1", "IP: ' . $ip . ' UA: ' . $ua . ' 位置: ' . get_ip_address($ip) . ' 正在进行黑客攻击", "' . $time . '");');
-		die('<h2>检测到攻击！</h2><br>你的浏览器：<b>' . $ua . '</b><br>你的IP： <b>' . $ip . '</b><br><b>已被记录，不要尝试违法操作！</b><br><br>有这时间多休息吧！！！');
-	}
+/**
+ * 测试文件是否为普通文件（使用 check_replace 检查路径）
+ *
+ * @param string $file 文件路径
+ * @return bool 如果是普通文件返回 true，否则返回 false
+ */
+function test_file($file) {
+	return (is_file(check_replace($file)));
 }
 
-// 确保所有通过 GET/POST 方法传入的数据都被清理和转义（没卵用）
-/*
-if(isset($_GET)) {
-	foreach($_GET as $key => $value) {
-		$_GET[$key] = fiera($value);
-	}
+/**
+ * 测试文件是否存在（使用 check_replace 检查路径）
+ *
+ * @param string $file 文件路径
+ * @return bool 如果文件存在返回 true，否则返回 false
+ */
+function test_file2($file) {
+	return (file_exists(check_replace($file)));
 }
-if (isset($_POST)) {
-	foreach($_POST as $key => $value) {
-		$_POST[$key] = fiera($value);
-	}
-}
-*/
-
 
 function ages($age) {
 	$str = '';
@@ -429,6 +306,7 @@ function add_header($value) {
 	return $add[] = $value;
 	header_html($add);
 }
+
 function header_html($add = null) {
 	static $header;
 	if ($add == null) {
@@ -436,3 +314,200 @@ function header_html($add = null) {
 		echo "" . $header;
 	} else $header = $add;
 }
+
+// 从文件夹"sys/fnc"加载其余功能 
+$opdirbase = opendir(H . 'sys/fnc');
+while ($filebase = readdir($opdirbase)) {
+	if (preg_match('#\.php$#i', $filebase)) {
+		include_once(H . 'sys/fnc/' . $filebase);
+	}
+}
+
+
+
+
+// ============================== 定期执行的功能 ====================================
+
+
+/**
+ * 删除超过一小时的 IP 封禁记录
+ * 
+ * 仅删除 `prich` 字段为 `AntiDos` 且 `created_at` 早于一天前的记录
+ */
+dbquery("DELETE FROM `ban_ip` WHERE `prich` = 'AntiDos' AND `created_at` < '" . date('Y-m-d H:i:s', time() - 3600 * 24) . "'");
+dbquery("DELETE FROM `ban_ip` WHERE `prich` = 'Inject' AND `created_at` < '" . date('Y-m-d H:i:s', time() - 3600 * 24) . "'");
+
+// 禁止被封禁的 IP 访问
+if (!(isset($ban_ip_page) && $ban_ip_page == true) && checkBanIp($ip)) {
+	header('Location: /user/ban_ip.php');
+	exit;
+}
+
+// DOS 攻击防护
+if ($set['antidos']) {
+	try {
+		// 插入当前请求记录
+		$db->insert(
+			"INSERT INTO ip_requests (`ip`, `time`) VALUES (:ip, NOW())",
+			['ip' => $ip]
+		);
+
+		// 查询该 IP 在过去 5 秒内的请求次数
+		$requestCount = $db->query(
+			"SELECT COUNT(*) as count FROM ip_requests WHERE ip = :ip AND time > :time_limit",
+			[
+				'ip' => $ip,
+				'time_limit' => date('Y-m-d H:i:s', $time - 5)
+			]
+		)['count'];
+
+		// 如果请求次数超过 100，则封禁 IP
+		if ($requestCount > 100) {
+			$banExists = $db->query(
+				"SELECT COUNT(*) as count FROM `ban_ip` WHERE `min` <= :ip AND `max` >= :ip",
+				['ip' => $ip]
+			)['count'];
+
+			if ($banExists == 0) {
+				$db->insert(
+					"INSERT INTO `ban_ip` (`min`, `max`, `prich`) VALUES (:min, :max, 'AntiDos')",
+					['min' => $ip, 'max' => $ip]
+				);
+			}
+		}
+
+		// 定期清理过期的请求记录（1 小时前）
+		$db->delete(
+			"DELETE FROM ip_requests WHERE time < :time_limit",
+			['time_limit' => date('Y-m-d H:i:s', $time - 3600)]
+		);
+	} catch (Exception $e) {
+		// 处理异常，例如记录日志或返回错误信息
+		error_log("Anti-DOS error: " . $e->getMessage());
+	}
+}
+
+// 反黑客攻击行为
+if (!defined("ADMIN") && isset($set['hacker_attacks']) && $set['hacker_attacks'] == 1) {
+	$hackparam = htmlspecialchars((string) ($_SERVER['QUERY_STRING'] ?? ''));
+
+	$hackcmd = array('chr(', 'r57shell', 'remview', '%27', 'config=', 'OUTFILE%20', 'spnuke_authors', 'spnuke_admins', 'uname%20', 'netstat%20', 'rpm%20', 'passwd', '%20', 'del%20', 'deltree%20', 'format%20', 'start%20', 'wget', 'group_access', '%3E', '%3С',  'select%20', 'SELECT', 'cmd=', 'rush=', 'union', 'javascript:', 'UNION', 'echr(', 'esystem(', 'cp%20', 'mdir%20', 'mcd%20', 'mrd%20', 'rm%20', 'mv%20', 'rmdir%20', 'chmod(', 'chmod%20', 'chown%20', 'chgrp%20', 'locate%20', 'diff%20', 'kill%20', 'kill(', 'killall', 'cmd', 'command', 'fetch', 'whereis', 'grep%20', 'ls -', 'lynx', 'su%20root', 'test', 'etc/passwd',  "'", '%60', '%00', '%F20', 'echo', 'write(', 'killall', 'passwd%20', 'telnet%20', 'vi(', 'vi%20', 'INSERT%20INTO', 'SELECT%20', 'javascript', 'fopen', 'fwrite', '$_REQUEST', '$_GET', '<script>', 'alert', '&lt', '&gt'); //禁用参数和值
+
+	$checkcmd = str_replace($hackcmd, 'X', $hackparam);
+
+	if ($hackparam != $checkcmd) {
+		dbquery("INSERT INTO ban_ip (min, max, prich) VALUES(\"$ip\", \"$ip\", \"Inject\");");
+		dbquery('INSERT INTO mail (id_user, id_kont, msg, time) VALUES("0", "1", "IP: ' . $ip . ' UA: ' . $ua . ' 位置: ' . get_ip_address($ip) . ' 正在进行黑客攻击", "' . $time . '");');
+		die('<h2>检测到攻击！</h2><br>你的浏览器：<b>' . $ua . '</b><br>你的IP： <b>' . $ip . '</b><br><b>已被记录，不要尝试违法操作！</b><br><br>有这时间多休息吧！！！');
+	}
+}
+
+if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL && !preg_match('#(rules)|(smiles)|(secure)|(aut)|(reg)|(umenu)|(zakl)|(mail)|(anketa)|(settings)|(avatar)|(info)\.php#',$_SERVER['SCRIPT_NAME'])) $_SESSION['refer'] = NULL;
+
+// 正在清除临时文件夹
+if (!isset($hard_process)) {
+	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'clear_tmp_dir'");
+	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('clear_tmp_dir', '$time')");
+	$clear_dir = dbassoc($q);
+	if (!isset($clear_dir['time']) || isset($clear_dir['time']) && $clear_dir['time'] < $time - 60 * 60 * 24) {
+		$hard_process = true;
+		dbquery("UPDATE `cron` SET `time` = '$time' WHERE `id` = 'clear_tmp_dir'");
+		// if (function_exists('curl_init')) {
+		// 	$ch = curl_init();
+		// 	curl_setopt($ch, CURLOPT_URL, 'https://dcms-social.ru/curl.php?site=' . $_SERVER['HTTP_HOST'] . '&version=' . $set['dcms_version'] . '&title=' . $set['title']);
+		// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		// 	$data = curl_exec($ch);
+		// 	curl_close($ch);
+		// }
+		$od = opendir(H . 'sys/tmp/');
+		while ($rd = readdir($od)) {
+			if (!preg_match('#^\.#', $rd) && filectime(H . 'sys/tmp/' . $rd) < $time - 60 * 60 * 24) {
+				delete_dir(H . 'sys/tmp/' . $rd);
+			}
+		}
+		closedir($od);
+	}
+}
+// 统计数据汇总
+
+// 每日访问记录
+if (!isset($hard_process)) {
+	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'visit' LIMIT 1");
+	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('visit', '$time')");
+	$visit = dbassoc($q);
+	if (!isset($visit['time']) || isset($visit['time']) && $visit['time'] < time() - 60 * 60 * 24) {
+		if (function_exists('set_time_limit')) @set_time_limit(600); // 将限制设置为 10 分钟
+		$last_day = mktime(0, 0, 0, date('m'), date('d') - 1); // 昨天的开始
+		$today_time = mktime(0, 0, 0); // 今天的开始
+		if (dbresult(dbquery("SELECT COUNT(*) FROM `visit_everyday` WHERE `time` = '$last_day'"), 0) == 0) {
+			$hard_process = true;
+			// 在单独的表中记下昨天的一般数据
+			dbquery("INSERT INTO `visit_everyday` (`host` , `host_ip_ua`, `hit`, `time`) VALUES ((SELECT COUNT(DISTINCT `ip`) FROM `visit_today` WHERE `time` < '$today_time'),(SELECT COUNT(DISTINCT `ip`, `ua_hash`) FROM `visit_today` WHERE `time` < '$today_time'),(SELECT COUNT(*) FROM `visit_today` WHERE `time` < '$today_time'),'$last_day')");
+			dbquery('DELETE FROM `visit_today` WHERE `time` < ' . $today_time);
+		}
+	}
+}
+
+// 现场迁移记录
+if (isset($_SERVER['HTTP_REFERER']) && !preg_match('#' . preg_quote($_SERVER['HTTP_HOST']) . '#', $_SERVER['HTTP_REFERER']) && $ref = @parse_url($_SERVER['HTTP_REFERER'])) {
+	if (isset($ref['host'])) $_SESSION['http_referer'] = $ref['host'];
+}
+
+if (!isset($hard_process)) {
+	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'everyday'");
+	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('everyday', '" . time() . "')");
+	$everyday = dbassoc($q);
+	if (!isset($everyday['time']) || isset($everyday['time']) && $everyday['time'] < time() - 60 * 60 * 24) {
+		$hard_process = true;
+		if (function_exists('set_time_limit')) set_time_limit(600); // 将限制设置为 10 分钟
+		dbquery("UPDATE `cron` SET `time` = '" . time() . "' WHERE `id` = 'everyday'");
+		dbquery("DELETE FROM `guests` WHERE `date_last` < '" . (time() - 600) . "'");
+		dbquery("DELETE FROM `chat_post` WHERE `time` < '" . (time() - 60 * 60 * 24) . "'"); // 删除旧的聊天帖子
+		dbquery("DELETE FROM `user` WHERE `activation` != null AND `date_reg` < '" . (time() - 60 * 60 * 24) . "'"); // 删除未激活的账户
+
+		// 删除过期的 password reset token
+		dbquery("DELETE FROM `password_reset_tokens` WHERE `created_at` < '" . date('Y-m-d H:i:s') . "'");
+
+		// 删除所有一个多月前标记为删除的联系人
+		$qd = dbquery("SELECT * FROM `users_konts` WHERE `type` = 'deleted' AND `time` < " . ($time - 60 * 60 * 24 * 30));
+		while ($deleted = dbarray($qd)) {
+			dbquery("DELETE FROM `users_konts` WHERE `id_user` = '{$deleted['id_user']}' AND `id_kont` = '{$deleted['id_kont']}'");
+
+			if (dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_kont` = '{$deleted['id_user']}' AND `id_user` = '{$deleted['id_kont']}'"), 0) == 0) {
+				// 如果用户未与其他人联系，则删除所有消息
+				dbquery("DELETE FROM `mail` WHERE `id_user` = '{$deleted['id_user']}' AND `id_kont` = '{$deleted['id_kont']}' OR `id_kont` = '{$deleted['id_user']}' AND `id_user` = '{$deleted['id_kont']}'");
+			}
+		}
+		$tab = dbquery('SHOW TABLES FROM ' . $set['sql_db_name']);
+		while ($table = mysqli_fetch_row($tab)) {
+			dbquery("OPTIMIZE TABLE `{$table[0]}`"); // 表的优化
+		}
+	}
+}
+
+// 发送预定邮件
+$q = dbquery("SELECT * FROM `mail_to_send` LIMIT 1");
+if (dbrows($q) != 0) {
+	$mail = dbassoc($q);
+	$adds = "From: \"admin@$_SERVER[HTTP_HOST]\" <admin@$_SERVER[HTTP_HOST]>\n";
+	$adds .= "Content-Type: text/html; charset=utf-8\n";
+	mail($mail['mail'], '=?utf-8?B?' . base64_encode($mail['them']) . '?=', $mail['msg'], $adds);
+	dbquery("DELETE FROM `mail_to_send` WHERE `id` = '$mail[id]'");
+}
+
+// 删除过期的captcha_token
+$db->query("DELETE FROM captcha_tokens WHERE expires_at < NOW()");
+
+// 确保所有通过 GET/POST 方法传入的数据都被清理和转义（没卵用）
+/*
+if(isset($_GET)) {
+	foreach($_GET as $key => $value) {
+		$_GET[$key] = fiera($value);
+	}
+}
+if (isset($_POST)) {
+	foreach($_POST as $key => $value) {
+		$_POST[$key] = fiera($value);
+	}
+}
+*/

@@ -44,9 +44,13 @@ $conf['phpversion'] = $phpvervion[0];
 
 $upload_max_filesize = ini_get('upload_max_filesize');
 if (preg_match('#([0-9]*)([a-z]*)#i', $upload_max_filesize, $varrs)) {
-	if ($varrs[2] == 'M') $upload_max_filesize = $varrs[1] * 1048576;
-	elseif ($varrs[2] == 'K') $upload_max_filesize = $varrs[1] * 1024;
-	elseif ($varrs[2] == 'G') $upload_max_filesize = $varrs[1] * 1024 * 1048576;
+	if ($varrs[2] == 'M') {
+		$upload_max_filesize = $varrs[1] * 1048576;
+	} elseif ($varrs[2] == 'K') {
+		$upload_max_filesize = $varrs[1] * 1024;
+	} elseif ($varrs[2] == 'G') {
+		$upload_max_filesize = $varrs[1] * 1024 * 1048576;
+	}
 }
 
 

@@ -8,16 +8,19 @@
 require 'classes/class.user.php';
 require 'classes/authManager.php';
 
+// 访问记录
+dbquery("INSERT INTO `visit_today` (`ip`, `ua`, `ua_hash`, `time`) VALUES ('$ip', '" . my_esc(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '" . md5(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '$time')");
+
 // 生成一个默认的随机字符串
 $passgen = passgen();
 
 $authManager = new AuthManager($db, $set);
 
 // 检查登录状态
-$result = $authManager->checkLoginStatus();
+$authManagerResult = $authManager->checkLoginStatus();
 
-if ($result['status']) {
-	$user = $result['data'];
+if ($authManagerResult['status']) {
+	$user = $authManagerResult['data'];
 	// 处理已认证用户
 }
 

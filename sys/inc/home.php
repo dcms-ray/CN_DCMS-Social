@@ -9,6 +9,9 @@ if (!defined('I')) define("I", "");
 // 定义常量 REPLACE，如果未定义，则设置为 H 目录下的 "replace/" 子目录
 if (!defined('REPLACE')) define("REPLACE", H . "replace/");
 
+/*
+===========意义不明的代码=============
+
 // 扫描 H 目录下的 "sys/inc" 子目录，获取文件列表（不包括子目录）
 $includes = scandir(H . "sys/inc", 0);
 
@@ -25,10 +28,13 @@ foreach ($includes as $file) {
 	if (!defined(strtoupper($file_constant))) {
 		// 检查是否启用了替换功能（通过 setget 函数）
 		if (setget('replace', 1) == 1) {
-			// 如果替换目录中存在该文件，则定义常量为替换路径
-			if (file_exists(REPLACE . $file_path)) define($file_constant, REPLACE . $file_path);
-			// 否则定义常量为原始路径
-			else define($file_constant, H . $file_path);
+			if (file_exists(REPLACE . $file_path)) {
+				// 如果替换目录中存在该文件，则定义常量为替换路径
+				define($file_constant, REPLACE . $file_path);
+			} else {
+				// 否则定义常量为原始路径
+				define($file_constant, H . $file_path);
+			}
 		} else {
 			// 未启用替换功能时，直接定义常量为原始路径
 			define($file_constant, H . $file_path);
@@ -36,62 +42,6 @@ foreach ($includes as $file) {
 	}
 }
 
-/**
- * 检查并返回文件的替换路径或原始路径
- *
- * @param string $source2 输入的文件路径
- * @return string 返回替换后的文件路径或原始路径
- */
-function check_replace($source2) {
-	// 获取文件的真实路径，如果不存在则使用原始输入
-	$source = realpath($source2);
-	if (!file_exists($source)) $source = $source2;
-	// 将路径中的目录分隔符统一替换为正斜杠
-	$source = str_ireplace(DIRECTORY_SEPARATOR, "/", (string)$source);
-	$h = str_ireplace(DIRECTORY_SEPARATOR, "/", H);
-	$replace = str_ireplace(DIRECTORY_SEPARATOR, "/", REPLACE);
-	// 计算替换路径
-	$replace_file = str_ireplace($h, $replace, (string)$source);
-	// 检查是否启用了替换功能
-	if (setget('replace', 1) == 1) {
-		// 如果替换文件存在，返回替换路径
-		if (file_exists($replace_file)) {
-			return $replace_file;
-		} else {
-			// 否则返回原始路径
-			return $source;
-		}
-	} else {
-		// 未启用替换功能时，返回原始路径
-		return $source;
-	}
-}
-
-/**
- * 测试文件是否为普通文件（使用 check_replace 检查路径）
- *
- * @param string $file 文件路径
- * @return bool 如果是普通文件返回 true，否则返回 false
- */
-function test_file($file) {
-	return (is_file(check_replace($file)));
-}
-
-/**
- * 测试文件是否存在（使用 check_replace 检查路径）
- *
- * @param string $file 文件路径
- * @return bool 如果文件存在返回 true，否则返回 false
- */
-function test_file2($file) {
-	return (file_exists(check_replace($file)));
-}
-
-/**
- * 检查并包含指定文件（如果替换路径存在）
- *
- * @param string $source 文件路径
- */
 function check_file($source) {
 	// 使用静态变量记录已包含的文件
 	static $includes;
@@ -103,23 +53,8 @@ function check_file($source) {
 		if ($includes[$source] === TRUE) exit();
 	}
 }
-
-/**
- * 获取或设置全局配置变量的值
- *
- * @param string $name 配置项名称
- * @param mixed $default 默认值，默认为 NULL
- * @return mixed 返回配置项的值
- */
-function setget($name, $default = NULL) {
-	global $set;
-	// 如果配置项未设置，则初始化为默认值
-	if (!isset($set[$name])) {
-		if ($default === NULL) $set[$name] = NULL;
-		else $set[$name] = $default;
-	}
-	return $set[$name];
-}
+======================================
+*/
 
 // 初始化变量 $num 为 0
 $num = 0;

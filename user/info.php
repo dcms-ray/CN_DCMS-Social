@@ -25,10 +25,9 @@ if ($ank['id'] == 0) {
 	aut();
 	echo "<span class=\"status\">$ank[group_name]</span><br />";
 	if ($ank['ank_o_sebe'] != NULL) echo "<span class=\"ank_n\">关于我:</span> <span class=\"ank_d\">$ank[ank_o_sebe]</span><br />";
-	if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL && otkuda($_SESSION['refer']))
-		echo "<div class='foot'>&laquo;<a href='$_SESSION[refer]'>" . otkuda($_SESSION['refer']) . "</a><br /></div>";
+	if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL)
+		echo "<div class='foot'>&laquo;<a href='$_SESSION[refer]'> 上一页</a><br /></div>";
 	include_once '../sys/inc/tfoot.php';
-	exit;
 }
 
 
@@ -42,8 +41,8 @@ if ((!isset($user) || $user['group_access'] == 0) && dbresult(dbquery("SELECT CO
 	echo '<b><font color=red>该用户已被封禁,无法查看个人主页</font></b><br /> ';
 	echo '</div>';
 	include_once '../sys/inc/tfoot.php';
-	exit;
 }
+
 // 删除动态
 if (isset($_GET['delete_post']) && dbresult(dbquery("SELECT COUNT(*) FROM `stena` WHERE `id` = '" . intval($_GET['delete_post']) . "'"), 0) == 1) {
 	$post = dbassoc(dbquery("SELECT * FROM `stena` WHERE `id` = '" . intval($_GET['delete_post']) . "' LIMIT 1"));

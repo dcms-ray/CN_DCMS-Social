@@ -26,9 +26,6 @@ require_once 'sys/inc/ipua.php';
 require_once 'sys/inc/fnc.php';
 require_once 'sys/inc/user.php';
 
-error_reporting(E_ALL); // 启用错误显示
-ini_set('display_errors',true); // 启用错误显示
-
 // 检测是否启用了 API
 if (empty($set['api']) || $set['api'] == '0') {
 	http_response_code(403);
@@ -88,26 +85,6 @@ function validateCaptchaToken($user_input, $captcha_token) {
 		];
 	}
 }
-
-
-// 计算字符串长度
-function getStringLength($str) {
-	if (extension_loaded('iconv')) {	// 检查 iconv 扩展是否可用
-		// 使用 iconv_strlen()，如果 iconv 扩展可用
-		return iconv_strlen($str, 'UTF-8');
-	} elseif (extension_loaded('mbstring')) {	// 检查 mbstring 扩展是否可用
-		// 使用 mb_strlen()，如果 mbstring 扩展可用
-		return mb_strlen($str, 'UTF-8');
-	} else {
-		// 如果两者都不可用，使用 strlen() 来获取字节长度
-		return strlen($str);
-	}
-}
-
-// 删除过期的captcha_token
-$db->query("DELETE FROM captcha_tokens WHERE expires_at < NOW()");
-
-
 
 // 处理登录
 if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是否已经提交登录表单
@@ -223,7 +200,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 			// 昵称含有非法字符
 			throw new Exception('invalid characters in nick');
 		}
-		$nickLength = getStringLength($_POST['reg_nick']);
+		$nickLength = strlen2($_POST['reg_nick']);
 		if ($nickLength < 3) throw new Exception('nick too short');
 		if ($nickLength > 32) throw new Exception('nick too long');
 
@@ -235,7 +212,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 		}
 
 		// 检查密码
-		$passwordLength = getStringLength($_POST['password']);
+		$passwordLength = strlen2($_POST['password']);
 		if ($passwordLength < 6) throw new Exception('password too short');
 		if ($passwordLength > 32) throw new Exception('password too long');
 

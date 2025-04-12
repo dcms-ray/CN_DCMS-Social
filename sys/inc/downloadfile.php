@@ -3,7 +3,11 @@ function DownloadFile($filename, $name, $mimetype = NULL) {
 	// 检查文件
 	if (!file_exists($filename)) {
 		http_response_code(404);
-		die('找不到文件');
+	}
+
+	if (is_dir($filename)) {
+		http_response_code(403);
+		die("Error: Cannot download a directory.");
 	}
 
 	ob_end_clean();
@@ -58,7 +62,7 @@ function DownloadFile($filename, $name, $mimetype = NULL) {
 	$f = fopen($filename, 'rb');
 	if (fseek($f, $from, SEEK_SET) !== 0) {
 		http_response_code(500);
-		error_log('文件读取失败: ' . $filename);
+		error_log('File read failed: ' . $filename);
 		exit;
 	}
 
