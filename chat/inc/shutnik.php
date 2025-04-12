@@ -13,7 +13,7 @@ if ($k_vopr > 0) {
 } else {
 	$no_problem_last = dbassoc(dbquery("SELECT * FROM `chat_post` WHERE `room` = '$room[id]' AND `shutnik` = '2' ORDER BY id DESC LIMIT 1"));
 	if ($no_problem_last == NULL || $no_problem_last['shutnik'] == 0) {
-		$msg = "没有笑话。";
+		$msg = "没有笑话,请在控制面板添加";
 		dbquery("INSERT INTO `chat_post` (`shutnik`, `time`, `msg`, `room`, `privat`) values('2', '$time', '$msg', '$room[id]', '0')");
 	}
 }

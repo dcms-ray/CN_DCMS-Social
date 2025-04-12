@@ -9,7 +9,7 @@ if (isset($_POST['msg']) && isset($user)) {
 	$mat = antimat($msg);
 	if ($mat) $err[] = '在信息的文本中发现了一个非法字符: ' . $mat;
 	if (strlen2($msg) > 1024 ) {
-		$err[] = '信息不能超过 512 字';
+		$err[] = '信息不能超过 1024 字';
 	} elseif (strlen2($msg) < 1) {
 		$err[] = '信息不能少于 1 字';
 	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `chat_post` WHERE `id_user` = '{$user['id']}' AND `msg` = '" . my_esc($msg) . "' AND `time` > '" . ($time - 300) . "' LIMIT 1"), 0) != 0) {
@@ -55,7 +55,7 @@ $start = $set['p_str'] * $page - $set['p_str'];
 echo "<table class='post'>";
 if ($k_post == 0) {
 	echo "<div class='mess'>";
-	echo "目前没有信息。";
+	echo "欢迎光临！这里是一个开放的交流空间，快来分享你的想法吧!";
 	echo "</div>";
 }
 $q = dbquery("SELECT * FROM `chat_post` WHERE `room` = '$room[id]' AND (`privat`='0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") ORDER BY id DESC LIMIT $start, $set[p_str]");
