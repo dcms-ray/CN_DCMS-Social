@@ -2,9 +2,25 @@
 
 API地址：https://[网站域名]/api.php
 
+支持的登录认证方式：Session、Cookie、Authorization
+
 ## API 列表
 
 ### 0. 系统功能
+
+#### 0.0 Hello world
+
+- **请求URL**: `?`
+- **请求方式**: GET
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "message": "Hello <UserName>"
+    }
+    ```
 
 #### 0.1 获取验证码
 
@@ -30,8 +46,10 @@ API地址：https://[网站域名]/api.php
 - **请求参数**:
 
     ```x-www-form-urlencoded
-    nick=<string>&password=<string>
+    nick=<string>&password=<string>&aut_save=<int>
     ```
+
+    参数说明：nick -> 用户名、password -> 密码、aut_save -> 是否记住密码（可选，值为“1”就记住密码）
 
 - **响应内容**:
 
@@ -289,7 +307,7 @@ API地址：https://[网站域名]/api.php
     }
     ```
 
-### 1.4 用邮箱找回密码
+#### 1.4 用邮箱找回密码
 
 - **请求URL**: `?action=forgot-password`
 - **请求方式**: POST
@@ -349,7 +367,7 @@ API地址：https://[网站域名]/api.php
     }
     ```
 
-### 1.5 重置密码（这个功能还没有做）
+#### 1.5 重置密码（这个功能还没有做）
 
 - **请求URL**: `?action=reset-password`
 - **请求方式**: POST
@@ -368,5 +386,49 @@ API地址：https://[网站域名]/api.php
         "data": {
             "user_id": "int"
         }
+    }
+    ```
+
+#### 1.6 获取当前在线用户列表
+
+- **请求URL**: `?action=online-users`
+- **请求方式**: GET
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "users": [
+            {
+                "id": "int",
+                "last_online": "Y-m-d H:i:s"
+            },
+            {...}
+        ]
+    }
+    ```
+
+### 2. 留言板相关
+
+#### 2.1 获取留言板列表
+
+- **请求URL**: `?action=message-list&page=<int>`
+- **请求方式**: GET
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "data": [
+            {
+                "id": "int",
+                "id_user": "int",
+                "time": "int",
+                "msg": "string"
+            },
+            {...}
+        ]
     }
     ```

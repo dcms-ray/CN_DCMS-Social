@@ -40,7 +40,7 @@ if (empty($set['api']) || $set['api'] == '0') {
 if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是否已经提交登录表单
 	if (isset($_POST['nick']) && isset($_POST['password'])) {
 		// 选择了“记住我”
-		if (isset($_POST['aut_save']) && $_POST['aut_save']) {
+		if (isset($_POST['aut_save']) && $_POST['aut_save'] == '1') {
 			$expiration = time() + 60 * 60 * 24 * 365;
 		} else {
 			$expiration = time() + 3600 * 24;
@@ -296,6 +296,26 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	}
 
 
+} elseif (isset($_GET['action']) && $_GET['action'] == 'online-users') {
+	$results = $db->queryAll('SELECT ul.id, ul.id_user, ul.last_online, ul.url FROM `user_log` ul WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0) ORDER BY ul.last_online DESC');
+
+	$response = ['status' => 'success', 'users' => array_map(function($user) {
+		return [
+			'id' => $user['id_user'],
+			'last_online' => $user['last_online']
+		];
+	}, $results)];
+
+
+} elseif (isset($_GET['action']) && $_GET['action'] == 'message-list') {
+	$k_post = $db->queryColumn("SELECT COUNT(id) FROM `guest`");
+	$k_page = k_page($k_post, $set['p_str']);
+	$page = page($k_page);
+	$start = $set['p_str'] * $page - $set['p_str'];
+
+	$results = $db->queryAll("SELECT * FROM `guest` ORDER BY id DESC LIMIT $start, $set[p_str]");
+
+	$response = ['status' => 'success', 'data' => $results];
 } else {
 	// 检查登录状态
 	if (isset($user)) {
