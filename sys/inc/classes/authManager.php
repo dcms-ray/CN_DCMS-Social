@@ -19,20 +19,22 @@
 
 class AuthManager
 {
-	private Database $db;
 	private array $set;
+	private Database $db;
+	private array $clientDetails;
 	private const JWT_ALGORITHM = 'HS256';
 
-	public function __construct(Database $db, array $set) {
-		$this->db = $db;
+	public function __construct(array $set, Database $db, array $clientDetails) {
 		$this->set = $set;
+		$this->db = $db;
+		$this->clientDetails = $clientDetails;
 	}
 
 	/**
 	 * 检查用户登录状态
 	 * @return array
 	 */
-	public function checkLoginStatus(): array {
+	public function checkStatus(): array {
 		// 优先检查 Session
 		if ($this->isSessionValid()) {
 			return $this->processSessionLogin();
@@ -54,10 +56,9 @@ class AuthManager
 	/**
 	 * 处理用户登录后的后续操作
 	 * @param array $user
-	 * @param array $clientDetails
 	 * @return array
 	 */
-	public function processAuthenticatedUser(array $user, array $clientDetails): array {
+	public function processAuthenticatedUser(array $user): array {
 		// 获取最后在线时间
 		$lastOnline = $this->db->query("SELECT ul.last_online
 		                                 FROM `user_log` ul
@@ -71,38 +72,80 @@ class AuthManager
 		// 计算活跃时间
 		$timeActive = time() - strtotime($lastOnline['last_online']);
 		if ($timeActive < 120) {
-			$this->db->update(
-				'UPDATE user SET time = time + :time_active WHERE id = :user_id LIMIT 1',
-				[
-					':time_active' => $timeActive,
-					':user_id' => $user['id']
-				]
-			);
+			$this->db->update('UPDATE user SET time = time + :time_active WHERE id = :user_id LIMIT 1', [
+				':time_active' => $timeActive,
+				':user_id' => $user['id']
+			]);
 		}
 
 		// 更新用户日志
-		$this->db->update(
-			'UPDATE user_log SET last_online = :last_online, url = :url, ip = :ip WHERE id = :login_id LIMIT 1',
-			[
-				':last_online' => date('Y-m-d H:i:s'),
-				':url' => $_SERVER['SCRIPT_NAME'],
-				':ip' => $clientDetails['ip'],
-				':login_id' => $user['login_id']
-			]
-		);
+		$this->db->update('UPDATE user_log SET last_online = :last_online, url = :url, ip = :ip WHERE id = :login_id LIMIT 1', [
+			':last_online' => date('Y-m-d H:i:s'),
+			':url' => $_SERVER['SCRIPT_NAME'],
+			':ip' => $this->clientDetails['ip'],
+			':login_id' => $user['login_id']
+		]);
 
 		// 更新用户代理信息
-		if (!empty($clientDetails['ua'])) {
-			$this->db->update(
-				'UPDATE user_log SET ua = :ua WHERE id = :login_id LIMIT 1',
-				[
-					':ua' => $clientDetails['ua'],
-					':login_id' => $user['login_id']
-				]
-			);
+		if (!empty($this->clientDetails['ua'])) {
+			$this->db->update('UPDATE user_log SET ua = :ua WHERE id = :login_id LIMIT 1', [
+				':ua' => $this->clientDetails['ua'],
+				':login_id' => $user['login_id']
+			]);
 		}
 
 		return ['status' => true, 'data' => $user];
+	}
+
+	public function login($nick, $password, $expiration = 3600): array {
+		// 使用参数化查询验证用户名和密码
+		$user = $this->db->query("SELECT `id`, `pass` FROM `user` WHERE `nick` = :nick LIMIT 1", ['nick' => $nick]);
+		// 比较密码
+		if ($user && password_verify($password, $user['pass'])) {
+			// 登录成功
+
+			// 记录登录日志
+			$logQuery = "INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) VALUES (:id_user, :date, :expire_date, :last_online, :ua, :ip, '1')";
+			// 设置默认值：如果没有指定 `last_online`，就用 `date`
+			$log_id = $this->db->insert($logQuery, [
+				'id_user' => $user['id'],
+				'date' => date('Y-m-d H:i:s'),						// 当前时间
+				'expire_date' => date('Y-m-d H:i:s', $expiration),	// 转换过期时间戳为 MySQL 时间格式
+				'last_online' => date('Y-m-d H:i:s'),				// 如果没有指定 last_online，就设置为 date 字段的当前时间
+				'ua' => $this->clientDetails['ua'],						// 从客户端获取 User-Agent
+				'ip' => $this->clientDetails['ip']						// 从客户端获取 IP 地址
+			]);
+
+			$payload = array(
+				"iat" => time(),
+				"exp" => $expiration,
+				"jwt_id" => $log_id,
+				"user_id" => $user['id'],
+				"username" => $nick
+			);
+
+			// 生成 Token
+			$jwt = \Firebase\JWT\JWT::encode($payload, $this->set['shif'], 'HS256');
+
+			// 设置响应为成功
+			return [
+				'status' => true,
+				'message' => 'login successful',
+				'data' => array(
+					'user_id' => $user['id'],
+					'login_id' => $log_id,
+					'token' => $jwt,
+					'expiration' => $expiration
+				)
+			];
+		} else {
+			// 登录失败
+			return ['status' => false, 'message' => 'incorrect username or password'];
+		}
+	}
+
+	public function logout($login_id) {
+		return $this->db->update('UPDATE `user_log` SET `ban` = ? WHERE `id` = ?;', ['1', $login_id]);
 	}
 
 	private function isSessionValid(): bool {

@@ -14,13 +14,13 @@ dbquery("INSERT INTO `visit_today` (`ip`, `ua`, `ua_hash`, `time`) VALUES ('$ip'
 // 生成一个默认的随机字符串
 $passgen = passgen();
 
-$authManager = new AuthManager($db, $set);
+$authManager = new AuthManager($set, $db, $clientDetails);
 
 // 检查登录状态
-$authManagerResult = $authManager->checkLoginStatus();
+$authManagerCheckStatusResult = $authManager->checkStatus();
 
-if ($authManagerResult['status']) {
-	$user = $authManagerResult['data'];
+if ($authManagerCheckStatusResult['status']) {
+	$user = $authManagerCheckStatusResult['data'];
 	// 处理已认证用户
 }
 
@@ -42,7 +42,7 @@ if (!empty($user)) {
 		$user['level'] = 0;
 	}
 
-	$processedResult = $authManager->processAuthenticatedUser($user, $clientDetails);
+	$processedResult = $authManager->processAuthenticatedUser($user);
 
 	if (isset($user['type_input']) && isset($_SERVER['HTTP_REFERER']) && !preg_match('#' . preg_quote($_SERVER['HTTP_HOST']) . '#', $_SERVER['HTTP_REFERER']) && preg_match('#^https?://#i', $_SERVER['HTTP_REFERER']) && $ref = @parse_url($_SERVER['HTTP_REFERER'])) {
 		if (isset($ref['host'])) {

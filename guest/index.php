@@ -52,7 +52,7 @@ if (isset($_POST['msg']) && isset($user)) {
 			if ($notifiacation['komm'] == 1 && $ank_reply['id'] != $user['id'])
 				dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$ank_reply[id]', 0, 'guest', '$time')");
 		}
-		$db->query('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [$user['id'], $time, my_esc($msg)]);
+		$db->query('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [$user['id'], $time, $msg]);
 		$_SESSION['message'] = '留言添加成功';
 		header('Location: index.php');
 		exit;

@@ -36,116 +36,39 @@ if (empty($set['api']) || $set['api'] == '0') {
 	]));
 }
 
-// 核对验证码
-function validateCaptchaToken($user_input, $captcha_token) {
-	global $set;
-	global $db;
-	// 解析 captcha_token
-	$token_parts = explode('.', $captcha_token);
-	if (count($token_parts) !== 2) {
-		// captcha_token 格式错误
-		return [
-			'status' => 'error',
-			'message' => 'captcha_token format error'
-		];
-	}
-
-	// 解密并拆分 Token
-	$decrypted_captcha_token = explode('.', openssl_decrypt(base64_decode($token_parts[0]), 'aes-256-cbc', $set['shif'], 0, base64_decode($token_parts[1])));
-	if (count($decrypted_captcha_token) !== 2) {
-		return [
-			'status' => 'error',
-			'message' => 'captcha_token format error'
-		];
-	} elseif ($decrypted_captcha_token[1] < time()) {
-		return [
-			'status' => 'error',
-			'message' => 'captcha_token expired'
-		];
-	}
-	// 查询数据库，检查 token 是否存在且未使用
-	$token_record = $db->query("SELECT * FROM captcha_tokens WHERE captcha_token = ? AND status = 'unused'", [$captcha_token]);
-
-	if (isset($token_record['captcha_token']) && $token_record['captcha_token'] != $captcha_token) {
-		// captcha_token 无效或已使用
-		return ['status' => 'error', 'message' => 'captcha_token invalid or used'];
-	}
-	// 验证解密后的验证码是否正确（与用户输入的验证码比较）
-	if ($decrypted_captcha_token[0] === $user_input) {
-		// 验证通过，更新 token 状态为 'used'
-		$db->update("UPDATE captcha_tokens SET status = 'used' WHERE captcha_token = ?", [$captcha_token]);
-		return [
-			'status' => 'success'
-		];
-	} else {
-		// 验证失败
-		return [
-			'status' => 'error',
-			'message' => 'incorrect verification code'
-		];
-	}
-}
-
 // 处理登录
 if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是否已经提交登录表单
 	if (isset($_POST['nick']) && isset($_POST['password'])) {
-		// 使用参数化查询验证用户名和密码
-		$user = $db->query("SELECT `id`, `pass` FROM `user` WHERE `nick` = :nick LIMIT 1", ['nick' => $_POST['nick']]);
-
-		if ($user && password_verify($_POST['password'], $user['pass'])) {	// 比较密码
+		// 选择了“记住我”
+		if (isset($_POST['aut_save']) && $_POST['aut_save']) {
+			$expiration = time() + 60 * 60 * 24 * 365;
+		} else {
+			$expiration = time() + 3600 * 24;
+		}
+		$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['password'], $expiration);
+		if ($authManagerLoginResult['status']) {
 			// 登录成功
 
-			// 选择了“记住我”
-			if (isset($_POST['aut_save']) && $_POST['aut_save']) {
-				$expiration = time() + 60 * 60 * 24 * 365;
-			} else {
-				$expiration = time() + 3600 * 24;
-			}
-
-
-			// 记录登录日志
-			$logQuery = "INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) VALUES (:id_user, :date, :expire_date, :last_online, :ua, :ip, '1')";
-			// 设置默认值：如果没有指定 `last_online`，就用 `date`
-			$log_id = $db->insert($logQuery, [
-				'id_user' => $user['id'],
-				'date' => date('Y-m-d H:i:s'),						// 当前时间
-				'expire_date' => date('Y-m-d H:i:s', $expiration),	// 转换过期时间戳为 MySQL 时间格式
-				'last_online' => date('Y-m-d H:i:s'),				// 如果没有指定 last_online，就设置为 date 字段的当前时间
-				'ua' => $clientDetails['ua'],						// 从客户端获取 User-Agent
-				'ip' => $clientDetails['ip']						// 从客户端获取 IP 地址
-			]);
-
 			// 在 session 存储用户ID与登录记录ID
-			$_SESSION['id_user'] = $user['id'];
-			$_SESSION['login_id'] = $log_id;
+			$_SESSION['id_user'] = $authManagerLoginResult['data']['user_id'];
+			$_SESSION['login_id'] = $authManagerLoginResult['data']['login_id'];
 
-			$payload = array(
-				"iat" => time(),
-				"exp" => $expiration,
-				"jwt_id" => $log_id,
-				"user_id" => $user['id'],
-				"username" => $_POST['nick']
-			);
-
-			$jwt = \Firebase\JWT\JWT::encode($payload, $set['shif'], 'HS256');
-
-			setcookie('auth_token', $jwt, $expiration, '/');
+			setcookie('auth_token', $authManagerLoginResult['data']['token'], $expiration, '/');
 
 			// 设置响应为成功
-			$response['status'] = 'success';
-			$response['message'] = 'login successful';
-			$response['data']['user_id'] = $user['id'];
-			$response['data']['token'] = $jwt;
+			$response = [
+				'status' => 'success',
+				'message' => 'login successful',
+				'data' => $authManagerLoginResult['data']
+			];
 		} else {
 			// 登录失败
 			http_response_code(403);
-			$response['status'] = 'error';
-			$response['message'] = 'incorrect username or password';
+			$response = ['status' => 'error', 'message' => 'incorrect username or password'];
 		}
 	} else {
 		http_response_code(403);
-		$response['status'] = 'error';
-		$response['message'] = 'missing required parameters';
+		$response = ['status' => 'error', 'message' => 'missing required parameters'];
 	}
 
 
@@ -154,8 +77,11 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	// 退出登录
 	setcookie('auth_token', '', time() - 3600, '/');
 	session_destroy();
-	$response['status'] = 'success';
-
+	if (isset($user) && $authManager->logout($user['login_id'])) {
+		$response['status'] = 'success';
+	} else {
+		$response['status'] = 'error';
+	}
 
 
 } elseif (isset($_GET['action']) && $_GET['action'] == 'register') {

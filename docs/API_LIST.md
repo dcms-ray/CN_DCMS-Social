@@ -41,7 +41,9 @@ API地址：https://[网站域名]/api.php
         "message": "login successful",
         "data": {
             "user_id": "int",
-            "token": "string"  // JWT token
+            "login_id": "int",
+            "token": "string",  // JWT token
+            "expiration": "int"
         }
     }
     ```
@@ -276,7 +278,7 @@ API地址：https://[网站域名]/api.php
 
 #### 1.3 退出登录
 
-- **请求URL**: `/api/user/logout`
+- **请求URL**: `?action=logout`
 - **请求方式**: POST
 - **请求参数**: 无
 - **响应内容**:

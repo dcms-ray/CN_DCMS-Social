@@ -13,10 +13,10 @@ only_reg();
 if (setget('exit', 1) == 1) {
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if (isset($_POST['confirm_yes'])) {
-			$db->update('UPDATE `user_log` SET `ban` = ? WHERE `id` = ?;', ['1', $user['login_id']]);
+			$authManager->logout($user['login_id']);
 			setcookie('auth_token', '', time() - 3600, '/');
 			session_destroy();
-			header('Location: /?' . session_id());
+			header('Location: ../?' . session_id());
 			exit();
 		} else {
 			header('Location: ' . $_POST['return']);
@@ -26,7 +26,7 @@ if (setget('exit', 1) == 1) {
 } else {
 	setcookie('auth_token', '', time() - 3600, '/');
 	session_destroy();
-	header('Location: /?' . session_id());
+	header('Location: ../?' . session_id());
 	exit();
 }
 
