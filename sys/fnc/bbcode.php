@@ -45,6 +45,7 @@ function BBcode($msg) {
 	$bbcode = array();
 	$bbcode['/\[br\]/isU'] = '<br />';
 	if ($set['bb_i']) $bbcode['/\[i\](.+)\[\/i\]/isU'] = '<em>$1</em>';
+	if ($set['bb_c']) $bbcode['/\[c\](.+)\[\/c\]/isU'] = '<div style="text-align: center;">$1</div>';
 	if ($set['bb_b']) $bbcode['/\[b\](.+)\[\/b\]/isU'] = '<strong>$1</strong>';
 	if ($set['bb_u']) $bbcode['/\[u\](.+)\[\/u\]/isU'] = '<span style="text-decoration:underline;">$1</span>';
 	if ($set['bb_big']) $bbcode['/\[big\](.+)\[\/big\]/isU'] = '<span style="font-size:large;">$1</span>';
