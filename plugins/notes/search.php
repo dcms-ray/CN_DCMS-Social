@@ -80,7 +80,7 @@ if (!empty($usearch)) {
 			// 检查是否有新记录
 			$k_n = $db->query(
 				"SELECT COUNT(*) as count FROM `notes` WHERE `id` = :id AND `time` > :ftime",
-				['id' => $post['id'], 'ftime' => $ftime]
+				['id' => $post['id'], 'ftime' => mktime(0, 0, 0)]
 			)['count'];
 			if ($k_n > 0) {
 				echo " <img src='../../style/icons/new.gif' alt='*'>";

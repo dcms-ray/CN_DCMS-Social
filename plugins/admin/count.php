@@ -1,5 +1,5 @@
 <?php
-$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `adm_chat` WHERE `time` > '$ftime'"), 0);
+$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `adm_chat` WHERE `time` > 'mktime(0, 0, 0)'"), 0);
 if ($k_n == 0) {
 	$k_n = NULL;
 } else {

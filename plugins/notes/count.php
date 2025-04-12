@@ -1,6 +1,6 @@
 <?php
 $k_p = dbresult(dbquery("SELECT COUNT(*) FROM `notes`"), 0);
-$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `time` > '" . $ftime . "'"), 0);
+$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `time` > '" . mktime(0, 0, 0) . "'"), 0);
 if ($k_n == 0) {
 	$k_n = NULL;
 } else {

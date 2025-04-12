@@ -127,7 +127,7 @@ if (isset($_GET['id']) && $kount == 1) {
 		echo "<img src='../../style/icons/dnev.png' alt='*'> ";
 		echo "<a href='list.php?id=$post[id]&amp;dir=$post[id_dir]'>" . htmlspecialchars($post['name']) . "</a> ";
 		echo " <span style='time'>(" . vremja($post['time']) . ")</span>";
-		$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = $post[id] AND `time` > '" . $ftime . "'"), 0);
+		$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = $post[id] AND `time` > '" . mktime(0, 0, 0) . "'"), 0);
 		if ($k_n != 0) echo " <img src='../../style/icons/new.gif' alt='*'>";
 		echo "   </div>";
 	}
@@ -166,7 +166,7 @@ while ($post = dbassoc($q)) {
 	/*---------------------------*/
 	echo "<img src='../../style/themes/$set[set_them]/loads/14/dir.png' alt='*'> ";
 	$k_pp = dbresult(dbquery("SELECT COUNT(*) FROM `notes`  WHERE `id_dir` = '$post[id]'"), 0);
-	$k_nn = dbresult(dbquery("SELECT COUNT(*) FROM `notes`  WHERE `id_dir` = '$post[id]' AND `time` > '$ftime'"), 0);
+	$k_nn = dbresult(dbquery("SELECT COUNT(*) FROM `notes`  WHERE `id_dir` = '$post[id]' AND `time` > '" . mktime(0, 0, 0) . "'"), 0);
 	if ($k_nn > 0) {
 		$k_nn = "<font color='red'>+$k_nn</font>";
 	} else {
@@ -175,7 +175,7 @@ while ($post = dbassoc($q)) {
 	echo "<a href='dir.php?id=$post[id]'>" . output_text($post['name']) . "</a> ($k_pp) $k_nn";
 	if (isset($user) && ($user['level'] > 3))
 		echo "<a href='delete.php?dir=$post[id]'><img src='../../style/icons/delete.gif' alt='*'></a><br />";
-	//$k_n= dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id_dir` = $post[id] AND `time` > '".$ftime."'"), 0);
+	//$k_n= dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id_dir` = $post[id] AND `time` > '" . mktime(0, 0, 0) . "'"), 0);
 	echo output_text($post['msg']) . "<br />";
 	echo "   </div>";
 }
