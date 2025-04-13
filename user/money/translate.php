@@ -1,13 +1,13 @@
 <?//网页标题
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 only_reg();
 if (isset($user))$ank['id'] = intval($_GET['id']);
 $ank=user::get_user($ank['id']);
@@ -15,20 +15,20 @@ if(!$ank || $user['id'] == $ank['id']){header("Location: /index.php?".session_id
 if (isset($_GET['act']) && $_POST['money'])
 {
 $money=abs(intval($_POST['money']));
-if ($user['money'] < $money)$err = '你没有足够的资金转帐';
+if ($user['money'] < $money)$err = '你没有足够的硬币赠送';
 if (!$err)
 {
 dbquery("UPDATE `user` SET `money` = '" . ($ank['money'] + $money) . "' WHERE `id` ='$ank[id]';");
 dbquery("UPDATE `user` SET `money` = '" . ($user['money'] - $money) . "' WHERE `id` ='$user[id]';");
-$msg = "用户 [b]".$user['nick']."[/b] 我转给你了 [b] $money [/b] $sMonet[0]! [br]别忘了说谢谢！";
+$msg = "用户 [b]".$user['nick']."[/b] 赠送给你 [b] $money [/b] $sMonet[0]! [br]别忘了说谢谢！";
 dbquery("INSERT INTO `mail` (`id_user`, `id_kont`, `msg`, `time`) values('0', '$ank[id]', '$msg', '$time')");
-$_SESSION['message'] = '转让成功完成';
+$_SESSION['message'] = '赠送成功';
 header("Location: /user/info.php?id=$ank[id]");
 exit;
 }
 }
 $set['title']='赠送'.$sMonet[0]; // заголовок страницы
-include_once '../../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 title();
 aut();
 err();
@@ -60,4 +60,4 @@ echo "</form>";
 echo "<div class='foot'>";
 echo "<img src='/style/icons/str2.gif' alt='*'> <a href='/user/info.php?id=$ank[id]'>$ank[nick]</a> | 赠送<br />";
 echo "</div>";
-include_once '../../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';

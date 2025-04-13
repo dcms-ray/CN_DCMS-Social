@@ -22,20 +22,15 @@ require_once '../sys/inc/thead.php';
 title();
 aut();
 
-/*
-==============================================
-这个脚本输出 1 个随机的“领导者”和
-他们整个名单的链接。(с) DCMS-Social
-==============================================
-*/
+// 随机输出优先展示用户信息
 $k_lider = dbresult(dbquery("SELECT COUNT(*) FROM `liders` WHERE `time` > '$time'"), 0);
 $liders = dbassoc(dbquery("SELECT * FROM `liders` WHERE `time` > '$time' ORDER BY rand() LIMIT 1"));
 if ($k_lider > 0) {
 	echo '<div class="main">';
 	$lider = user::get_user($liders['id_user']);
-	echo user::nick($lider['id'], 1, 1, 0) . '<br />';//输出用户名
+	echo user::nick($lider['id'], 1, 1, 0) . '<br />';
 	if ($liders['msg']) echo output_text($liders['msg']) . '<br />';
-	echo '<img src="/style/icons/lider.gif" alt="S"/> <a href="/user/liders/">所有领导者</a> (' . $k_lider . ')';
+	echo '<img src="/style/icons/lider.gif" alt="S"/> <a href="/user/liders/">优先展示用户</a> (' . $k_lider . ')';
 	echo '</div>';
 }
 

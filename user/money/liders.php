@@ -1,16 +1,16 @@
 <?
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/adm_check.php';
-include_once '../../sys/inc/user.php';
-$set['title'] = '领导者';
-include_once '../../sys/inc/thead.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/adm_check.php';
+include_once '../sys/inc/user.php';
+$set['title'] = '加入优先展示';
+require_once '../sys/inc/thead.php';
 title();
 if (!isset($user))
 header("location: /index.php?");
@@ -81,9 +81,8 @@ echo '<div class="foot">';
 echo '<img src="/style/icons/str2.gif" alt="S"/> <a href="/user/money/">附加服务</a> | <b>成为领导者</b>';
 echo '</div>';
 echo '<div class="mess">';
-echo '为了进入领导者，你至少需要 <b style="color:red;">1</b> <b style="color:green;">' . $sMonet[1] . '</b>, 这项服务将提供一定天 
-数在这上面的位置，具体取决于 ' . $sMonet[0] . ' 的数量（总停留时间）！ 
-此外，你的个人资料将在约会和搜索页面上展示！'; //“约会”是个什么东西？——Diamochang
+echo '至少需要 <b style="color:red;">1</b> <b style="color:green;">' . $sMonet[1] . '</b>
+你的个人资料将在在线列表优先展示！'; 
 echo '</div>';
 echo '<form class="main" method="post" action="?">';
 	echo '花费: <select name="stav">
@@ -96,11 +95,11 @@ echo '<form class="main" method="post" action="?">';
 	<option value="7">7</option>
 	</select> ' . $sMonet[0] . '<br />';
 echo '留言（215 字节）<textarea name="msg"></textarea><br />';
-echo '<input value="成为领导者" type="submit" />';
+echo '<input value="加入优先展示" type="submit" />';
 echo '</form>';
 }
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="S"/> <a href="/user/money/">附加服务</a> | <b>成为领导者</b>';
+echo '<img src="/style/icons/str2.gif" alt="S"/> <a href="/user/money/">附加服务</a>';
 echo '</div>';
-include_once '../../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';
 ?>
