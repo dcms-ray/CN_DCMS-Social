@@ -28,7 +28,7 @@ aut();
 if ((!isset($_SESSION['refer']) || $_SESSION['refer'] == NULL) && isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != NULL && !preg_match('#mail\.php#', $_SERVER['HTTP_REFERER'])) {
 	$_SESSION['refer'] = str_replace('&', '&amp;', preg_replace('#^http://[^/]*/#', '/', $_SERVER['HTTP_REFERER']));
 }
-
+?>
 
 <form class="mess" method="post" action="/user/login.php">
 	用户名:<br />
@@ -45,5 +45,4 @@ if ((!isset($_SESSION['refer']) || $_SESSION['refer'] == NULL) && isset($_SERVER
 	<a href="/user/pass.php">密码恢复</a><br />
 </div>
 
-require_once '../sys/inc/tfoot.php';
-?>
+<?php require_once '../sys/inc/tfoot.php';
