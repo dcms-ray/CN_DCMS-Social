@@ -16,7 +16,7 @@ only_reg();
 $kont = dbquery("SELECT `id_kont` FROM `users_konts` WHERE `type`='deleted' AND `id_user`='" . $user['id'] . "' AND `time`>='" . $_SERVER['REQUEST_TIME'] . "'");
 if (dbrows($kont) > 0) {
 	while ($konts = dbassoc($kont)) {
-		dbquery("DELETE FROM `user_konts` WHERE `id_kont`='" . $konts['id_kont'] . "'");
+		dbquery("DELETE FROM `users_konts` WHERE `id_kont`='" . $konts['id_kont'] . "'");
 		dbquery("DELETE FROM `mail` WHERE `id_user`='" . $user['id'] . "' AND `id_kont`='" . $konts['id_kont'] . "'");
 	}
 }
