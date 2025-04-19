@@ -15,18 +15,19 @@ if ($type == 'down') {
 	$file = dbassoc(dbquery("SELECT * FROM `downnik_files` WHERE `id` = '" . $post['id_sim'] . "' LIMIT 1"));
 	if (isset($file['id']) && $file['id']) {
 		echo '<div class="nav1">';
-		echo '<img src="/style/icons/disk.png" alt="*" />';
-		echo '<a href="/user/personalfiles/' . $file['id_user']  . '/' . $file['my_dir'] . '/?id_file=' . $file['id'] . '&amp;page=' . $pageEnd . '">' . $name . '</a>';
+		echo '<img src="../../style/icons/disk.png" alt="*" />';
+		echo '<a href="../personalfiles/' . $file['id_user']  . '/' . $file['my_dir'] . '/?id_file=' . $file['id'] . '&amp;page=' . $pageEnd . '">' . $name . '</a>';
 		if ($post['count'] > 0) echo "<b><font color='red'>+{$post['count']}</font></b>";
-		echo '<span class="time">' . $s1 . vremja($post['time']) . $s2 . '</span>';
+		echo ' <span class="time">' . $s1 . vremja($post['time']) . $s2 . '</span>';
 		echo '</div>';
+
 		echo '<div class="nav2">';
 		echo '&raquo; <b>' . text($file['name']) . '</b><br />';
 		echo '<span class="text">' . output_text($file['opis']) . '</span>';
 		echo '</div>';
 	} else {
 		echo '<div class="nav1">';
-		echo '<img src="/style/icons/disk.png" alt="*" />';
+		echo '<img src="../../style/icons/disk.png" alt="*" />';
 		echo $name . ' ';
 		if ($post['count'] > 0) echo "<b><font color='red'>+{$post['count']}</font></b>";
 		echo '<span class="time">' . $s1 . vremja($post['time']) . $s2 . '</span>';
