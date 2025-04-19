@@ -219,7 +219,7 @@ if (isset($_GET['f'])) {
 							if ($file_id['id_user'] != $a['id'] || $a['id'] != $user['id'])
 								dbquery("INSERT INTO `discussions` (`id_user`, `avtor`, `type`, `time`, `id_sim`, `count`) values('{$a['id']}', '{$file_id['id_user']}', 'down', '{$time}', '{$file_id['id']}', '1')");
 						} else {
-							$disc = dbarray(dbquery("SELECT * FROM `discussions` WHERE `id_user` = '{$file_id['id_user']}' AND `type` = 'down' AND `id_sim` = '{$file_id[id]}' LIMIT 1"));
+							$disc = dbarray(dbquery("SELECT * FROM `discussions` WHERE `id_user` = '{$file_id['id_user']}' AND `type` = 'down' AND `id_sim` = '{$file_id['id']}' LIMIT 1"));
 							if ($file_id['id_user'] != $a['id'] || $a['id'] != $user['id'])
 								dbquery("UPDATE `discussions` SET `count` = '" . ($disc['count'] + 1) . "', `time` = '{$time}' WHERE `id_user` = '{$a['id']}' AND `type` = 'down' AND `id_sim` = '{$file_id['id']}' LIMIT 1");
 						}
