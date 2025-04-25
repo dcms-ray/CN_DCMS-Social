@@ -380,6 +380,27 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 		$response['status'] = 'error';
 		$response['message'] = 'msg not found';
 	}
+
+} elseif (isset($_GET['action']) && $_GET['action'] == 'user-info') {
+	$user_info = user::get_user(($_GET['id'] ?? ($user ?? 0)));
+	if ($user_info) {
+		$response = [
+			'status' => 'success',
+			'data' => [
+				'id' => $user_info['id'],
+				'nick' => $user_info['nick'],
+				'date_reg' => $user_info['date_reg'],
+				'balls' => $user_info['balls'],
+				'browser' => $user_info['browser'],
+				'money' => $user_info['money'],
+				'group_name' => $user_info['group_name'],
+				'pol' => $user_info['pol'],
+				'date_last' => $user_info['date_last']
+			]
+		];
+	} else {
+		$response['status'] = 'error';
+	}
 } else {
 	// 检查登录状态
 	if (isset($user)) {

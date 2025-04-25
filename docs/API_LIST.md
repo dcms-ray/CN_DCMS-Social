@@ -384,7 +384,7 @@ API地址：https://[网站域名]/api.php
         "status": "success",
         "message": "reset password successfully",
         "data": {
-            "user_id": "int"
+            "user_id": "<int>"
         }
     }
     ```
@@ -401,13 +401,41 @@ API地址：https://[网站域名]/api.php
         "status": "success",
         "users": [
             {
-                "id": "int",
-                "last_online": "Y-m-d H:i:s"
+                "id": "<int>",
+                "last_online": "<Y-m-d H:i:s>"
             },
             {...}
         ]
     }
     ```
+
+#### 1.7 获取当前在线用户列表
+
+- **请求URL**: `?action=user-info&id=<int>`
+- **请求方式**: GET
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "data": [
+            {
+                "id": "<int>",
+                "nick": "<string>",
+                "date_reg": "<int>",
+                "balls": "<int>",
+                "browser": "<string>",
+                "money": "<int>",
+                "group_name": "<string>",
+                "pol": "<int>",
+                "date_last": "<int>"
+            }
+        ]
+    }
+    ```
+
+    id: 用户ID，nick: 用户昵称，date_reg: 注册时间，balls: 积分？，browser: 浏览器类型，money: 硬币，pol: 性别，date_last: 最后在线时间
 
 ### 2. 留言板相关
 
