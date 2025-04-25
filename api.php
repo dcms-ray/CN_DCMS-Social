@@ -97,7 +97,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 			throw new Exception('verification code is required');
 		}
 	
-		// 优化验证码验证逻辑
+		// 验证码验证逻辑
 		$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
 		if ($validateCaptchaToken['status'] != 'success') {
 			throw new Exception($validateCaptchaToken['message']);
@@ -307,7 +307,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	}, $results)];
 
 
-} elseif (isset($_GET['action']) && $_GET['action'] == 'message-list') {
+} elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-list') {
 	$k_post = $db->queryColumn("SELECT COUNT(id) FROM `guest`");
 	$k_page = k_page($k_post, $set['p_str']);
 	$page = page($k_page);
@@ -316,6 +316,70 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	$results = $db->queryAll("SELECT * FROM `guest` ORDER BY id DESC LIMIT $start, $set[p_str]");
 
 	$response = ['status' => 'success', 'data' => $results];
+
+} elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-add') {
+	if (isset($_POST['msg'])) {
+		// 检查是否有违禁词
+		$mat = antimat($_POST['msg']);
+		if ($mat) {
+			$response['status'] = 'error';
+			$response['message'] = 'forbidden strings: ' . $mat;
+		} elseif (strlen2($_POST['msg']) > 1024) {
+			$response['status'] = 'error';
+			$response['message'] = 'content too long';
+		} elseif (strlen2($_POST['msg']) < 2) {
+			$response['status'] = 'error';
+			$response['message'] = 'content too short';
+		} else {
+			if (isset($user)) {
+				// 获取该用户的上一条消息
+				$lastMessage = $db->query('SELECT `msg`, `time` FROM `guest` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [($user['id']) ?? 0]);
+				if ($lastMessage && $lastMessage['msg'] == $_POST['msg'] && (time() - $lastMessage['time']) < 300) {
+					$response['status'] = 'error';
+					$response['message'] = 'duplicate content';
+				} else {
+					// 活动积分的累积
+					include_once 'sys/add/user.active.php';
+					
+					// 添加通知信息
+					if (isset($ank_reply['id'])) {
+						$notifiacation = dbassoc(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $ank_reply['id'] . "' LIMIT 1"));
+						if ($notifiacation['komm'] == 1 && $ank_reply['id'] != $user['id'])
+							dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$ank_reply[id]', 0, 'guest', '$time')");
+					}
+					$db->insert('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [$user['id'], $time, $_POST['msg']]);
+					$response['status'] = 'success';
+				}
+			} elseif (isset($set['write_guest']) && $set['write_guest'] == 1) {
+				if (isset($_POST['captcha']) && isset($_POST['captcha_token'])) {
+					$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
+					if ($validateCaptchaToken['status'] == 'success') {
+						// 获取上一条消息
+						$lastMessage = $db->query('SELECT `msg`, `time` FROM `guest` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [0]);
+						if ($lastMessage && $lastMessage['msg'] == $_POST['msg'] && (time() - $lastMessage['time']) < 300) {
+							$response['status'] = 'error';
+							$response['message'] = 'duplicate content';
+						} else {
+							$db->insert('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [0, $time, $_POST['msg']]);
+							$response['status'] = 'success';
+						}
+					} else {
+						$response['status'] = 'error';
+						$response['message'] = $validateCaptchaToken['message'];
+					}
+				} else {
+					$response['status'] = 'error';
+					$response['message'] = 'captcha not found';
+				}
+			} else {
+				$response['status'] = 'error';
+				$response['message'] = 'not login';
+			}
+		}
+	} else {
+		$response['status'] = 'error';
+		$response['message'] = 'msg not found';
+	}
 } else {
 	// 检查登录状态
 	if (isset($user)) {

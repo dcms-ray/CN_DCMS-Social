@@ -413,7 +413,7 @@ API地址：https://[网站域名]/api.php
 
 #### 2.1 获取留言板列表
 
-- **请求URL**: `?action=message-list&page=<int>`
+- **请求URL**: `?action=guest-msg-list&page=<int>`
 - **请求方式**: GET
 
 - **响应内容**:
@@ -430,5 +430,77 @@ API地址：https://[网站域名]/api.php
             },
             {...}
         ]
+    }
+    ```
+
+#### 2.2 添加留言
+
+- **请求URL**: `?action=guest-msg-add&page=<int>`
+- **请求方式**: POST
+
+- **请求参数**(已登录):
+
+    ```x-www-form-urlencoded
+    msg=<string>
+    ```
+
+- **请求参数**(未登录):
+
+    ```x-www-form-urlencoded
+    msg=<string>&captcha=<string>&captcha_token=<string>
+    ```
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+    }
+    ```
+
+- **可能的报错内容**:
+
+    缺少信息内容:
+
+    ```json
+    {
+        "status": "error",
+        "message": "msg not found"
+    }
+    ```
+
+    在信息文本中发现了一个禁止字符:
+
+    ```json
+    {
+        "status": "error",
+        "message": "forbidden strings: <string>"
+    }
+    ```
+
+    内容过长:
+
+    ```json
+    {
+        "status": "error",
+        "message": "content too long"
+    }
+    ```
+
+    内容过短:
+
+    ```json
+    {
+        "status": "error",
+        "message": "content too short"
+    }
+    ```
+
+    需要登录:
+
+    ```json
+    {
+        "status": "error",
+        "message": "not login"
     }
     ```
