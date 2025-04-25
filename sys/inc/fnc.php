@@ -334,8 +334,7 @@ while ($filebase = readdir($opdirbase)) {
  * 
  * 仅删除 `prich` 字段为 `AntiDos` 且 `created_at` 早于一天前的记录
  */
-dbquery("DELETE FROM `ban_ip` WHERE `prich` = 'AntiDos' AND `created_at` < '" . date('Y-m-d H:i:s', time() - 3600 * 24) . "'");
-dbquery("DELETE FROM `ban_ip` WHERE `prich` = 'Inject' AND `created_at` < '" . date('Y-m-d H:i:s', time() - 3600 * 24) . "'");
+$db->delete('DELETE FROM ban_ip WHERE created_at < NOW() - INTERVAL 1 HOUR AND prich IN (?, ?);', ['AntiDos', 'Inject']);
 
 // 禁止被封禁的 IP 访问
 if (!(isset($ban_ip_page) && $ban_ip_page == true) && checkBanIp($ip)) {
