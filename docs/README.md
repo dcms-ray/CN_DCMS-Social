@@ -112,4 +112,4 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 - [ ] OAuth 支持
 - [x] 支持 PDO 操作数据库
 - [ ] 适配不支持Cookie的浏览器
-- [ ] 删除评论前确认
+- [x] 删除日记评论前确认
