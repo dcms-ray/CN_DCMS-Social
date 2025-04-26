@@ -96,8 +96,8 @@ if (isset($_POST['title']) && isset($_POST['msg'])) {
 	}
 }
 
-if (isset($_GET['id_dir'])) {
-	$id_dir = intval($_GET['id_dir']);
+if (isset($_POST['id_dir'])) {
+	$id_dir = intval($_POST['id_dir']);
 } else {
 	$id_dir = 0;
 }
@@ -105,38 +105,44 @@ if (isset($_GET['id_dir'])) {
 err();
 aut();
 
-if (isset($_POST["msg"])) $msg = output_text($_POST["msg"]);
+if (isset($_POST["msg"])) $msg2 = $_POST["msg"];
 
-echo "<form method=\"post\" name=\"message\" action=\"add.php\">";
-echo "标题:<br /><input name=\"title\" size=\"16\" maxlength=\"32\" value=\"\" type=\"text\" /><br />";
-if ($set['web'] && is_file(H.'style/themes/'.$set['set_them'].'/altername_post_form.php')) {
-	include_once H.'style/themes/'.$set['set_them'].'/altername_post_form.php';
+echo '<form method="post" name="message" action="add.php">';
+echo '标题:<br /><input name="title" size="16" maxlength="32" value="' . ($_POST['title'] ?? '') . '" type="text" /><br />';
+if ($set['web'] && is_file(H . 'style/themes/'.$set['set_them'] . '/altername_post_form.php')) {
+	include_once H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php';
 } else {
-	echo "通信:$tPanel<textarea name=\"msg\"></textarea><br />";
+	if (!isset($msg2)) $msg2 = NULL;
+	echo "通信:$tPanel<textarea title='输入日记内容' name='msg'>$msg2</textarea><br />";
 }
 
+$q = dbquery("SELECT * FROM `notes_dir` ORDER BY `id` DESC");
 echo "分类:<br /><select name='id_dir'>";
-$q=dbquery("SELECT * FROM `notes_dir` ORDER BY `id` DESC");
-echo "<option value='0'".($id_dir==0?" selected='selected'":null)."><b>没有类别</b></option>";
+echo "<option value='0'" . ($id_dir == 0 ? " selected='selected'" : null) . "><b>没有类别</b></option>";
 while ($post = dbassoc($q)) {
-	echo "<option value='$post[id]'".($id_dir == $post['id']?" selected='selected'" : null).">" . text($post['name']) . "</option>";
+	echo "<option value='$post[id]'" . ($id_dir == $post['id'] ? " selected='selected'" : null) . ">" . text($post['name']) . "</option>";
 }
 echo "</select><br />";
 
-echo "<div class='main'>他们可以看:<br /><input name='private' type='radio' value='0'  selected='selected'/>所有人 ";
-echo "<input name='private' type='radio'  value='1' />朋友 ";
-echo "<input name='private' type='radio'  value='2' />只有我</div>";
-echo "<div class='main'>他们可以发表评论:<br /><input name='private_komm' type='radio' value='0'  selected='selected'/>所有人 ";
-echo "<input name='private_komm' type='radio'  value='1' />朋友 ";
-echo "<input name='private_komm' type='radio'  value='2' />只有我</div>";
+echo '<div class="main">他们可以看:<br />
+      <input title="所有人可查看" name="private" type="radio" value="0" ' . ((isset($_POST["private"]) && $_POST["private"] == 0) ? 'checked="checked" ' : '') . '/>所有人 ';
+echo '<input title="仅朋友可查看" name="private" type="radio" value="1" ' . ((isset($_POST["private"]) && $_POST["private"] == 1) ? 'checked="checked" ' : '') . '/>朋友 ';
+echo '<input title="仅自己可查看" name="private" type="radio" value="2" ' . ((isset($_POST["private"]) && $_POST["private"] == 2) ? 'checked="checked" ' : '') . '/>只有我
+      </div>';
+echo '<div class="main">他们可以发表评论:<br />
+      <input title="所有人可评论" name="private_komm" type="radio" value="0" ' . ((isset($_POST["private_komm"]) && $_POST["private_komm"] == 0) ? 'checked="checked" ' : '') . '/>所有人 ';
+echo '<input title="仅朋友可评论" name="private_komm" type="radio" value="1" ' . ((isset($_POST["private_komm"]) && $_POST["private_komm"] == 1) ? 'checked="checked" ' : '') . '/>朋友 ';
+echo '<input title="仅自己可评论" name="private_komm" type="radio" value="2" ' . ((isset($_POST["private_komm"]) && $_POST["private_komm"] == 2) ? 'checked="checked" ' : '') . '/>只有我
+      </div>';
 
 if ($user['rating'] < 6 || $user['group_access'] < 6) {
 	echo "验证码:<img src='../../captcha.php?SESS=$sess' width='100' height='30' alt='核证号码' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
 }
-echo "<input value=\"创建\" type=\"submit\" />";
-echo "</form>";
+echo '<input value="创建" type="submit" />';
+echo '</form>';
 
-echo "<div class='foot'>";
-echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a><br />";
-echo "</div>";
+echo '<div class="foot">';
+echo '<img src="../../style/icons/str2.gif" alt="*"> <a href="index.php">日记</a><br />';
+echo '</div>';
+
 include_once '../../sys/inc/tfoot.php';
