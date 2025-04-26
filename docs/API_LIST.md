@@ -634,13 +634,13 @@ API地址：https://[网站域名]/api.php
 
 #### 3.3 获取添加聊天信息
 
-- **请求URL**: `?action=chat-msg-add`
+- **请求URL**: `?action=chat-msg-add&room=<int>`
 - **请求方式**: POST
 
 - **请求参数**:
 
     ```x-www-form-urlencoded
-    room=<int>&msg=<string>
+    msg=<string>
     ```
 
 - **响应内容**:
