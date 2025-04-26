@@ -557,7 +557,7 @@ API地址：https://[网站域名]/api.php
 
 ### 3. 聊天室相关
 
-#### 2.1 获取聊天室列表
+#### 3.1 获取聊天室列表
 
 - **请求URL**: `?action=chat-rooms-list`
 - **请求方式**: GET
@@ -582,7 +582,7 @@ API地址：https://[网站域名]/api.php
 
     id: 聊天室ID，pos: 排序ID，name: 聊天室名称，umnik：是否启用答题机器人，shutnik: 是否启用笑话机器人，opis: 聊天室描述
 
-#### 2.2 获取聊天内容列表
+#### 3.2 获取聊天内容列表
 
 - **请求URL**: `?action=chat-msg-list&room=<int>&page=<int>`
 - **请求方式**: GET
@@ -632,7 +632,7 @@ API地址：https://[网站域名]/api.php
     }
     ```
 
-#### 2.3 获取添加聊天信息
+#### 3.3 获取添加聊天信息
 
 - **请求URL**: `?action=chat-msg-add`
 - **请求方式**: POST
