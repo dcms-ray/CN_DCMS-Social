@@ -17,6 +17,7 @@ if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` 
 }
 
 $set['title'] = '聊天室-谁在这里？'; // 页面标题
+$in_chat_room = 1;
 include_once '../sys/inc/thead.php';
 title();
 aut();

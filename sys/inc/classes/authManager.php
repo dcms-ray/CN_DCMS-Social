@@ -46,8 +46,9 @@ class AuthManager
 		}
 
 		// 检查 Authorization 头中的 Bearer Token
-		if ($this->isBearerTokenValid()) {
-			return $this->processBearerTokenLogin();
+		$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? getallheaders()['Authorization'] ?? false;
+		if ($authHeader) {
+			return $this->processBearerTokenLogin($authHeader);
 		}
 
 		return ['status' => false, 'message' => 'No authentication parameters provided'];
@@ -182,12 +183,16 @@ class AuthManager
 		return ['status' => false, 'message' => 'Cookie error: ' . $userInfo['message']];
 	}
 
-	private function processBearerTokenLogin(): array {
-		$jwt = preg_split('/\s+/', $_SERVER['HTTP_AUTHORIZATION'])[1];
-		$userInfo = $this->jwtGetUserInfo($jwt);
-		if ($userInfo['status']) {
-			$userInfo['info']['type_input'] = 'authorization';
-			return ['status' => true, 'data' => $userInfo['info']];
+	private function processBearerTokenLogin($authHeader): array {
+		if ($authHeader && preg_match('/Bearer\s+(.+)/', $authHeader, $matches)) {
+			$jwt = $matches[1];
+			$userInfo = $this->jwtGetUserInfo($jwt);
+			if ($userInfo['status']) {
+				$userInfo['info']['type_input'] = 'authorization';
+				return ['status' => true, 'data' => $userInfo['info']];
+			}
+		} else {
+			return ['status' => false, 'message' => 'JWT invalid'];
 		}
 
 		return ['status' => false, 'message' => 'JWT invalid: ' . $userInfo['message']];

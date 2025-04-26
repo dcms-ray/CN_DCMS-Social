@@ -12,7 +12,7 @@ function my_esc($text, $br = NULL) {
 	return $text;
 }
 
-// 对于php4（替代file_put_contents）
+// 用于兼容php4的file_put_contents替代函数（不再需要）
 if (!function_exists('file_put_contents')) {
 	function file_put_contents($file, $data) {
 		$f = @fopen($file, 'w');

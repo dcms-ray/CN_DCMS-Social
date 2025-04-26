@@ -190,7 +190,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	}
 
 
-} elseif (isset($_GET['action']) && $_GET['action'] == 'get_captcha_url') {
+} elseif (isset($_GET['action']) && $_GET['action'] == 'get-captcha-url') {
 	// 获取 Captcha URL 和 Captcha token
 
 	// 生成5位验证码
@@ -307,6 +307,26 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	}, $results)];
 
 
+} elseif (isset($_GET['action']) && $_GET['action'] == 'user-info') {
+	$user_info = user::get_user(($_GET['id'] ?? ($user ?? 0)));
+	if ($user_info) {
+		$response = [
+			'status' => 'success',
+			'data' => [
+				'id' => $user_info['id'],
+				'nick' => $user_info['nick'],
+				'date_reg' => $user_info['date_reg'],
+				'balls' => $user_info['balls'],
+				'browser' => $user_info['browser'],
+				'money' => $user_info['money'],
+				'group_name' => $user_info['group_name'],
+				'pol' => $user_info['pol'],
+				'date_last' => $user_info['date_last']
+			]
+		];
+	} else {
+		$response['status'] = 'error';
+	}
 } elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-list') {
 	$k_post = $db->queryColumn("SELECT COUNT(id) FROM `guest`");
 	$k_page = k_page($k_post, $set['p_str']);
@@ -315,7 +335,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 
 	$results = $db->queryAll("SELECT * FROM `guest` ORDER BY id DESC LIMIT $start, $set[p_str]");
 
-	$response = ['status' => 'success', 'data' => $results];
+	$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
 
 } elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-add') {
 	if (isset($_POST['msg'])) {
@@ -360,8 +380,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 							$response['status'] = 'error';
 							$response['message'] = 'duplicate content';
 						} else {
-							$db->insert('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [0, $time, $_POST['msg']]);
-							$response['status'] = 'success';
+							$msgId = $db->insert('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [0, $time, $_POST['msg']]);
+							$response = ['status' => 'success', 'id' => $msgId];
 						}
 					} else {
 						$response['status'] = 'error';
@@ -381,26 +401,115 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 		$response['message'] = 'msg not found';
 	}
 
-} elseif (isset($_GET['action']) && $_GET['action'] == 'user-info') {
-	$user_info = user::get_user(($_GET['id'] ?? ($user ?? 0)));
-	if ($user_info) {
-		$response = [
-			'status' => 'success',
-			'data' => [
-				'id' => $user_info['id'],
-				'nick' => $user_info['nick'],
-				'date_reg' => $user_info['date_reg'],
-				'balls' => $user_info['balls'],
-				'browser' => $user_info['browser'],
-				'money' => $user_info['money'],
-				'group_name' => $user_info['group_name'],
-				'pol' => $user_info['pol'],
-				'date_last' => $user_info['date_last']
-			]
-		];
+} elseif (isset($_GET['action']) && $_GET['action'] == 'guest-users-list') {
+	$k_post = $db->query("SELECT COUNT(DISTINCT ul.id_user) AS online_users
+	                      FROM `user_log` ul
+	                      WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
+	                          AND ul.ban = 0
+	                          AND ul.url LIKE '/guest/%'
+	                          AND ul.last_online = (
+	                              SELECT MAX(last_online)
+	                              FROM `user_log` ul2
+	                              WHERE ul2.id_user = ul.id_user
+	                                  AND ul2.last_online > NOW() - INTERVAL 100 SECOND
+	                                  AND ul2.ban = 0
+	                          )");
+	$k_page = k_page($k_post['online_users'], $set['p_str']);
+	$page = page($k_page);
+	$start = $set['p_str'] * $page - $set['p_str'];
+
+	$query = $db->queryAll("SELECT DISTINCT ul.id_user, ul.last_online
+	                        FROM `user_log` ul
+	                        WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
+	                            AND ul.ban = 0
+	                            AND ul.url LIKE '/guest/%'
+	                        ORDER BY ul.last_online DESC
+					        LIMIT $start, $set[p_str]");
+
+	$response = ['status' => 'success', 'data' => $query, 'all_pages' => $k_page];
+
+} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-rooms-list') {
+	$results = $db->queryAll('SELECT * FROM `chat_rooms` ORDER BY `pos` ASC');
+	$response['status'] = 'success';
+	$response['data'] = $results;
+
+} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-users-list') {
+	$results = $db->queryAll('SELECT * FROM `chat_who`');
+	$response['status'] = 'success';
+	$response['data'] = $results;
+
+} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-msg-list') {
+	if (isset($_GET['room'])) {
+		$room = $db->query('SELECT * FROM `chat_rooms` WHERE `id` = ? LIMIT 1', [intval($_GET['room'])]);
+		if (empty($room)) {
+			$response = ['status' => 'error', 'message' => 'room not found'];
+		} else {
+			$k_post = $db->queryColumn("SELECT COUNT(*) FROM `chat_post` WHERE `room` = '$room[id]' AND (`privat`='0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ")");
+			$k_page = k_page($k_post, $set['p_str']);
+			$page = page($k_page);
+			$start = $set['p_str'] * $page - $set['p_str'];
+
+			$results = $db->queryAll("SELECT * FROM `chat_post` WHERE `room` = ? AND (`privat`= ?" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") ORDER BY id DESC LIMIT {$start}, {$set['p_str']}", [
+				$room['id'],
+				0
+			]);
+			$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
+		}
+	} else {
+		$response = ['status' => 'error', 'message' => 'room id not found'];
+	}
+
+} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-msg-add') {
+	if (isset($user)) {
+		if (isset($_GET['room'])) {
+			$room = $db->query('SELECT * FROM `chat_rooms` WHERE `id` = ? LIMIT 1', [intval($_GET['room'])]);
+			if (empty($room)) {
+				$response = ['status' => 'error', 'message' => 'room not found'];
+			} elseif (isset($_POST['msg'])) {
+				$msg = $_POST['msg'];
+				$mat = antimat($msg);
+				if ($mat) {
+					$response['status'] = 'error';
+					$response['message'] = 'forbidden strings: ' . $mat;
+				} elseif (strlen2($msg) > 1024) {
+					$response['status'] = 'error';
+					$response['message'] = 'content too long';
+				} elseif (strlen2($msg) < 2) {
+					$response['status'] = 'error';
+					$response['message'] = 'content too short';
+				} else {
+					// 获取该用户的上一条消息
+					$lastMessage = $db->query('SELECT `msg`, `time` FROM `chat_post` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [$user['id']]);
+					if ($lastMessage && $lastMessage['msg'] == $msg && (time() - $lastMessage['time']) < 300) {
+						$response['status'] = 'error';
+						$response['message'] = 'duplicate content';
+					} else {
+						if (isset($_POST['privat'])) {
+							$priv = abs(intval($_POST['privat']));
+						} else {
+							$priv = 0;
+						}
+						$msgId = $db->insert('INSERT INTO `chat_post` (`id_user`, `time`, `msg`, `room`, `privat`) values(?, ?, ?, ?, ?)',[
+							$user['id'],
+							$time,
+							$msg,
+							$room['id'],
+							$priv
+						]);
+						$response = ['status' => 'success', 'id' => $msgId];
+					}
+				}
+			} else {
+				$response = ['status' => 'error', 'message' => 'msg not found'];
+			}
+		} else {
+			$response = ['status' => 'error', 'message' => 'room id not found'];
+		}
 	} else {
 		$response['status'] = 'error';
+		$response['message'] = 'not login';
 	}
+
 } else {
 	// 检查登录状态
 	if (isset($user)) {
