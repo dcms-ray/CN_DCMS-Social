@@ -24,7 +24,7 @@ API地址：https://[网站域名]/api.php
 
 #### 0.1 获取验证码
 
-- **请求URL**: `?action=get_captcha_url`
+- **请求URL**: `?action=get-captcha-url`
 - **请求方式**: GET
 
 - **响应内容**:
@@ -451,19 +451,20 @@ API地址：https://[网站域名]/api.php
         "status": "success",
         "data": [
             {
-                "id": "int",
-                "id_user": "int",
-                "time": "int",
-                "msg": "string"
+                "id": "<int>",
+                "id_user": "<int>",
+                "time": "<int>",
+                "msg": "<string>"
             },
             {...}
-        ]
+        ],
+        "all_pages": "<int>"
     }
     ```
 
 #### 2.2 添加留言
 
-- **请求URL**: `?action=guest-msg-add&page=<int>`
+- **请求URL**: `?action=guest-msg-add`
 - **请求方式**: POST
 
 - **请求参数**(已登录):
@@ -483,6 +484,171 @@ API地址：https://[网站域名]/api.php
     ```json
     {
         "status": "success",
+        "id": "<int>"
+    }
+    ```
+
+- **可能的报错内容**:
+
+    缺少信息内容:
+
+    ```json
+    {
+        "status": "error",
+        "message": "msg not found"
+    }
+    ```
+
+    在信息文本中发现了一个禁止字符:
+
+    ```json
+    {
+        "status": "error",
+        "message": "forbidden strings: <string>"
+    }
+    ```
+
+    内容过长:
+
+    ```json
+    {
+        "status": "error",
+        "message": "content too long"
+    }
+    ```
+
+    内容过短:
+
+    ```json
+    {
+        "status": "error",
+        "message": "content too short"
+    }
+    ```
+
+    需要登录:
+
+    ```json
+    {
+        "status": "error",
+        "message": "not login"
+    }
+    ```
+
+#### 2.3 查看当前在留言板的用户
+
+- **请求URL**: `?action=guest-users-list&page=<int>`
+- **请求方式**: GET
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "data": [
+            {
+                "id_user": "<int>",
+                "last_online": "<Y-m-d H:i:s>"
+            },
+            {...}
+        ],
+        "all_pages": "<int>"
+    }
+    ```
+
+### 3. 聊天室相关
+
+#### 2.1 获取聊天室列表
+
+- **请求URL**: `?action=chat-rooms-list`
+- **请求方式**: GET
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "data": [
+            {
+                "id": "<int>",
+                "pos": "<int>",
+                "name": "<string>",
+                "umnik": "<string>",
+                "shutnik": "<string>",
+                "opis": "<string>"
+            },
+            {...}
+        ]
+    }
+    ```
+
+    id: 聊天室ID，pos: 排序ID，name: 聊天室名称，umnik：是否启用答题机器人，shutnik: 是否启用笑话机器人，opis: 聊天室描述
+
+#### 2.2 获取聊天内容列表
+
+- **请求URL**: `?action=chat-msg-list&room=<int>&page=<int>`
+- **请求方式**: GET
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "data": [
+            {
+            "id": "<int>",
+            "room": "<int>",
+            "id_user": "<int>",
+            "time": "<int>",
+            "msg": "<string>",
+            "vopros": "<int>",
+            "umnik_st": "<string>",
+            "shutnik": "<string>",
+            "privat": "<int>"
+            },
+            {...}
+        ],
+        "all_pages": "<int>"
+    }
+    ```
+
+    id: 信息ID，id_user: 用户ID，umnik_st：答题机器人的信息，shutnik: 笑话机器人的信息，privat: 私聊对象
+
+- **可能的报错内容**:
+
+    缺少`room`参数:
+
+    ```json
+    {
+        "status": "error",
+        "message": "room id not found"
+    }
+    ```
+
+    请求的聊天室ID无效:
+
+    ```json
+    {
+        "status": "error",
+        "message": "room not found"
+    }
+    ```
+
+#### 2.3 获取添加聊天信息
+
+- **请求URL**: `?action=chat-msg-add`
+- **请求方式**: POST
+
+- **请求参数**:
+
+    ```x-www-form-urlencoded
+    room=<int>&msg=<string>
+    ```
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "id": "<int>"
     }
     ```
 
