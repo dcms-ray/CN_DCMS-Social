@@ -1,6 +1,4 @@
-<?
-echo '<?xml version="1.0" encoding="utf-8"?>';
-
+<?php
 $set['web'] = true;
 header("Content-type: text/html");
 ?>
@@ -28,7 +26,7 @@ header("Content-type: text/html");
 		<script type="text/javascript" src="/ajax/ajax.js"></script><script type="text/javascript" src="/ajax/form-submit.js"></script>
 		<link rel="alternate" title="新闻 RSS" href="/news/rss.php" type="application/rss+xml" />
 		<script src="/style/themes/<? echo $set['set_them']; ?>/js.js" type="text/javascript" language="JavaScript" charset="utf-8"></script>
-		<!-- Диалоговое окно -->
+		<!-- 对话框 -->
 		<script src="https://code.jquery.com/jquery-1.8.3.js"></script>
 		<script src="/ajax/dialog.js"></script>
 		<link type="text/css" href="/ajax/style/dialog.css" rel="stylesheet" />
@@ -74,7 +72,7 @@ header("Content-type: text/html");
 			}
 		</script>  
 	</head>
-	<body><?php include_once H . 'style/themes/' . $set['set_them'] . '/title.php'; ?>
+	<body><?php include H . 'style/themes/' . $set['set_them'] . '/title.php'; ?>
 		<div class="head">
 			<table class="nav">
 				<tr>
@@ -82,7 +80,7 @@ header("Content-type: text/html");
 						<a href="/index.php" title="到主页"><img src="/style/themes/<? echo $set['set_them']; ?>/logo.png" alt="Logotype" /></a>
 					</td>
 					<td class="head_menu">
-						<?php include_once H . 'style/themes/' . $set['set_them'] . '/navigation.php'; ?>
+						<?php include H . 'style/themes/' . $set['set_them'] . '/navigation.php'; ?>
 					</td>
 				</tr>
 			</table>
@@ -91,15 +89,16 @@ header("Content-type: text/html");
 			<table class="table">
 				<tr>
 					<td class="block_menu_nav">
-						<?php include_once H . 'style/themes/' . $set['set_them'] . '/menu.php'; ?>
+						<?php include H . 'style/themes/' . $set['set_them'] . '/menu.php'; ?>
+
 					</td>
 					<td class="block_all_nav">
 						<div class="ind_cont">
 							<div class="title">
-								<? echo $set['title']; ?>
+								<?php echo $set['title']; ?>
 							</div>
 							<div class='content_block'> 
-								<? if (isset($user)): ?>
+								<?php if (isset($user)): ?>
 									<!-- 用于加载表情符号的块 -->
 									<div id="dialog" title="表情符号列表">
 										<div id="contentBody">  
@@ -110,4 +109,4 @@ header("Content-type: text/html");
 										正在加载...
 										</div>
 									</div>
-								<? endif; ?>
+								<?php endif;
