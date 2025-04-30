@@ -6,7 +6,6 @@ include_once '../sys/inc/settings.php';
 include_once '../sys/inc/db_connect.php';
 include_once '../sys/inc/ipua.php';
 include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/downloadfile.php';
 include_once '../sys/inc/user.php';
 
 header("Expires: ".gmdate("D, d M Y H:i:s", time() + 3600)." GMT");
