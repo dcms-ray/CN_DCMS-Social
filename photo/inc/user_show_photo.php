@@ -324,9 +324,9 @@ if (!isset($block_photo)) {
 		echo '类型: <b>' . $photo['ras'] . '</b>, ' . $w . 'x' . $h . ' <br />';
 		if ($photo['opis'] != null)
 			echo output_text($photo['opis']) . '<br />';
-		echo '<img src="/style/icons/d.gif" alt="*"> <a href="/photo/photo0/' . $photo['id'] . '.' . $photo['ras'] . '" title="下载原图">';
-		echo '下载';
-		echo ' (' . size_file(filesize(H . 'files/gallery/photo/' . $photo['id'] . '.' . $photo['ras'])) . ')';
+		echo '<img src="/style/icons/d.gif" alt="*"> ';
+		echo '<a href="/photo/download/' . $photo['id'] . '.' . $photo['ras'] . '" title="下载原图">';
+		echo '下载 (' . size_file(filesize(H . 'files/gallery/photo/' . $photo['id'] . '.' . $photo['ras'])) . ')';
 		echo '</a><br />';
 		echo '</div>';
 		if (user_access('photo_photo_edit') && $ank['level'] < $user['level'] || isset($user) && $ank['id'] == $user['id']) include_once check_replace('inc/gallery_show_photo_form.php');

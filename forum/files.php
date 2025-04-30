@@ -8,7 +8,6 @@ include_once '../sys/inc/db_connect.php';
 include_once '../sys/inc/ipua.php';
 include_once '../sys/inc/fnc.php';
 include_once '../sys/inc/user.php';
-include_once '../sys/inc/downloadfile.php';
 
 // 检查文件ID是否有效且文件存在
 if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `forum_files` WHERE `id` = '" . intval($_GET['id']) . "'"), 0) == 1) {
