@@ -26,7 +26,7 @@ if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `guest` WHERE `
 	}
 	if (isset($_POST['ok']) && $_POST['ok'] == 1) {
 		if (user_access('guest_delete') || (isset($user['id']) && $user['id'] == $post['id_user'])) {
-			admin_log('留言板', '删除邮件', '从中删除消息 ' . $ank['nick']);
+			if ($user['id'] != $post['id_user']) admin_log('留言板', '删除邮件', '从中删除消息 ' . $ank['nick']);
 			dbquery("DELETE FROM `guest` WHERE `id` = '$post[id]'");
 		}
 		header("Location: index.php?page={$page}");

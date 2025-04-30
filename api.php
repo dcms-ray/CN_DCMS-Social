@@ -401,6 +401,36 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 		$response['message'] = 'msg not found';
 	}
 
+} elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-delete') {
+	if (isset($user)) {
+		if (isset($_POST['id'])) {
+			$post = $db->query('SELECT * FROM `guest` WHERE `id` = ? LIMIT 1', [$_POST['id']]);
+			if (empty($post['id'])) {
+				$response = ['status' => 'error', 'message' => 'msg not exist'];
+			} else {
+				if ($post['id_user'] == 0) {
+					$ank['id'] = 0;
+					$ank['pol'] = 'guest';
+					$ank['level'] = 0;
+					$ank['nick'] = '客人';
+				} else {
+					$ank = user::get_user($post['id_user']);
+				}
+				if (user_access('guest_delete') || $user['id'] == $post['id_user']) {
+					if ($user['id'] != $post['id_user']) admin_log('留言板', '删除邮件', '从中删除消息 ' . $ank['nick']);
+					$db->delete('DELETE FROM guest WHERE id = ?', [$post['id']]);
+					$response['status'] = 'success';
+				} else {
+					$response = ['status' => 'error', 'message' => 'no permissions'];
+				}
+			}
+		} else {
+			$response = ['status' => 'error', 'message' => 'msg id not found'];
+		}
+	} else {
+		$response = ['status' => 'error', 'message' => 'not login'];
+	}
+
 } elseif (isset($_GET['action']) && $_GET['action'] == 'guest-users-list') {
 	$k_post = $db->query("SELECT COUNT(DISTINCT ul.id_user) AS online_users
 	                      FROM `user_log` ul

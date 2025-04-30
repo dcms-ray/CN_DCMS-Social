@@ -555,6 +555,63 @@ API地址：https://[网站域名]/api.php
     }
     ```
 
+#### 2.4 删除留言板信息
+
+- **请求URL**: `?action=guest-msg-delete`
+- **请求方式**: POST
+
+- **请求参数**:
+
+    ```x-www-form-urlencoded
+    id=<int>
+    ```
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success"
+    }
+    ```
+
+- **可能的报错内容**:
+
+    需要登录:
+
+    ```json
+    {
+        "status": "error",
+        "message": "not login"
+    }
+    ```
+
+    无权限:
+
+    ```json
+    {
+        "status": "error",
+        "message": "no permissions"
+    }
+    ```
+
+    缺少 id 参数:
+
+    ```json
+    {
+        "status": "error",
+        "message": "msg id not found"
+    }
+    ```
+
+    消息不存在:
+
+    ```json
+    {
+        "status": "error",
+        "message": "msg not exist"
+    }
+    ```
+
 ### 3. 聊天室相关
 
 #### 3.1 获取聊天室列表
@@ -632,7 +689,7 @@ API地址：https://[网站域名]/api.php
     }
     ```
 
-#### 3.3 获取添加聊天信息
+#### 3.3 添加聊天信息
 
 - **请求URL**: `?action=chat-msg-add&room=<int>`
 - **请求方式**: POST
