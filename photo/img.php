@@ -8,10 +8,25 @@ include_once '../sys/inc/ipua.php';
 include_once '../sys/inc/fnc.php';
 include_once '../sys/inc/user.php';
 
-header("Expires: ".gmdate("D, d M Y H:i:s", time() + 3600)." GMT");
-header("Cache-Control: max-age=3600");
-if (!isset($_GET['id']) || !isset($_GET['size'])) exit;
-$size = intval($_GET['size']);
+header("Expires: ".gmdate("D, d M Y H:i:s", time() + 2592000)." GMT");
+header("Cache-Control: max-age=2592000");
+
+if (!isset($_GET['id']) || !isset($_GET['mode'])) {
+	http_response_code(404);
+	exit;
+}
+if ($_GET['mode'] == 'view') {
+	$size = intval($_GET['size'] ?? NULL);
+	$inlineFile = true;
+} elseif ($_GET['mode'] == 'download') {
+	$size = 0;
+	$inlineFile = false;
+}
+if ($size === NULL) {
+	http_response_code(404);
+	exit;
+}
+
 $if_photo = intval($_GET['id']);
 $photo = dbassoc(dbquery("SELECT * FROM `gallery_photo` WHERE `id` = '$if_photo'  LIMIT 1"));
 $gallery = dbassoc(dbquery("SELECT * FROM `gallery` WHERE `id` = '$photo[id_gallery]'  LIMIT 1"));
@@ -60,7 +75,7 @@ if ($size == 0) {
 	if (is_file($file_path)) {
 		header('Access-Control-Allow-Origin: *');
 		// 输出文件
-		DownloadFile($file_path, "photo_{$if_photo}.{$photo['ras']}", ras_to_mime($photo['ras']));
+		DownloadFile($file_path, "photo_{$if_photo}.{$photo['ras']}", ras_to_mime($photo['ras']), $inlineFile);
 	} else {
 		error_log("[photo/img.php] Error: File not found at path: $file_path");
 		http_response_code(404);
@@ -71,7 +86,7 @@ if ($size == 0) {
 	if (is_file($file_path)) {
 		header('Access-Control-Allow-Origin: *');
 		// 输出文件
-		DownloadFile($file_path, "photo_{$if_photo}.jpg", ras_to_mime('jpg'));
+		DownloadFile($file_path, "photo_{$if_photo}.jpg", ras_to_mime('jpg'), true);
 	} else {
 		error_log("[photo/img.php] Error: File not found at path: $file_path");
 		http_response_code(404);

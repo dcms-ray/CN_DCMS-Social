@@ -16,7 +16,9 @@ http://dcms-social.ru
 */
 
 // 检查是否定义了常量“USER”，如果没有定义，则禁止访问此页面
-if (!defined("USER")) die('No access');
+//if (!defined("USER")) die('No access');
+
+if (empty($user)) die('No access');
 
 // 判断用户是否已选择下载目录，如果有，则从数据库中获取目录信息
 if (isset($_SESSION['down_dir'])) {

@@ -86,7 +86,11 @@ if (isset($_GET['f'])) {
 			$_SESSION['file_' . $file_id['id'] . ''] = 1;
 			dbquery("UPDATE `downnik_files` SET `k_loads` = '" . ($file_id['k_loads'] + 1) . "' WHERE `id` = '$file_id[id]' LIMIT 1");
 			header('Access-Control-Allow-Origin: *');
-			DownloadFile(H . 'files/down/data/' . $file_id['id'] . '.dat', retranslit($file_id['name']) . (!empty($ras) ? '.' . $ras : ''), ras_to_mime($ras));
+			DownloadFile(
+				"../files/down/data/{$file_id['id']}.dat",
+				retranslit($file_id['name']) . (!empty($ras) ? '.' . $ras : ''),
+				ras_to_mime($ras)
+			);
 			exit;
 		}
 
