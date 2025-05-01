@@ -54,7 +54,7 @@ if (!empty($user)) {
 	}
 
 	// 聊天刷新时间
-	if ($user['set_time_chat'] != NULL) $set['time_chat'] = $user['set_time_chat'];
+	if ($user['set_time_chat'] !== NULL) $set['time_chat'] = $user['set_time_chat'];
 
 	// 逐页导航
 	if ($user['set_p_str'] != NULL) $set['p_str'] = $user['set_p_str'];
