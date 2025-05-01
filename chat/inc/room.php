@@ -12,18 +12,30 @@ if (isset($_POST['msg']) && isset($user)) {
 		$err[] = '信息不能超过 1024 字';
 	} elseif (strlen2($msg) < 1) {
 		$err[] = '信息不能少于 1 字';
-	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `chat_post` WHERE `id_user` = '{$user['id']}' AND `msg` = '" . my_esc($msg) . "' AND `time` > '" . ($time - 300) . "' LIMIT 1"), 0) != 0) {
-		$err = '留言重复';
-	} elseif (!isset($err)) {
-		if (isset($_POST['privat'])) {
-			$priv = abs(intval($_POST['privat']));
-		} else {
-			$priv = 0;
+	} else {
+		// 获取该用户的上一条消息
+		$lastMessage = $db->query('SELECT `msg`, `time` FROM `chat_post` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [$user['id']]);
+		if ($lastMessage && $lastMessage['msg'] == $msg && (time() - $lastMessage['time']) < 300) {
+			$err = '留言重复';
+		} elseif (!isset($err)) {
+			if (isset($_POST['privat'])) {
+				$priv = abs(intval($_POST['privat']));
+			} else {
+				$priv = 0;
+			}
+
+			$msgId = $db->insert('INSERT INTO `chat_post` (`id_user`, `time`, `msg`, `room`, `privat`) values(?, ?, ?, ?, ?)',[
+				$user['id'],
+				$time,
+				$msg,
+				$room['id'],
+				$priv
+			]);
+
+			$_SESSION['message'] = '留言已成功添加';
+			header("Location: /chat/room/{$room['id']}/" . rand(1000, 9999) . "/");
+			exit;
 		}
-		dbquery("INSERT INTO `chat_post` (`id_user`, `time`, `msg`, `room`, `privat`) values('$user[id]', '$time', '" . my_esc($msg) . "', '$room[id]', '$priv')");
-		$_SESSION['message'] = '留言已成功添加';
-		header("Location: /chat/room/{$room['id']}/" . rand(1000, 9999) . "/");
-		exit;
 	}
 }
 
