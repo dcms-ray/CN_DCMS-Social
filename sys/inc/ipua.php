@@ -184,8 +184,8 @@ class ClientDetails
 		if (isset($_SERVER['HTTP_USER_AGENT'])) {
 			$ua = $_SERVER['HTTP_USER_AGENT'];
 			$result = UAParser\Parser::create()->parse($ua);
-			if (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) && stripos($ua, 'Opera') !== false) {
-				$ua_om = preg_replace('#[^a-z_\. 0-9\-]#iu', null, strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']));
+			if (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) && stripos($ua, 'Opera') !== false && false) {
+				$ua_om = preg_replace('#[^a-z_\. 0-9\-]#iu', '', strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']));
 				$ua = $result->toString() . '(' . $ua_om . ')';
 			} else {
 				$ua = $result->toString();
