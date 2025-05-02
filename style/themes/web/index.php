@@ -17,7 +17,7 @@ $q = dbquery("SELECT ul.id, ul.id_user, ul.last_online, ul.url
 			  LIMIT 10;");
 if ($k_post > 0) {
 	echo "<a href='/user/online.php'><div class='main'>";
-	echo "现在在网站上 ($k_post) 人.</div></a>";
+	echo "当前网站在线 ($k_post) 人.</div></a>";
 
 	echo "<div class='nav3'>";
 	echo '<table>';
