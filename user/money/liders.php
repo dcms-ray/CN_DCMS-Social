@@ -18,25 +18,27 @@ err();
 aut();
 
 if (isset($user)):
-if (isset($_POST['stav']) && isset($_POST['msg']) && is_int($_POST['stav'])) {
-	$st = $_POST['stav'];
-	$tm = $time + 60 * 60 * 24 * $_POST['stav'];
-	$msg = my_esc($_POST['msg']);
-	if ($user['money'] >= $st) {
-		if (dbresult(dbquery("SELECT COUNT(*) FROM `liders` WHERE `id_user` = '$user[id]'"), 0) == 0) {
-			dbquery("INSERT INTO `liders` (`id_user`, `stav`, `msg`, `time`, `time_p`) values('$user[id]', '$st', '$msg', '$tm', '$time')");
+if (isset($_POST['stav']) && is_numeric($_POST['stav'])) {
+		if (isset($_POST['msg'])) {
+		$st = $_POST['stav'];
+		$tm = $time + 60 * 60 * 24 * $_POST['stav'];
+		$msg = my_esc($_POST['msg']);
+		if ($user['money'] >= $st) {
+			if (dbresult(dbquery("SELECT COUNT(*) FROM `liders` WHERE `id_user` = '$user[id]'"), 0) == 0) {
+				dbquery("INSERT INTO `liders` (`id_user`, `stav`, `msg`, `time`, `time_p`) values('$user[id]', '$st', '$msg', '$tm', '$time')");
+			} else {
+				dbquery("UPDATE `liders` SET `time` = '$tm', `time_p` = '$time', `msg` = '$msg', `stav` = '$st' WHERE `id_user` = '$user[id]'");
+			}
+			dbquery("UPDATE `user` SET `money` = '" . ($user['money'] - $st) . "' WHERE `id` = '$user[id]' LIMIT 1");
+			$_SESSION['message'] = '你已经成功地成为一个领导者';
+			header("Location: ./index.php?ok");
+			exit;
 		} else {
-			dbquery("UPDATE `liders` SET `time` = '$tm', `time_p` = '$time', `msg` = '$msg', `stav` = '$st' WHERE `id_user` = '$user[id]'");
+			$err = '你没有足够的资金';
 		}
-		dbquery("UPDATE `user` SET `money` = '" . ($user['money'] - $st) . "' WHERE `id` = '$user[id]' LIMIT 1");
-		$_SESSION['message'] = '你已经成功地成为一个领导者';
-		header("Location: ./index.php?ok");
-		exit;
 	} else {
-		$err = '你没有足够的资金';
+		$err = '信息字段不能为空';
 	}
-} else {
-	$err = '信息字段不能为空';
 }
 err();
 ?>
