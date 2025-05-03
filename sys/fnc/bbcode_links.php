@@ -46,10 +46,10 @@ function links_preg2($arr) {
 	global $set;
 	$url = $arr[2];
 
-	if (preg_match('#^https?://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $url)) {
+	if (true || preg_match('#^https?://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $url)) {
 		return $arr[1] . '<a href="' . $url . '">' . $url . '</a>' . $arr[3];
 	} else {
-		return $arr[1] . '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?go=' . base64_encode(html_entity_decode($url)) . '">' . $url . '</a>' . $arr[3];
+		return $arr[1] . '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?url=' . base64_encode(html_entity_decode($url)) . '">' . $url . '</a>' . $arr[3];
 	}
 }
 

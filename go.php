@@ -12,10 +12,11 @@ $set['title'] = '外部链接跳转';
 require_once 'sys/inc/thead.php';
 title();
 
-$decoded_url = base64_decode($_GET['go'] ?? '');
+$decoded_url = base64_decode($_GET['url'] ?? '');
+$goId = intval($_GET['go'] ?? false);
 
-if (!isset($_GET['go']) || (dbresult(dbquery("SELECT COUNT(*) FROM `rekl` WHERE `id` = '" . intval($_GET['go']) . "'"), 0) == 0 && !preg_match('#^(https?://|//)#', $decoded_url))) {
-	header("Location: index.php?" . session_id());
+if (empty($decoded_url) || empty($goId) || (dbresult(dbquery("SELECT COUNT(*) FROM `rekl` WHERE `id` = '{$goId}'"), 0) == 0 && !preg_match('#^(https?://|//)#', $decoded_url))) {
+	http_response_code(404);
 } elseif (preg_match('#^(https?://|//)#', $decoded_url)) {
 	if (isset($_SESSION['adm_auth'])) unset($_SESSION['adm_auth']);
 	// 如果是“//”开头，补全当前页面的协议
