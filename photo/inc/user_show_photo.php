@@ -258,10 +258,10 @@ if (!isset($block_photo)) {
 	if ((isset($user) && ($user['abuld'] == 1 || $photo['id_user'] == $user['id'])) || $photo['metka'] == 0) {	// 标记为18+
 		echo '<div class="nav2">';
 		if ($webbrowser == 'web' && $w > 128) {
-			echo "<a href='/photo/photo0/{$photo['id']}.{$photo['ras']}' title='下载图片'><img style='max-width:90%' src='/photo/photo640/{$photo['id']}.jpg'/></a>";
+			echo "<a href='/photo/photo0/{$photo['id']}.{$photo['ras']}' title='查看图片'><img style='max-width:90%' src='/photo/photo640/{$photo['id']}.jpg'/></a>";
 			if ($rat > 0) echo "<div style='display:inline;margin-left:-45px;vertical-align:top;'><img style='padding-top:15px;' src='/style/icons/5_plus.png'/></div>";
 		} else {
-			echo "<a href='/photo/photo0/{$photo['id']}.{$photo['ras']}' title='下载图片'><img src='/photo/photo128/{$photo['id']}.jpg'/></a>";
+			echo "<a href='/photo/photo0/{$photo['id']}.{$photo['ras']}' title='查看图片'><img src='/photo/photo128/{$photo['id']}.jpg'/></a>";
 			if ($rat > 0) echo "<div style='display:inline;margin-left:-25px;vertical-align:top;'><img style='padding-top:10px;' src='/style/icons/6.png'/></div>";
 		}
 		echo '</div>';

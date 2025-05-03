@@ -80,6 +80,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	if (isset($user) && $authManager->logout($user['login_id'])) {
 		$response['status'] = 'success';
 	} else {
+		http_response_code(403);
 		$response['status'] = 'error';
 	}
 
@@ -187,6 +188,17 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	} catch (Exception $e) {
 		$response['status'] = 'error';
 		$response['message'] = $e->getMessage();
+
+		// 设置 HTTP Code
+		if ($response['message'] == 'registration is closed') {
+			http_response_code(405);
+		} elseif ($response['message'] == 'nick already registered' || $response['message'] == 'email already registered') {
+			http_response_code(403);
+		} elseif (isset($emailResult['status']) && $emailResult['status'] == 'error') {
+			http_response_code(500);
+		} else {
+			http_response_code(400);
+		}
 	}
 
 
@@ -240,6 +252,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 	} else {
 		$response['status'] = 'error';
 		$response['message'] = 'missing parameters';
+		http_response_code(400);
 	}
 
 
@@ -279,14 +292,17 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 					$response['message'] = "password reset email sent";
 				} else {
 					// 如果邮件发送失败
+					http_response_code(500);
 					$response['status'] = 'error';
 					$response['message'] = $emailResult['message'];
 				}
 			} else {
+				http_response_code(400);
 				$response['status'] = 'error';
 				$response['message'] = 'invalid email address';
 			}
 		} else {
+			http_response_code(400);
 			$response['status'] = 'error';
 			$response['message'] = 'nick not found';
 		}
@@ -325,6 +341,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 			]
 		];
 	} else {
+		http_response_code(404);
 		$response['status'] = 'error';
 	}
 } elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-list') {
