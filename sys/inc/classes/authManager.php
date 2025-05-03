@@ -22,12 +22,14 @@ class AuthManager
 	private array $set;
 	private Database $db;
 	private array $clientDetails;
+	private bool $webbrowser;
 	private const JWT_ALGORITHM = 'HS256';
 
-	public function __construct(array $set, Database $db, array $clientDetails) {
+	public function __construct(array $set, Database $db, array $clientDetails, bool $webbrowser) {
 		$this->set = $set;
 		$this->db = $db;
 		$this->clientDetails = $clientDetails;
+		$this->webbrowser = $webbrowser;
 	}
 
 	/**
@@ -56,10 +58,11 @@ class AuthManager
 
 	/**
 	 * 处理用户登录后的后续操作
-	 * @param array $user
+	 * @param int $user_id
+	 * @param int $login_id
 	 * @return array
 	 */
-	public function processAuthenticatedUser(array $user): array {
+	public function processAuthenticatedUser(int $user_id, int $login_id): array {
 		// 获取最后在线时间
 		$lastOnline = $this->db->query("SELECT ul.last_online
 		                                 FROM `user_log` ul
@@ -67,35 +70,29 @@ class AuthManager
 		                                     AND ul.ban = 0
 		                                 ORDER BY ul.last_online DESC
 		                                 LIMIT 1",
-									    [':user_id' => $user['id']]
+									    [':user_id' => $user_id]
 		);
 
 		// 计算活跃时间
 		$timeActive = time() - strtotime($lastOnline['last_online']);
-		if ($timeActive < 120) {
+		if ($timeActive < 300) {
 			$this->db->update('UPDATE user SET time = time + :time_active WHERE id = :user_id LIMIT 1', [
 				':time_active' => $timeActive,
-				':user_id' => $user['id']
+				':user_id' => $user_id
 			]);
 		}
 
 		// 更新用户日志
-		$this->db->update('UPDATE user_log SET last_online = :last_online, url = :url, ip = :ip WHERE id = :login_id LIMIT 1', [
+		$this->db->update('UPDATE user_log SET last_online = :last_online, url = :url, ip = :ip, ua = :ua, browser = :browser WHERE id = :login_id LIMIT 1', [
 			':last_online' => date('Y-m-d H:i:s'),
 			':url' => $_SERVER['SCRIPT_NAME'],
 			':ip' => $this->clientDetails['ip'],
-			':login_id' => $user['login_id']
+			':ua' => $this->clientDetails['ua'],
+			':browser' => $this->webbrowser == true ? "web" : "wap",
+			':login_id' => $login_id
 		]);
 
-		// 更新用户代理信息
-		if (!empty($this->clientDetails['ua'])) {
-			$this->db->update('UPDATE user_log SET ua = :ua WHERE id = :login_id LIMIT 1', [
-				':ua' => $this->clientDetails['ua'],
-				':login_id' => $user['login_id']
-			]);
-		}
-
-		return ['status' => true, 'data' => $user];
+		return ['status' => true];
 	}
 
 	public function login($nick, $password, $expiration = 3600): array {
@@ -239,15 +236,6 @@ class AuthManager
 		if ($userLog['ban'] != 0) {
 			return ['status' => false, 'message' => 'Login log is banned'];
 		}
-
-		// 更新最后在线时间
-		$this->db->update(
-			'UPDATE user_log SET last_online = :last_online WHERE id = :id LIMIT 1',
-			[
-				':last_online' => date('Y-m-d H:i:s'),
-				':id' => $logId
-			]
-		);
 
 		$userData['login_id'] = $logId;
 		return [
