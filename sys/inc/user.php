@@ -14,7 +14,7 @@ dbquery("INSERT INTO `visit_today` (`ip`, `ua`, `ua_hash`, `time`) VALUES ('$ip'
 // 生成一个默认的随机字符串
 $passgen = passgen();
 
-$authManager = new AuthManager($set, $db, $clientDetails);
+$authManager = new AuthManager($set, $db, $clientDetails, $webbrowser);
 
 // 检查登录状态
 $authManagerCheckStatusResult = $authManager->checkStatus();
@@ -42,7 +42,7 @@ if (!empty($user)) {
 		$user['level'] = 0;
 	}
 
-	$processedResult = $authManager->processAuthenticatedUser($user);
+	$processedResult = $authManager->processAuthenticatedUser($user['id'], $user['login_id']);
 
 	if (isset($user['type_input']) && isset($_SERVER['HTTP_REFERER']) && !preg_match('#' . preg_quote($_SERVER['HTTP_HOST']) . '#', $_SERVER['HTTP_REFERER']) && preg_match('#^https?://#i', $_SERVER['HTTP_REFERER']) && $ref = @parse_url($_SERVER['HTTP_REFERER'])) {
 		if (isset($ref['host'])) {
@@ -101,20 +101,8 @@ if (!empty($user)) {
 		else dbquery("UPDATE `user` SET `set_them` = '$set[set_them]' WHERE `id` = '$user[id]' LIMIT 1");
 	}
 
-	// 记录用户的 ip
-	dbquery("UPDATE `user_log` SET `ip` = '{$ip}' WHERE `id` = '{$user['login_id']}' LIMIT 1");
-
-	// 记录用户的 ua
-	if ($ua) dbquery("UPDATE `user_log` SET `ua` = '" . my_esc($ua) . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
-
 	// 难以理解的会话
 	dbquery("UPDATE `user_log` SET `sess` = '{$sess}' WHERE `id` = '{$user['login_id']}' LIMIT 1");
-
-	// 浏览器类型
-	dbquery("UPDATE `user_log` SET `browser` = '" . ($webbrowser == true ? "web" : "wap") . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
-
-	// 更新最后在线时间
-	dbquery("UPDATE `user_log` SET `last_online` = '" . date('Y-m-d H:i:s') . "' WHERE `id` = '{$user['login_id']}' LIMIT 1");
 
 	// 检查相似的昵称
 	// 一定时间范围内检查是否有多个用户在相同的IP、相同的用户代理和相似的登录时间（10分钟内）之间产生了碰撞，如果有碰撞，则将这两个用户的信息记录在 user_collision 表中
