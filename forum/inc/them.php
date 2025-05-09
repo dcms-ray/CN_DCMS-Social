@@ -502,11 +502,11 @@ if ($vote_c != 0) {
 		if ($sum == 0) $poll = 0;
 		elseif ($var == 0) $poll = 0;
 		else $poll = ($var / $sum) * 100;
-		$us = dbresult(dbquery("SELECT COUNT(*) FROM `votes_user` WHERE `them` = '" . abs(intval($them['id'])) . "'  AND `id_user`='$user[id]' LIMIT 1"), 0);
-		if ($us == '0' && isset($user)) {
+		if (isset($user)) $us = dbresult(dbquery("SELECT COUNT(*) FROM `votes_user` WHERE `them` = '" . abs(intval($them['id'])) . "'  AND `id_user`='$user[id]' LIMIT 1"), 0);
+		if (isset($us) && isset($user) && $us == '0') {
 			echo '<input type="radio" value="' . $row['num'] . '" name="vote" />&nbsp;' . output_text($row['var']) . '</a> - <a href="?vote_user=' . $row['num'] . '">' . $var . ' 人</a></br>';
 		} else {
-			echo output_text($row['var']) . '<a href="?vote_user=' . $row['num'] . '">' . $var . '</a></br><img src="/forum/img.php?img=' . $poll . '" alt="*" /></br>';
+			echo output_text($row['var']) . ' - <a href="?vote_user=' . $row['num'] . '">' . $var . ' 人</a></br><img src="/forum/img.php?img=' . $poll . '" alt="*" /></br>';
 		}
 	}
 	if (isset($user) && $us == 0 && $them['vote_close'] != '1' && $them['close'] == 0) {

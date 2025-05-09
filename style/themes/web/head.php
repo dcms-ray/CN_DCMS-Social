@@ -11,25 +11,31 @@ header("Content-type: text/html");
 		<link rel="stylesheet" href="/style/themes/<? echo $set['set_them']; ?>/tables.css" type="text/css" />
 
 		<!-- Модальное окно -->
-		<link rel="stylesheet" href="/ajax/style/style.css" type="text/css"/>
-		<script type="text/javascript" src="/ajax/jquery.js"></script>
-		<script type="text/javascript" src="/ajax/facebox.js"></script>
+		<link rel="stylesheet" href="/assets/css/style.css" type="text/css"/>
+
+		<!-- 多余的jQuery
+		<script type="text/javascript" src="<?php echo get_http_type(); ?>://code.jquery.com/jquery-1.2.1.js"></script>
+		-->
+
+		<script src="/assets/js/jquery/jquery-1.8.3.js"></script>
+		<script type="text/javascript" src="/assets/js/facebox.js"></script>
 		<script type="text/javascript">
 			jQuery(document).ready(function($) {
 				$('a[rel*=facebox]').facebox({
-					loading_image: '/ajax/style/icons/loading.gif',
-					close_image: '/ajax/style/icons/closelabel.gif'
+					loading_image: '/assets/img/loading.gif',
+					close_image: '/assets/img/closelabel.gif'
 				})
 			})
 		</script>
 
-		<script type="text/javascript" src="/ajax/ajax.js"></script><script type="text/javascript" src="/ajax/form-submit.js"></script>
+		<script type="text/javascript" src="/assets/js/ajax.js"></script>
+		<script type="text/javascript" src="/assets/js/form-submit.js"></script>
 		<link rel="alternate" title="新闻 RSS" href="/news/rss.php" type="application/rss+xml" />
 		<script src="/style/themes/<? echo $set['set_them']; ?>/js.js" type="text/javascript" language="JavaScript" charset="utf-8"></script>
+
 		<!-- 对话框 -->
-		<script src="https://code.jquery.com/jquery-1.8.3.js"></script>
-		<script src="/ajax/dialog.js"></script>
-		<link type="text/css" href="/ajax/style/dialog.css" rel="stylesheet" />
+		<script src="/assets/js/dialog.js"></script>
+		<link type="text/css" href="/assets/css/dialog.css" rel="stylesheet" />
 		<script>
 			function showContent2(link) {
 
