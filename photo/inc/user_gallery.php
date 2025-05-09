@@ -54,7 +54,7 @@ echo '<table class="post">';
 // 如果用户没有相册，则显示提示信息
 if ($k_post == 0) {
 	echo '<div class="mess">';
-	echo '目前该用户没有相册。';
+	echo '目前该用户没有相册';
 	echo '</div>';
 }
 // 查询相册信息并按时间降序排列

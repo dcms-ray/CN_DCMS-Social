@@ -134,7 +134,6 @@ if ($set['daily_news'] == '1') {
 		}
 	</style>
 	<div class="container">
-		<?php if (isset($data['data']['cover']) && filter_var($data['data']['cover'], FILTER_VALIDATE_URL)): ?><?php endif; ?>
 		<?php if (isset($data['data']['news'])): ?><h2>今日新闻</h2><?php endif; ?>
 		<?php if (isset($data['data']['updated_at'])): ?><p>更新时间：<?= htmlspecialchars(date("Y-m-d H:i:s", $data['data']['updated_at'] / 1000)) ?><?php endif; ?>
 		<?php if (isset($data['data']['news'])): foreach ($data['data']['news'] as $news): ?>
