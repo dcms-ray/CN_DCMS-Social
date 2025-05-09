@@ -17,6 +17,7 @@ header("Content-type: text/html");
 		<script type="text/javascript" src="<?php echo get_http_type(); ?>://code.jquery.com/jquery-1.2.1.js"></script>
 		-->
 
+		<script src="/assets/js/jquery/jquery-1.8.3.js"></script>
 		<script type="text/javascript" src="/assets/js/facebox.js"></script>
 		<script type="text/javascript">
 			jQuery(document).ready(function($) {
@@ -31,8 +32,6 @@ header("Content-type: text/html");
 		<script type="text/javascript" src="/assets/js/form-submit.js"></script>
 		<link rel="alternate" title="新闻 RSS" href="/news/rss.php" type="application/rss+xml" />
 		<script src="/style/themes/<? echo $set['set_them']; ?>/js.js" type="text/javascript" language="JavaScript" charset="utf-8"></script>
-
-		<script src="/assets/js/jquery-1.8.3.js"></script>
 
 		<!-- 对话框 -->
 		<script src="/assets/js/dialog.js"></script>
