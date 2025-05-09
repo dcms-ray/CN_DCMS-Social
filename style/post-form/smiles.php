@@ -30,6 +30,6 @@ echo '</div>';
 $q = dbquery("SELECT * FROM `smile_dir` ORDER BY id ASC");
 echo '<div class="title">分类</div>';
 while ($dir = dbassoc($q)) {
-	echo '<a onclick="showContent2(\'/ajax/php/smiles.php?dir='.$dir['id'].'\')" class="onclick">' . text($dir['name']) . '</a> ';
+	echo '<a onclick="showContent2(\'/style/post-form/smiles.php?dir='.$dir['id'].'\')" class="onclick">' . text($dir['name']) . '</a> ';
 	echo '('.dbresult(dbquery("SELECT COUNT(*) FROM `smile` WHERE `dir` = '$dir[id]'"),0).') ';
 }

@@ -525,8 +525,8 @@ if ($ank['group_access'] > 1) {
 			echo ' <a onclick="anketa.submit()" name="myForm"><div class="form_info">显示详细信息</div></a>';
 			echo '</div></form>';
 			echo "<script type='text/javascript'>	
-			      var anketa = new DHTMLSuite.form({ formRef:'myForm',action:'/ajax/php/anketa.php?id=$ank[id]',responseEl:'formResponse'});	
-			      var anketaClose = new DHTMLSuite.form({ formRef:'myForm',action:'/ajax/php/anketa.php',responseEl:'formResponse'});
+			      var anketa = new DHTMLSuite.form({ formRef:'myForm',action:'/style/post-form/anketa.php?id=$ank[id]',responseEl:'formResponse'});	
+			      var anketaClose = new DHTMLSuite.form({ formRef:'myForm',action:'/style/post-form/anketa.php',responseEl:'formResponse'});
 			      </script>";
 			/*
 			========================================

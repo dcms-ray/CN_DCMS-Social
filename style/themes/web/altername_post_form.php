@@ -54,7 +54,7 @@ if (!isset($msg2)) $msg2 = NULL;
 	$("#dialog").dialog({autoOpen: false, show: "blind", hide: "explode"});
 	$("#opener").click(function() {
 		$("#dialog").dialog("open");
-		showContent2('/ajax/php/smiles.php');
+		showContent2('/style/post-form/smiles.php');
 		return false;
 	});
 </script>
