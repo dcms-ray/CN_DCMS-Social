@@ -14,13 +14,17 @@ function retranslit($in) {
 	return str_replace($trans1,$trans2,$in);
 }
 
-// -------------------------
-// Функция text($str)
-// -------------------------
-// 功能：对字符串进行过滤和安全处理。
-// - 使用 htmlspecialchars() 转义 HTML 特殊字符，防止 XSS 攻击。
-// - 使用 stripcslashes() 去除字符串中的反斜杠。
-// - 用途：对用户输入的数据进行安全过滤。
+/** -------------------------
+ * Функция text($str)
+ * -------------------------
+ * 
+ * 意义不明的函数嵌套
+ * 
+ * 功能：对字符串进行过滤和安全处理。
+ * - 使用 htmlspecialchars() 转义 HTML 特殊字符，防止 XSS 攻击。
+ * - 使用 stripcslashes() 去除字符串中的反斜杠。
+ * - 用途：对用户输入的数据进行安全过滤。
+ */
 function text($str) {
 	if ($str === NULL) return ''; // 将 NULL 转为空字符串
 	return stripcslashes(htmlspecialchars($str));

@@ -2,7 +2,7 @@
 
 function bbcodehightlight($arr) {
 	$arr[0] = html_entity_decode($arr[0], ENT_QUOTES, 'UTF-8');
-	return '<div class="cit" style="overflow:scroll;clip:auto;max-width:480px;">'.preg_replace('#<code>(.*?)</code>#si', '\\1' ,highlight_string($arr[0],1)).'</div>'."\n";
+	return '<div class="cit" style="overflow:scroll;clip:auto;max-width:480px;">' . preg_replace('#<code>(.*?)</code>#si', '\\1', highlight_string($arr[0], 1)) . '</div>' . "\n";
 }
 
 function bbcodeplayvideo($data){
@@ -31,12 +31,12 @@ function img_preg($arr) {
 	global $set;
 	if (preg_match('#^http://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $arr[1]) || !preg_match('#://#', $arr[1]) || $set['bb_external_img'] == '1') {
 		if (true) {	// 意义不明而且毫无作用的判断
-			return '<img decoding=async style="max-width:240px; max-height:320px;" src="' . text($arr[1]) . '" alt="img" />';
+			return '<img decoding=async style="max-width:240px; max-height:320px;" src="' . $arr[1] . '" alt="img" />';
 		} else {
 			return '<img style="max-width:240px;" src="/style/no_image.png" alt="No Image" />';
 		}
 	} else {
-		return '<a target="_blank" href="/go.php?go=' . base64_encode(html_entity_decode($arr[1])) . '">外部站点的图像</a>';
+		return '<a target="_blank" rel="nofollow" href="' . $arr[1] . '">外部站点的图像</a>';
 	}
 }
 
