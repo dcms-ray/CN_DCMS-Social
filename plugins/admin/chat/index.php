@@ -43,7 +43,7 @@ if (user_access('adm_panel_show')) {
 			if (isset($user) && $respons == TRUE) {
 				$notifiacation = dbassoc(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $ank_otv['id'] . "' LIMIT 1"));
 				if ($notifiacation['komm'] == 1 && $ank_otv['id'] != $user['id'])
-					dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `type`, `id_object` `time`) VALUES ('$user[id]', '$ank_otv[id]', 'adm_komm', '$msgId', '$time')");
+					dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `type`, `id_object`, `time`) VALUES ('$user[id]', '$ank_otv[id]', 'adm_komm', '$msgId', '$time')");
 			}
 			dbquery("UPDATE `user` SET `balls` = '" . ($user['balls'] + 1) . "' WHERE `id` = '$user[id]' LIMIT 1");
 			$_SESSION['message'] = '消息已成功添加';
