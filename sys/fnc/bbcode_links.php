@@ -28,7 +28,7 @@ function links_preg1($arr) {
 		return '<a href="' . $url . '">' . $arr[2] . '</a>';
 	} else {
 		// 如果是外部 http(s) 链接，通过 /go.php 跳转
-		return '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?go=' . base64_encode(html_entity_decode($url)) . '">' . $arr[2] . '</a>';
+		return '<a' . ($set['web'] ? ' target="_blank" rel="nofollow"' : '') . ' href="' . $url . '">' . $arr[2] . '</a>';
 	}
 }
 
@@ -46,10 +46,10 @@ function links_preg2($arr) {
 	global $set;
 	$url = $arr[2];
 
-	if (true || preg_match('#^https?://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $url)) {
+	if (preg_match('#^https?://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $url)) {
 		return $arr[1] . '<a href="' . $url . '">' . $url . '</a>' . $arr[3];
 	} else {
-		return $arr[1] . '<a' . ($set['web'] ? ' target="_blank"' : null) . ' href="/go.php?url=' . base64_encode(html_entity_decode($url)) . '">' . $url . '</a>' . $arr[3];
+		return $arr[1] . '<a' . ($set['web'] ? ' target="_blank" rel="nofollow"' : '') . ' href="' . $url . '">' . $url . '</a>' . $arr[3];
 	}
 }
 
