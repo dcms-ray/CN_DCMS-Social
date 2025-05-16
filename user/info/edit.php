@@ -194,7 +194,7 @@ if (isset($_GET['set'])) {
 		echo '<select name="ank_g_r">';
 		if (!empty($user['ank_g_r']))  echo '<option  value=""></option>';
 		echo '<option selected="'.$user['ank_g_r'].'" value="'.$user['ank_g_r'].'" >'.$user['ank_g_r'].'</option>';
-		for( $i = date("Y")-16; $i >= 1940; $i--) {
+		for($i = date("Y"); $i >= 1940; $i--) {
 			echo '<option  value="' . $i . '">' . $i . '</option>';
 		}
 		echo '</select><br/>';
