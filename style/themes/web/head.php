@@ -6,9 +6,10 @@ header("Content-type: text/html");
 <html lang="zh-cn">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title><? echo htmlspecialchars($set['title']); ?></title>
-		<link rel="shortcut icon" href="/favicon.ico" /><link rel="stylesheet" href="/style/themes/<? echo $set['set_them']; ?>/style.css" type="text/css" />
-		<link rel="stylesheet" href="/style/themes/<? echo $set['set_them']; ?>/tables.css" type="text/css" />
+		<title><?php echo htmlspecialchars($set['title']); ?></title>
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="stylesheet" href="/style/themes/<?php echo $set['set_them']; ?>/style.css" type="text/css" />
+		<link rel="stylesheet" href="/style/themes/<?php echo $set['set_them']; ?>/tables.css" type="text/css" />
 
 		<!-- Модальное окно -->
 		<link rel="stylesheet" href="/assets/css/style.css" type="text/css"/>
@@ -31,7 +32,7 @@ header("Content-type: text/html");
 		<script type="text/javascript" src="/assets/js/ajax.js"></script>
 		<script type="text/javascript" src="/assets/js/form-submit.js"></script>
 		<link rel="alternate" title="新闻 RSS" href="/news/rss.php" type="application/rss+xml" />
-		<script src="/style/themes/<? echo $set['set_them']; ?>/js.js" type="text/javascript" language="JavaScript" charset="utf-8"></script>
+		<script src="/style/themes/<?php echo $set['set_them']; ?>/js.js" type="text/javascript" language="JavaScript" charset="utf-8"></script>
 
 		<!-- 对话框 -->
 		<script src="/assets/js/dialog.js"></script>
@@ -83,7 +84,7 @@ header("Content-type: text/html");
 			<table class="nav">
 				<tr>
 					<td class="logo">
-						<a href="/index.php" title="到主页"><img src="/style/themes/<? echo $set['set_them']; ?>/logo.png" alt="Logotype" /></a>
+						<a href="/index.php" title="到主页"><img src="/style/themes/<?php echo $set['set_them']; ?>/logo.png" alt="Logotype" /></a>
 					</td>
 					<td class="head_menu">
 						<?php include H . 'style/themes/' . $set['set_them'] . '/navigation.php'; ?>

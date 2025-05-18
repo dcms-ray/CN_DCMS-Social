@@ -55,4 +55,3 @@ if ($_SERVER['PHP_SELF'] != '/index.php') {
 </script>
 </body>
 </html>
-<? exit; ?>

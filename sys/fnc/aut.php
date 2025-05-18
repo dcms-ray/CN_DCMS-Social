@@ -44,7 +44,7 @@ function title() {
 								<font color="#ff0000">(<?=$k_new?>)</font>
 							</center>
 						</a>
-					<? else: ?>
+					<?php else: ?>
 						<a href="/user/conts.php">
 							<center>
 								<img src="/style/icons/nav_pochta.gif" alt="S" />
@@ -83,14 +83,14 @@ function title() {
 
 				<!--------- 刷新 ---------->
 				<td class='auts'>
-					<a href="<?=text($_SERVER['REQUEST_URI'])?>">
+					<a href="<?php echo text($_SERVER['REQUEST_URI']); ?>">
 						<center>
 							<img src="/style/icons/nav_obnovit.gif" alt="DS" />
 						</center>
 					</a>
 				</td>
 			</tr></table>
-			<?
+			<?php
 		}
 	}
 }

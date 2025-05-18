@@ -2,7 +2,7 @@
 </table>
 </td></tr>
 </table></div></div>
-<? rekl(3); ?>
+<?php rekl(3); ?>
 <table>
 	<div id="footer" class="gradient_grey">
 		<div class="body_width_limit">

@@ -39,10 +39,10 @@ if (!isset($user)) {
 }
 
 // 难以理解的会话
-dbquery("UPDATE `user_log` SET `sess` = '{$sess}' WHERE `id` = '{$log_id}' LIMIT 1");
+dbquery("UPDATE `user_log` SET `sess` = '{$sess}' WHERE `id` = '{$authManagerLoginResult['data']['user_id']}' LIMIT 1");
 
 // 浏览器类型
-dbquery("UPDATE `user_log` SET `browser` = '" . ($webbrowser == true ? "web" : "wap") . "' WHERE `id` = '{$log_id}' LIMIT 1");
+dbquery("UPDATE `user_log` SET `browser` = '" . ($webbrowser == true ? "web" : "wap") . "' WHERE `id` = '{$authManagerLoginResult['data']['user_id']}' LIMIT 1");
 
 // 检查相似的昵称
 // 一定时间范围内检查是否有多个用户在相同的IP、相同的用户代理和相似的登录时间（10分钟内）之间产生了碰撞，如果有碰撞，则将这两个用户的信息记录在 user_collision 表中
