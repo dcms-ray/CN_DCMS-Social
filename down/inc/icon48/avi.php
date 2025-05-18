@@ -1,4 +1,5 @@
-<? if (test_file(H . "files/down/screens/48/$post[id].gif")) {
+<?php
+if (test_file(H . "files/down/screens/48/$post[id].gif")) {
     echo "<img src='/files/down/screens/48/$post[id].gif' alt='scr...' /><br />";
 } elseif (class_exists('ffmpeg_movie')) {
     $media = new ffmpeg_movie($file);

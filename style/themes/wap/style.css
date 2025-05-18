@@ -465,7 +465,8 @@ select {
 
 .mess {
 	padding: 7px;
-	background: #fff url(img/mess.png) repeat-x left center;
+	/* background: #fff url(img/mess.png) repeat-x left center; */
+	background: #fff repeat-x left center;
 	margin: 2px;
 	border: 1px solid #ffd339;
 }

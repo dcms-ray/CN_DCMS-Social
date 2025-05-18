@@ -24,4 +24,4 @@ echo '<?xml version="1.0" encoding="utf-8"?>';
 			<img src="/style/themes/<?php echo $set['set_them']; ?>/logo.png" alt="logo" /><br />
 			<?php echo $set['title']; ?>
 		</div>
-	<? endif;
+	<?php endif;

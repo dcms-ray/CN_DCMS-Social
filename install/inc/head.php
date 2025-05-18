@@ -6,7 +6,7 @@ header("Content-type: application/xhtml+xml;charset=UTF-8");
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru">
 <head>
 	<title><?echo $set['title'];?></title>
-	<link rel="stylesheet" href="/style/themes/<? echo $set['set_them']; ?>/style.css" type="text/css" />
+	<link rel="stylesheet" href="/style/themes/<?php echo $set['set_them']; ?>/style.css" type="text/css" />
 </head>
 <body>
 	<div class="body">

@@ -34,7 +34,7 @@ for ($i = 0; $i < count($f); $i++) {
 }
 ?>
 <form method="POST">
-	<textarea rows="20" cols="50" name="robots"><? echo $text; ?></textarea><br>
+	<textarea rows="20" cols="50" name="robots"><?php echo $text; ?></textarea><br>
 	<input type=submit name="save" value="保存">
 </form>
 <?php

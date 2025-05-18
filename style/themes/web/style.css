@@ -584,7 +584,8 @@ b.count {
 	/* Div 消息 */
 	
 	padding: 7px;
-	background: #EBF3FE url(img/mess.png) repeat-x left center;
+	/* background: #EBF3FE url(img/mess.png) repeat-x left center; */
+	background: #EBF3FE repeat-x left center;
 	margin-top: 2px;
 	margin-bottom: 2px;
 	margin-left: 2px;
@@ -717,7 +718,8 @@ b.count {
 }
 @media (prefers-color-scheme: dark) {
 	.mess {
-		background: #010C14 url(img/mess_dark.png) repeat-x left center;
+		/* background: #010C14 url(img/mess_dark.png) repeat-x left center; */
+		background: #010C14 repeat-x left center;
 		border: 1px solid #252525;
 	}
 	.main_menu {
