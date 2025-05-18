@@ -340,7 +340,7 @@ if (!isset($block_photo)) {
 	echo '</div>';
 	if ($k_post == 0) {
 		echo '<div class="mess">';
-		echo '目前没有评论。';
+		echo '目前没有评论';
 		echo '</div>';
 	} else {
 		/*------------按时间排序--------------*/
