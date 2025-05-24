@@ -1083,7 +1083,9 @@ textarea {
 		text-shadow: 0px -1px 0px #2B3E5A; /* 文本阴影颜色加深 */
 	}
 	.tmenu a:hover {
-		background: #506080 url(img/in_dark.png); /* 悬停时的背景颜色调整为更深的蓝色，并使用暗色图片 */
+		/* 悬停时的背景颜色调整为更深的蓝色，并使用暗色图片 */
+		/* background: #506080 url(img/in_dark.png); */
+		background-color: #506080;
 	}
 }
 
