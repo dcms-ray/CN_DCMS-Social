@@ -146,7 +146,8 @@ div.pager {
 }
 
 .page a {
-	background: #5c74a9 url(img/in.png);
+	/* background: #5c74a9 url(img/in.png); */
+	background-color: #5c74a9;
 	border: 1px solid #29447e;
 	margin-top: 1px;
 	padding: 4px 6px 4px 6px;
@@ -403,7 +404,8 @@ form label:hover {
 
 input[type="submit"] {
 	color: #ffffff;
-	background: #5c74a9 url(img/in.png);
+	/* background: #5c74a9 url(img/in.png); */
+	background-color: #5c74a9;
 	border: 1px solid #29447e;
 	margin-top: 1px;
 	padding: 4px 6px 4px 6px;
@@ -526,8 +528,9 @@ select {
 }
 
 .tmenu a:hover {
-	/* блок панели у textarea */
-	background: #5c74a9 url(img/in.png);
+	/* textArea 处的 panel 块 */
+	/* background: #5c74a9 url(img/in.png); */
+	background-color: #5c74a9;
 }
 
 .webmenu {

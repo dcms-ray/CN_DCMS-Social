@@ -16,13 +16,11 @@
 		document.forms['message'].elements['msg'].focus();
 	}
 </script>
-<?
 
-echo "<table width='100%'>";
-echo "<tr>";
-if (!isset($msg2)) $msg2 = NULL;
+<?php if (!isset($msg2)) $msg2 = NULL; ?>
 
-?>
+<table width='100%'><tr>
+
 <div id='comments' class='tpanel'>
 	<div class='tmenu'>
 		<a href='#' id='opener'>表情符号</a>
@@ -47,7 +45,7 @@ if (!isset($msg2)) $msg2 = NULL;
 	<a href="javascript:tag('[yellow]', '[/yellow]')"><img src="/style/value/ye.png" alt="yellow" title="黄色"/></a>
 </div>
 
-<textarea name="msg" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);"><?= $otvet . $msg2 ?></textarea>
+<textarea name="msg" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);"><?php echo $otvet . $msg2; ?></textarea>
 <br />
 <script>
 	$.fx.speeds._default = 1000;

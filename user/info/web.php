@@ -26,13 +26,13 @@ if (isset($user) && isset($_GET['frends'])  && $frend_new == 0 && $frend == 0) {
 }
 /*---------------------------------------------------------*/
 // 在网站上的位置
-if ($ank['group_access'] > 1) {
-	echo "<div class='err'>$ank[group_name]</div>";
-} ?>
+if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
+
+?>
 <table class='table_info' cellspacing="0" cellpadding="0">
 	<tr>
 		<td class='block_menu'>
-			<?
+			<?php
 			// 化身
 			echo "<div class='mains'>";
 			echo user::avatar($ank['id']);
