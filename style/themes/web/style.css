@@ -817,7 +817,8 @@ td.oline_user {
 
 /* P */
 .page a {
-	background: #5c74a9 url(img/in.png);
+	/* background: #5c74a9 url(img/in.png); */
+	background-color: #5c74a9;
 	border: 1px solid #29447e;
 	margin-top: 2px;
 	padding: 8px 12px 8px 12px;
@@ -828,10 +829,11 @@ td.oline_user {
 .page a:hover {
 	border: 1px solid #3b5998;
 	color: #ffffff;
-	background: #5c74a3 url(img/in.png);
+	/* background: #5c74a3 url(img/in.png); */
+	background-color: #5c74a3;
 }
 .page_gen {
-	/* генерация страницы */
+	/* 页面生成 */
 	
 	color: #999999;
 	text-align: right;
@@ -954,9 +956,10 @@ img.sto500 {
 	text-shadow: 0px -1px 0px #456489;
 }
 .tmenu a:hover {
-	/* блок панели у textarea */
+	/* textArea 处的 panel 块 */
 	
-	background: #5c74a9 url(img/in.png);
+	/* background: #5c74a9 url(img/in.png); */
+	background-color: #5c74a9;
 }
 .top_nav {
 	display: inline-block;
