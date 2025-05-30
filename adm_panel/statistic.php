@@ -17,9 +17,10 @@ title();
 err();
 aut();
 
-for ($i=0; $i<24; $i++) {
-	$hit = dbresult(dbquery("SELECT COUNT(*) FROM `visit_today` WHERE `time` >= '" . mktime($i, 0, 0) . "' AND `time` < '" . mktime($i + 1, 0, 0) . "'"), 0);
-	$host2 = dbresult(dbquery("SELECT COUNT(DISTINCT `ip`) FROM `visit_today` WHERE `time` >= '" . mktime($i,0,0) . "' AND `time` < '" . mktime($i + 1, 0, 0) . "'"), 0);
+$hit = $db->queryColumn('SELECT SUM(hit_count) AS total_clicks FROM visit_today;');
+$host2 = $db->queryColumn('SELECT COUNT(DISTINCT ip_ua_hash) AS visitor_count FROM visit_today;');
+
+for ($i = 0; $i < 24; $i++) {
 	$user_reg = dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `date_reg` >= '" . mktime($i, 0, 0) . "' AND `date_reg` < '" . mktime($i + 1, 0, 0) . "'"), 0);
 	$forum_them = dbresult(dbquery("SELECT COUNT(*) FROM `forum_t` WHERE `time_create` >= '" . mktime($i, 0, 0) . "' AND `time_create` < '" . mktime($i + 1, 0, 0) . "'"), 0);
 	$forum_post = dbresult(dbquery("SELECT COUNT(*) FROM `forum_p` WHERE `time` >= '" . mktime($i, 0, 0) . "' AND `time` < '" . mktime($i + 1, 0, 0) . "'"), 0);
@@ -27,11 +28,10 @@ for ($i=0; $i<24; $i++) {
 }
 
 echo "当前日期:<br />";
+echo "点击量：{$hit}；访客数量{$host2}";
 echo "<table border='1'>";
 echo "<tr>";
 echo "<td><b>时间</b></td>";
-echo "<td><b>点击数</b></td>";
-echo "<td><b>主机</b></td>";
 echo "<td><b>注册管理.</b></td>";
 echo "<td><b>论坛-主题</b></td>";
 echo "<td><b>论坛帖子</b></td>";
@@ -41,8 +41,6 @@ for ($i = 0; $i < sizeof($stat); $i++) {
 	if ($time < $stat[$i]['time']) continue;
 	echo "<tr>";
 	echo "<td>" . date('H', $stat[$i]['time'] + $user['set_timesdvig'] * 60 * 60) . "</td>";
-	echo "<td>" . $stat[$i]['hit'] . "</td>";
-	echo "<td>" . $stat[$i]['host'] . "</td>";
 	echo "<td>" . $stat[$i]['user'] . "</td>";
 	echo "<td>" . $stat[$i]['for_th'] . "</td>";
 	echo "<td>" . $stat[$i]['for_p'] . "</td>";
@@ -54,14 +52,14 @@ unset($stat);
 
 echo "最后一个月：<br />"; 
 $k_day = dbresult(dbquery("SELECT COUNT(*) FROM `visit_everyday`"), 0);
-$q = dbquery("SELECT * FROM `visit_everyday` ORDER BY `time` ASC LIMIT " . max($k_day - 30, 0) . ", 30");
+$q = dbquery("SELECT * FROM visit_everyday WHERE date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) ORDER BY date;");
 while ($result = dbassoc($q)) {
-	$day_st = mktime(0, 0, 0, date('n', $result['time']), date('j', $result['time']));
-	$day_fn  = mktime(0, 0, 0, date('n', $result['time']), date('j', $result['time']) + 1);
+	$day_st = mktime(0, 0, 0, date('n', strtotime($result['date'])), date('j', strtotime($result['date'])));
+	$day_fn  = mktime(0, 0, 0, date('n', strtotime($result['date'])), date('j', strtotime($result['date'])) + 1);
 	$user_reg = dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `date_reg` >= '$day_st' AND `date_reg` < '$day_fn'"), 0);
 	$forum_them = dbresult(dbquery("SELECT COUNT(*) FROM `forum_t` WHERE `time_create` >= '$day_st' AND `time_create` < '$day_fn'"), 0);
 	$forum_post = dbresult(dbquery("SELECT COUNT(*) FROM `forum_p` WHERE `time` >= '$day_st' AND `time` < '$day_fn'"), 0);
-	$stat[] = array('host'=>($result['host_ip_ua'] < $result['host'] * 2 ? $result['host_ip_ua'] : $result['host']), 'hit'=>$result['hit'], 'time'=>$result['time'], 'for_th'=>$forum_them, 'for_p'=>$forum_post, 'user'=>$user_reg);
+	$stat[] = array('visitors'=>$result['visitors'], 'hit'=>$result['hit'], 'date'=>$result['date'], 'for_th'=>$forum_them, 'for_p'=>$forum_post, 'user'=>$user_reg);
 }
 
 echo "<table border='1'>";
@@ -75,9 +73,9 @@ echo "<td><b>论坛帖子</b></td>";
 echo "</tr>";
 for ($i = 0; $i < sizeof($stat); $i++) {
 	echo "<tr>";
-	echo "<td>" . date('Y.m.d',$stat[$i]['time']) . "</td>";
+	echo "<td>" . date('Y.m.d', strtotime($stat[$i]['date'])) . "</td>";
 	echo "<td>" . $stat[$i]['hit'] . "</td>";
-	echo "<td>" . $stat[$i]['host'] . "</td>";
+	echo "<td>" . $stat[$i]['visitors'] . "</td>";
 	echo "<td>" . $stat[$i]['user'] . "</td>";
 	echo "<td>" . $stat[$i]['for_th'] . "</td>";
 	echo "<td>" . $stat[$i]['for_p'] . "</td>";

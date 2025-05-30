@@ -427,25 +427,54 @@ if (!isset($hard_process)) {
 		closedir($od);
 	}
 }
-// 统计数据汇总
 
-// 每日访问记录
-if (!isset($hard_process)) {
-	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'visit' LIMIT 1");
-	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('visit', '$time')");
-	$visit = dbassoc($q);
-	if (!isset($visit['time']) || isset($visit['time']) && $visit['time'] < time() - 60 * 60 * 24) {
-		if (function_exists('set_time_limit')) @set_time_limit(600); // 将限制设置为 10 分钟
-		$last_day = mktime(0, 0, 0, date('m'), date('d') - 1); // 昨天的开始
-		$today_time = mktime(0, 0, 0); // 今天的开始
-		if (dbresult(dbquery("SELECT COUNT(*) FROM `visit_everyday` WHERE `time` = '$last_day'"), 0) == 0) {
-			$hard_process = true;
-			// 在单独的表中记下昨天的一般数据
-			dbquery("INSERT INTO `visit_everyday` (`host` , `host_ip_ua`, `hit`, `time`) VALUES ((SELECT COUNT(DISTINCT `ip`) FROM `visit_today` WHERE `time` < '$today_time'),(SELECT COUNT(DISTINCT `ip`, `ua_hash`) FROM `visit_today` WHERE `time` < '$today_time'),(SELECT COUNT(*) FROM `visit_today` WHERE `time` < '$today_time'),'$last_day')");
-			dbquery('DELETE FROM `visit_today` WHERE `time` < ' . $today_time);
+
+(function() {
+	global $db, $hard_process, $ip, $ua;
+	// 每日访问记录
+	if (!isset($hard_process)) {
+		if ($db->queryColumn('SELECT 1 FROM `cron` WHERE `id` = ? LIMIT 1;', ['visit']) != 1) {
+			$db->insert('INSERT INTO cron (`id`, `time`) VALUES (?, ?)', ['visit', time()]);
+		}
+
+		$visit = $db->query('SELECT * FROM cron WHERE id = ? LIMIT 1', ['visit']);
+		if (!isset($visit['time']) || $visit['time'] < time() - 60 * 60 * 24) {
+			//if (function_exists('set_time_limit')) set_time_limit(600); // 将限制设置为 10 分钟
+
+			$datetime = new DateTime('today');
+			$today_time = $datetime->format('Y-m-d 00:00:00');
+			$last_day = (clone $datetime)->modify('-1 day')->format('Y-m-d 00:00:00');
+			// 检查是否已记录昨天的数据
+			if ($db->queryColumn('SELECT 1 FROM `visit_everyday` WHERE `date` = ?', [$last_day]) != 1) {
+				$hard_process = true;
+
+				// 统计昨天的数据并插入 visit_everyday
+				$db->insert("INSERT INTO `visit_everyday` (`visitors`, `hit`, `date`)
+								SELECT
+									COUNT(*) AS visitors,
+									SUM(`hit_count`) AS hit,
+									? AS date
+								FROM `visit_today`
+								WHERE `last_time` < ?", [$last_day, $today_time]);
+
+				// 清理昨天的数据
+				$db->delete("DELETE FROM `visit_today` WHERE `first_time` < CURRENT_DATE();");
+			}
 		}
 	}
-}
+
+	// 记录当前访问
+	$ip_ua_hash = md5($ip . $ua); // 基于 ip 和 ua 生成哈希
+	// 检查是否已有记录
+	if ($db->queryColumn('SELECT 1 FROM `visit_today` WHERE `ip_ua_hash` = ? LIMIT 1;', [$ip_ua_hash])) {
+		// 记录存在，更新计数和最后访问时间
+		$db->update('UPDATE visit_today SET hit_count = `hit_count` + 1, `last_time` = ? WHERE `ip_ua_hash` = ?', [date("Y-m-d H:i:s"), $ip_ua_hash]);
+	} else {
+		// 新访客，插入记录
+		$db->insert('INSERT INTO visit_today (ip_ua_hash, ip, ua) VALUES (?, ?, ?)', [$ip_ua_hash, $ip, $ua]);
+	}
+})();
+
 
 // 现场迁移记录
 if (isset($_SERVER['HTTP_REFERER']) && !preg_match('#' . preg_quote($_SERVER['HTTP_HOST']) . '#', $_SERVER['HTTP_REFERER']) && $ref = @parse_url($_SERVER['HTTP_REFERER'])) {
