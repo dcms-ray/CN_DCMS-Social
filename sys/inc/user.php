@@ -213,7 +213,7 @@ if (isset($user) && isset($_GET['t'])) {
 		$set_t = 'set_them';
 	}
 
-	$wap = 'default';
+	$wap = 'wap';
 	$web = 'web';
 
 	if ($_GET['t'] == 'wap')
