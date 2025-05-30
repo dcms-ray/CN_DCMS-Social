@@ -36,6 +36,7 @@ if (ini_get('register_globals')) {
 list($msec, $sec) = explode(chr(32), microtime()); // 脚本启动时间
 $conf['headtime'] = $sec + $msec;
 $time = time();	// 当前时间戳
+$dateTime = date("Y-m-d H:i:s");
 
 
 $phpvervion = explode('.', phpversion());

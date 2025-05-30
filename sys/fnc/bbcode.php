@@ -1,20 +1,19 @@
 <?php
 
 function bbcodehightlight($arr) {
-	$arr[0] = html_entity_decode($arr[0], ENT_QUOTES, 'UTF-8');
 	return '<div class="cit" style="overflow:scroll;clip:auto;max-width:480px;">' . preg_replace('#<code>(.*?)</code>#si', '\\1', highlight_string($arr[0], 1)) . '</div>' . "\n";
 }
 
 function bbcodeplayvideo($data){
 	$url = $data[1];
 	$iframeUrl = '';
-	if (preg_match('#\.youku\.com/.*/id_([a-zA-Z0-9=]+)#', $url, $arr)) {	//优酷
+	if (preg_match('#\.youku\.com/.*/id_([a-zA-Z0-9=]+)#', $url, $arr)) {			//优酷
 		$iframeUrl = 'https://player.youku.com/embed/' . $arr[1];
 	} else if (preg_match('#kg.*\.qq\.com/.*\bs=([a-zA-Z0-9=]+)#', $url, $arr)) {	// 全民K歌
 		$iframeUrl = 'https://kg.qq.com/node/play?s=' . $arr[1];
-	} else if (preg_match('#\.qq\.com/.*/([a-zA-Z0-9=]+)#', $url, $arr)) {	//腾讯视频
+	} else if (preg_match('#\.qq\.com/.*/([a-zA-Z0-9=]+)#', $url, $arr)) {			//腾讯视频
 		$iframeUrl = 'https://v.qq.com/txp/iframe/player.html?vid=' . $arr[1];
-	} else if (preg_match('#\b(?:bilibili\.com|b23\.tv)\b.*\bav(\d+)(?:.*\bp=(\d+))?#', $url, $arr)) {	//哔哩哔哩 av号
+	} else if (preg_match('#\b(?:bilibili\.com|b23\.tv)\b.*\bav(\d+)(?:.*\bp=(\d+))?#', $url, $arr)) {		//哔哩哔哩 av号
 		$iframeUrl = "https://player.bilibili.com/player.html?aid={$arr[1]}&page={$arr[2]}";
 	} else if (preg_match('#\b(?:bilibili\.com|b23\.tv)\b.*\b(BV[\w]+)(?:.*\bp=(\d+))?#', $url, $arr)) {	//哔哩哔哩 BV号
 		$iframeUrl = "https://player.bilibili.com/player.html?bvid={$arr[1]}&page={$arr[2]}";
@@ -31,9 +30,9 @@ function img_preg($arr) {
 	global $set;
 	if (preg_match('#^http://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $arr[1]) || !preg_match('#://#', $arr[1]) || $set['bb_external_img'] == '1') {
 		if (true) {	// 意义不明而且毫无作用的判断
-			return '<img decoding=async style="max-width:240px; max-height:320px;" src="' . $arr[1] . '" alt="img" />';
+			return '<img decoding=async class="bbcode-img" src="' . $arr[1] . '" alt="img" />';
 		} else {
-			return '<img style="max-width:240px;" src="/style/no_image.png" alt="No Image" />';
+			return '<img class="bbcode-img" src="/style/no_image.png" alt="No Image" />';
 		}
 	} else {
 		return '<a target="_blank" rel="nofollow" href="' . $arr[1] . '">外部站点的图像</a>';
