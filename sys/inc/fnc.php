@@ -342,9 +342,13 @@ if (!(isset($ban_ip_page) && $ban_ip_page == true) && checkBanIp($ip)) {
 	exit;
 }
 
-// DOS 攻击防护
-if ($set['antidos']) {
-	try {
+if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL && !preg_match('#(rules)|(smiles)|(secure)|(aut)|(reg)|(umenu)|(zakl)|(mail)|(anketa)|(settings)|(avatar)|(info)\.php#',$_SERVER['SCRIPT_NAME'])) $_SESSION['refer'] = NULL;
+
+(function() {
+	global $set, $db, $hard_process, $ip, $ua;
+
+	// DOS 攻击防护
+	if ($set['antidos']) {
 		// 插入当前请求记录
 		$db->insert(
 			"INSERT INTO ip_requests (`ip`, `time`) VALUES (:ip, NOW())",
@@ -356,7 +360,7 @@ if ($set['antidos']) {
 			"SELECT COUNT(*) as count FROM ip_requests WHERE ip = :ip AND time > :time_limit",
 			[
 				'ip' => $ip,
-				'time_limit' => date('Y-m-d H:i:s', $time - 5)
+				'time_limit' => date('Y-m-d H:i:s', time() - 5)
 			]
 		)['count'];
 
@@ -378,59 +382,53 @@ if ($set['antidos']) {
 		// 定期清理过期的请求记录（1 小时前）
 		$db->delete(
 			"DELETE FROM ip_requests WHERE time < :time_limit",
-			['time_limit' => date('Y-m-d H:i:s', $time - 3600)]
+			['time_limit' => date('Y-m-d H:i:s', time() - 3600)]
 		);
-	} catch (Exception $e) {
-		// 处理异常，例如记录日志或返回错误信息
-		error_log("Anti-DOS error: " . $e->getMessage());
 	}
-}
 
-// 反黑客攻击行为
-if (!defined("ADMIN") && isset($set['hacker_attacks']) && $set['hacker_attacks'] == 1) {
-	$hackparam = htmlspecialchars((string) ($_SERVER['QUERY_STRING'] ?? ''));
 
-	$hackcmd = array('chr(', 'r57shell', 'remview', '%27', 'config=', 'OUTFILE%20', 'spnuke_authors', 'spnuke_admins', 'uname%20', 'netstat%20', 'rpm%20', 'passwd', '%20', 'del%20', 'deltree%20', 'format%20', 'start%20', 'wget', 'group_access', '%3E', '%3С',  'select%20', 'SELECT', 'cmd=', 'rush=', 'union', 'javascript:', 'UNION', 'echr(', 'esystem(', 'cp%20', 'mdir%20', 'mcd%20', 'mrd%20', 'rm%20', 'mv%20', 'rmdir%20', 'chmod(', 'chmod%20', 'chown%20', 'chgrp%20', 'locate%20', 'diff%20', 'kill%20', 'kill(', 'killall', 'cmd', 'command', 'fetch', 'whereis', 'grep%20', 'ls -', 'lynx', 'su%20root', 'test', 'etc/passwd',  "'", '%60', '%00', '%F20', 'echo', 'write(', 'killall', 'passwd%20', 'telnet%20', 'vi(', 'vi%20', 'INSERT%20INTO', 'SELECT%20', 'javascript', 'fopen', 'fwrite', '$_REQUEST', '$_GET', '<script>', 'alert', '&lt', '&gt'); //禁用参数和值
+	// 反黑客攻击行为
+	if (!defined("ADMIN") && isset($set['hacker_attacks']) && $set['hacker_attacks'] == 1) {
+		$hackparam = htmlspecialchars((string) ($_SERVER['QUERY_STRING'] ?? ''));
 
-	$checkcmd = str_replace($hackcmd, 'X', $hackparam);
+		$hackcmd = array('chr(', 'r57shell', 'remview', '%27', 'config=', 'OUTFILE%20', 'spnuke_authors', 'spnuke_admins', 'uname%20', 'netstat%20', 'rpm%20', 'passwd', '%20', 'del%20', 'deltree%20', 'format%20', 'start%20', 'wget', 'group_access', '%3E', '%3С',  'select%20', 'SELECT', 'cmd=', 'rush=', 'union', 'javascript:', 'UNION', 'echr(', 'esystem(', 'cp%20', 'mdir%20', 'mcd%20', 'mrd%20', 'rm%20', 'mv%20', 'rmdir%20', 'chmod(', 'chmod%20', 'chown%20', 'chgrp%20', 'locate%20', 'diff%20', 'kill%20', 'kill(', 'killall', 'cmd', 'command', 'fetch', 'whereis', 'grep%20', 'ls -', 'lynx', 'su%20root', 'test', 'etc/passwd',  "'", '%60', '%00', '%F20', 'echo', 'write(', 'killall', 'passwd%20', 'telnet%20', 'vi(', 'vi%20', 'INSERT%20INTO', 'SELECT%20', 'javascript', 'fopen', 'fwrite', '$_REQUEST', '$_GET', '<script>', 'alert', '&lt', '&gt'); //禁用参数和值
 
-	if ($hackparam != $checkcmd) {
-		dbquery("INSERT INTO ban_ip (min, max, prich) VALUES(\"$ip\", \"$ip\", \"Inject\");");
-		dbquery('INSERT INTO mail (id_user, id_kont, msg, time) VALUES("0", "1", "IP: ' . $ip . ' UA: ' . $ua . ' 位置: ' . get_ip_address($ip) . ' 正在进行黑客攻击", "' . $time . '");');
-		die('<h2>检测到攻击！</h2><br>你的浏览器：<b>' . $ua . '</b><br>你的IP： <b>' . $ip . '</b><br><b>已被记录，不要尝试违法操作！</b><br><br>有这时间多休息吧！！！');
-	}
-}
+		$checkcmd = str_replace($hackcmd, 'X', $hackparam);
 
-if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL && !preg_match('#(rules)|(smiles)|(secure)|(aut)|(reg)|(umenu)|(zakl)|(mail)|(anketa)|(settings)|(avatar)|(info)\.php#',$_SERVER['SCRIPT_NAME'])) $_SESSION['refer'] = NULL;
-
-// 正在清除临时文件夹
-if (!isset($hard_process)) {
-	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'clear_tmp_dir'");
-	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('clear_tmp_dir', '$time')");
-	$clear_dir = dbassoc($q);
-	if (!isset($clear_dir['time']) || isset($clear_dir['time']) && $clear_dir['time'] < $time - 60 * 60 * 24) {
-		$hard_process = true;
-		dbquery("UPDATE `cron` SET `time` = '$time' WHERE `id` = 'clear_tmp_dir'");
-		// if (function_exists('curl_init')) {
-		// 	$ch = curl_init();
-		// 	curl_setopt($ch, CURLOPT_URL, 'https://dcms-social.ru/curl.php?site=' . $_SERVER['HTTP_HOST'] . '&version=' . $set['dcms_version'] . '&title=' . $set['title']);
-		// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		// 	$data = curl_exec($ch);
-		// 	curl_close($ch);
-		// }
-		$od = opendir(H . 'sys/tmp/');
-		while ($rd = readdir($od)) {
-			if (!preg_match('#^\.#', $rd) && filectime(H . 'sys/tmp/' . $rd) < $time - 60 * 60 * 24) {
-				delete_dir(H . 'sys/tmp/' . $rd);
-			}
+		if ($hackparam != $checkcmd) {
+			dbquery("INSERT INTO ban_ip (min, max, prich) VALUES(\"$ip\", \"$ip\", \"Inject\");");
+			dbquery('INSERT INTO mail (id_user, id_kont, msg, time) VALUES("0", "1", "IP: ' . $ip . ' UA: ' . $ua . ' 位置: ' . get_ip_address($ip) . ' 正在进行黑客攻击", "' . time() . '");');
+			die('<h2>检测到攻击！</h2><br>你的浏览器：<b>' . $ua . '</b><br>你的IP： <b>' . $ip . '</b><br><b>已被记录，不要尝试违法操作！</b><br><br>有这时间多休息吧！！！');
 		}
-		closedir($od);
 	}
-}
 
 
-(function() {
-	global $db, $hard_process, $ip, $ua;
+	// 正在清除临时文件夹
+	if (!isset($hard_process)) {
+		$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'clear_tmp_dir'");
+		if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('clear_tmp_dir', '" . time() . "')");
+		$clear_dir = dbassoc($q);
+		if (!isset($clear_dir['time']) || isset($clear_dir['time']) && $clear_dir['time'] < time() - 60 * 60 * 24) {
+			$hard_process = true;
+			dbquery("UPDATE `cron` SET `time` = '" . time() . "' WHERE `id` = 'clear_tmp_dir'");
+			// if (function_exists('curl_init')) {
+			// 	$ch = curl_init();
+			// 	curl_setopt($ch, CURLOPT_URL, 'https://dcms-social.ru/curl.php?site=' . $_SERVER['HTTP_HOST'] . '&version=' . $set['dcms_version'] . '&title=' . $set['title']);
+			// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			// 	$data = curl_exec($ch);
+			// 	curl_close($ch);
+			// }
+			$od = opendir(H . 'sys/tmp/');
+			while ($rd = readdir($od)) {
+				if (!preg_match('#^\.#', $rd) && filectime(H . 'sys/tmp/' . $rd) < time() - 60 * 60 * 24) {
+					delete_dir(H . 'sys/tmp/' . $rd);
+				}
+			}
+			closedir($od);
+		}
+	}
+
+
 	// 每日访问记录
 	if (!isset($hard_process)) {
 		if ($db->queryColumn('SELECT 1 FROM `cron` WHERE `id` = ? LIMIT 1;', ['visit']) != 1) {
@@ -473,6 +471,10 @@ if (!isset($hard_process)) {
 		// 新访客，插入记录
 		$db->insert('INSERT INTO visit_today (ip_ua_hash, ip, ua) VALUES (?, ?, ?)', [$ip_ua_hash, $ip, $ua]);
 	}
+
+
+	// 删除过期的captcha_token
+	$db->query("DELETE FROM captcha_tokens WHERE expires_at < NOW()");
 })();
 
 
@@ -522,9 +524,6 @@ if (dbrows($q) != 0) {
 	mail($mail['mail'], '=?utf-8?B?' . base64_encode($mail['them']) . '?=', $mail['msg'], $adds);
 	dbquery("DELETE FROM `mail_to_send` WHERE `id` = '$mail[id]'");
 }
-
-// 删除过期的captcha_token
-$db->query("DELETE FROM captcha_tokens WHERE expires_at < NOW()");
 
 // 确保所有通过 GET/POST 方法传入的数据都被清理和转义（没卵用）
 /*
