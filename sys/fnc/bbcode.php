@@ -31,9 +31,9 @@ function img_preg($arr) {
 	global $set;
 	if (preg_match('#^http://' . preg_quote($_SERVER['HTTP_HOST']) . '#', $arr[1]) || !preg_match('#://#', $arr[1]) || $set['bb_external_img'] == '1') {
 		if (true) {	// 意义不明而且毫无作用的判断
-			return '<img decoding=async style="max-width:240px; max-height:320px;" src="' . $arr[1] . '" alt="img" />';
+			return '<img decoding=async class="bbcode-img" src="' . $arr[1] . '" alt="img" />';
 		} else {
-			return '<img style="max-width:240px;" src="/style/no_image.png" alt="No Image" />';
+			return '<img class="bbcode-img" src="/style/no_image.png" alt="No Image" />';
 		}
 	} else {
 		return '<a target="_blank" rel="nofollow" href="' . $arr[1] . '">外部站点的图像</a>';
