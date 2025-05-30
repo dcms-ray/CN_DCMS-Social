@@ -443,7 +443,7 @@ if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL && !preg_match('#(ru
 			$today_time = $datetime->format('Y-m-d 00:00:00');
 			$last_day = (clone $datetime)->modify('yesterday')->format('Y-m-d 00:00:00');
 			// 检查是否已记录昨天的数据
-			if ($db->queryColumn('SELECT 1 FROM `visit_everyday` WHERE `date` = ?', [$last_day]) != 1 && $db->queryColumn('SELECT EXISTS (SELECT 1 FROM visit_everyday WHERE `last_time` < ?);',[$today_time]) == 1) {
+			if ($db->queryColumn('SELECT 1 FROM `visit_everyday` WHERE `date` = ?', [$last_day]) != 1 && $db->queryColumn('SELECT EXISTS (SELECT 1 FROM visit_today WHERE `last_time` < ?);', [$today_time]) == 1) {
 				$hard_process = true;
 
 				// 统计昨天的数据并插入 visit_everyday
