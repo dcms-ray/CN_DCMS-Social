@@ -689,7 +689,63 @@ API地址：https://[网站域名]/api.php
     }
     ```
 
-#### 3.3 添加聊天信息
+#### 3.3 获取聊天内容列表
+
+- **请求URL**: `?action=chat-msg-get&room=<int>&id=<int>`
+- **请求方式**: GET
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "data": [
+            {
+            "id": "<int>",
+            "room": "<int>",
+            "id_user": "<int>",
+            "time": "<int>",
+            "msg": "<string>",
+            "vopros": "<int>",
+            "umnik_st": "<string>",
+            "shutnik": "<string>",
+            "privat": "<int>"
+            },
+            {...}
+        ]
+    }
+    ```
+
+- **可能的报错内容**:
+
+    缺少`room`参数:
+
+    ```json
+    {
+        "status": "error",
+        "message": "room id not found"
+    }
+    ```
+
+    请求的聊天室ID无效:
+
+    ```json
+    {
+        "status": "error",
+        "message": "room not found"
+    }
+    ```
+
+    缺少`id`参数:
+
+    ```json
+    {
+        "status": "error",
+        "message": "msg id not found"
+    }
+    ```
+
+#### 3.4 添加聊天信息
 
 - **请求URL**: `?action=chat-msg-add&room=<int>`
 - **请求方式**: POST

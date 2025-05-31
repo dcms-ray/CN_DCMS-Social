@@ -496,11 +496,30 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是�
 			$page = page($k_page);
 			$start = $set['p_str'] * $page - $set['p_str'];
 
-			$results = $db->queryAll("SELECT * FROM `chat_post` WHERE `room` = ? AND (`privat`= ?" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") ORDER BY id DESC LIMIT {$start}, {$set['p_str']}", [
-				$room['id'],
-				0
+			$results = $db->queryAll("SELECT * FROM `chat_post` WHERE `room` = ? AND (`privat`= '0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") ORDER BY id DESC LIMIT {$start}, {$set['p_str']}", [
+				$room['id']
 			]);
 			$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
+		}
+	} else {
+		$response = ['status' => 'error', 'message' => 'room id not found'];
+	}
+
+} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-msg-get') {
+	if (isset($_GET['room'])) {
+		$room = $db->query('SELECT * FROM `chat_rooms` WHERE `id` = ? LIMIT 1', [intval($_GET['room'])]);
+		if (empty($room)) {
+			$response = ['status' => 'error', 'message' => 'room not found'];
+		} else {
+			if (isset($_GET['id'])) {
+				$results = $db->queryAll("SELECT * FROM `chat_post` WHERE `room` = ? AND (`privat`= '0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") AND `id` > ? ORDER BY id ASC LIMIT {$set['p_str']}", [
+					$room['id'],
+					$_GET['id'] // 最后一条已获取的消息ID
+				]);
+				$response = ['status' => 'success', 'data' => $results];
+			} else {
+				$response = ['status' => 'error', 'message' => 'msg id not found'];
+			}
 		}
 	} else {
 		$response = ['status' => 'error', 'message' => 'room id not found'];
