@@ -112,7 +112,14 @@ if (isset($user)) {
 }
 /*---------------------------------------------------------*/
 
-$set['title'] = '日记 - ' . text($notes['name']) . '';
+if ($notes['private'] == 1 && (empty($user) || ($user['id'] != $notes['id_user'] && $frend != 2  && !user_access('notes_delete')))) {
+	$set['title'] = '[不可见]';
+} elseif ($notes['private'] == 2 && (empty($user) || ($user['id'] != $notes['id_user']  && !user_access('notes_delete')))) {
+	$set['title'] = '[不可见]';
+} else {
+	$set['title'] = '日记 - ' . text($notes['name']) . '';
+}
+
 $set['meta_description'] = text($notes['msg']);
 include_once '../../sys/inc/thead.php';
 
