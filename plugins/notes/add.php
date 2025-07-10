@@ -22,7 +22,7 @@ if (!isset($user)) header("location: index.php?");
 if (isset($_POST['title']) && isset($_POST['msg'])) {
 	if (($user['rating'] < 2 || $user['group_access'] < 6 )) {
 		if (!isset($_SESSION['captcha'])) $err[] = '验证号码错误';
-		if (!isset($_POST['chislo'])) $err[] = '输入验证号码';
+		elseif (!isset($_POST['chislo'])) $err[] = '输入验证号码';
 		elseif ($_POST['chislo'] == null) $err[] = '输入验证号码';
 		elseif ($_POST['chislo'] != $_SESSION['captcha']) $err[] = '检查验证号码是否输入正确';
 	}
