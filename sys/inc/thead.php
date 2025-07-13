@@ -39,7 +39,6 @@ if (file_exists(H . "style/themes/{$set['set_them']}/head.php")) {
 		<title>' . $set['title'] . '</title> <!-- 设置页面标题 -->
 		<link rel="shortcut icon" href="/favicon.ico" /> <!-- 网站图标 -->
 		<link rel="stylesheet" href="/style/themes/' . $set['set_them'] . '/style.css" type="text/css" /> <!-- 引入样式表 -->
-		<link rel="alternate" title="订阅RSS" href="/news/rss.php" type="application/rss+xml" /> <!-- RSS订阅链接 -->
 	</head>
 	<body>
 		<div class="body">'; // 页面主体

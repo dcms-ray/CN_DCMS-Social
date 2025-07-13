@@ -16,9 +16,14 @@ if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` 
 }
 
 $set['title'] = '日记';
+function meta_note_rss($str) {
+	return str_replace('</head>', '<link rel="alternate" title="日记 RSS" href="../rss/notes.php" type="application/rss+xml" />' . "</head>", $str); // 在<head>结束前插入meta描述
+}
+ob_start('meta_note_rss');
 include_once '../../sys/inc/thead.php';
 title();
 aut(); // 授权形式
+
 
 /*** 搜索框 ****/
 echo "<div class='foot'><form method=\"get\" action=\"search.php\">";
@@ -119,7 +124,7 @@ while ($post = dbassoc($q)) {
 			$allowViewNote = false;
 		}
 	}
-	echo user::nick($post['id_user'], 1, 1, 0) . " : <a href='/plugins/notes/list.php?id=" . $post['id'] . "'>";
+	echo user::nick($post['id_user'], 1, 1, 0) . " : <a href='list.php?id=" . $post['id'] . "'>";
 	if ($allowViewNote) {
 		echo text($post['name']);
 	} else {
