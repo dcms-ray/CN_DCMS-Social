@@ -10,9 +10,14 @@ include_once '../sys/inc/fnc.php';
 include_once '../sys/inc/user.php';
 // 标题
 $set['title'] = '新闻中心';
+function meta_news_rss($str) {
+	return str_replace('</head>', '<link rel="alternate" title="新闻 RSS" href="../plugins/rss/news.php" type="application/rss+xml" />' . "</head>", $str); // 在<head>结束前插入meta描述
+}
+ob_start('meta_news_rss');
 include_once '../sys/inc/thead.php';
 title();
 aut();
+
 
 // 新闻数量
 $k_post = dbresult(dbquery("SELECT COUNT(*) FROM `news`"),0);

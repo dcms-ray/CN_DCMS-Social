@@ -31,7 +31,6 @@ header("Content-type: text/html");
 
 		<script type="text/javascript" src="/assets/js/ajax.js"></script>
 		<script type="text/javascript" src="/assets/js/form-submit.js"></script>
-		<link rel="alternate" title="新闻 RSS" href="/news/rss.php" type="application/rss+xml" />
 		<script src="/style/themes/<?php echo $set['set_them']; ?>/js.js" type="text/javascript" language="JavaScript" charset="utf-8"></script>
 
 		<!-- 对话框 -->

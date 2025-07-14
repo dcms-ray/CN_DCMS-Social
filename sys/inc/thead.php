@@ -20,6 +20,10 @@ if ($set['meta_description'] != NULL) {
 	}
 	ob_start('meta_description'); // 开启输出缓冲
 }
+function meta_bing($str) {
+	return str_replace('</head>', '<meta name="msvalidate.01" content="9766A166EC212E2EC33AFF6D98E1D3FC" />' . "</head>", $str); // 在<head>结束前插入meta描述
+}
+ob_start('meta_bing');
 
 // 检查主题文件是否存在，并包含头部文件
 if (file_exists(H . "style/themes/{$set['set_them']}/head.php")) {
@@ -29,14 +33,12 @@ if (file_exists(H . "style/themes/{$set['set_them']}/head.php")) {
 	//header("Content-type: application/vnd.wap.xhtml+xml");
 	//header("Content-type: application/xhtml+xml");
 	header("Content-type: text/html");
-	echo '<?xml version="1.0" encoding="utf-8"?>';
-	echo '<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
-	<html xmlns="http://www.w3.org/1999/xhtml">
+	echo '<!DOCTYPE html>
+	<html>
 	<head>
 		<title>' . $set['title'] . '</title> <!-- 设置页面标题 -->
 		<link rel="shortcut icon" href="/favicon.ico" /> <!-- 网站图标 -->
 		<link rel="stylesheet" href="/style/themes/' . $set['set_them'] . '/style.css" type="text/css" /> <!-- 引入样式表 -->
-		<link rel="alternate" title="订阅RSS" href="/news/rss.php" type="application/rss+xml" /> <!-- RSS订阅链接 -->
 	</head>
 	<body>
 		<div class="body">'; // 页面主体

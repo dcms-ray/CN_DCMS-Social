@@ -1,6 +1,6 @@
 # DCMS - 手机网站内容管理系统
 
-DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/eKing-one) 进行简中翻译后，通过 [CN_DCMS-Social](http://dcms.net.cn/) 引入中文互联网，以几乎所有老旧手机都能访问闻名怀旧圈，迅速吸引一批 Z 世代扎根。现在，eKing 将 CN_DCMS-Social 的源代码公开（基于原版发行版 `1.9.11`），以获得更好的发展。
+DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/eKing-one) 进行简中翻译后，通过 [CN_DCMS-Social](http://3g.cx) 引入中文互联网，以几乎所有老旧手机都能访问闻名怀旧圈，迅速吸引一批 Z 世代扎根。现在，eKing 将 CN_DCMS-Social 的源代码公开（基于原版发行版 `1.9.11`），以获得更好的发展。
 
 （以下内容由 DCMS 原作者 [Alex Borisi](mailto:alex-borisi@ya.ru) 编写，[eKing](https://github.com/eKing-one) 与 [Diamochang](https://github.com/Diamochang) 翻译）
 
@@ -44,7 +44,7 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 
 ## 安装前体验
 
-你可以前往 [GuGuan123](https://github.com/guguan123/) 开设的[副站](https://dcms.myredirect.us/)体验各项功能的最新改进。相关技术信息请参见[他的博客](https://blog.guguan.dpdns.org/?p=330)。
+你可以前往 [GuGuan123](https://guguan.us.kg) 开设的[副站](https://dcms.netlib.re)体验各项功能的最新改进。相关技术信息请参见[他的博客](https://blog.guguan.us.kg/?p=330)。
 
 ## 安装步骤
 
@@ -54,7 +54,7 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 4. 访问 `http://[您的网站]/install/`
 5. 遵循所有安装步骤进行操作。
 
-如遇安装困难或有任何改进建议，请访问我们的[网站](http://dcms.net.cn/)，在[论坛板块](https://dcms.net.cn/forum/12/20/)中反馈。
+如遇安装困难或有任何改进建议，请访问我们的[网站](http://3g.cx)，在[论坛板块](https://3g.cx/forum/12/20)中反馈。
 
 ## 开发贡献
 
