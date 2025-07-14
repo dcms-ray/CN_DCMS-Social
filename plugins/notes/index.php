@@ -85,7 +85,7 @@ if (!isset($_GET['sort']) or $_GET['sort'] != 'c') {
     $new = null;
 }
 
-$k_post = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `private`='0'"), 0);
+$k_post = $db->queryColumn('SELECT COUNT(*) FROM `notes`');
 $k_page = k_page($k_post, $set['p_str']);
 $page = page($k_page);
 $start = $set['p_str'] * $page - $set['p_str'];
@@ -95,13 +95,7 @@ if ($k_post == 0) {
     echo "<div class='mess'>没有日记</div>";
 }
 
-// 最后一页只显示最旧的一篇
-if ($page == $k_page && $k_post > 0) {
-    $q = dbquery("SELECT * FROM `notes` WHERE `private`='0' ORDER BY `time` ASC LIMIT 1");
-} else {
-    $q = dbquery("SELECT * FROM `notes` $order LIMIT $start, $set[p_str]");
-}
-
+$q = dbquery("SELECT * FROM `notes` $order LIMIT $start, $set[p_str]");
 while ($post = dbassoc($q)) {
 	/*-----------代码-----------*/
 	if ($num == 0) {
