@@ -9,7 +9,10 @@ require_once '../../sys/inc/ipua.php';
 require_once '../../sys/inc/fnc.php';
 require_once '../../sys/inc/user.php';
 only_reg();
-$discSet = dbassoc(dbquery("SELECT * FROM `discussions_set` WHERE `id_user` = '" . $user['id'] . "' LIMIT 1"));
+$set['title'] = '设置-讨论';
+require_once '../../sys/inc/thead.php';
+title();
+
 if (isset($_POST['save'])) {
 	// 关于照片讨论
 	if (isset($_POST['disc_photo']) && ($_POST['disc_photo'] == 0 || $_POST['disc_photo'] == 1)) {
@@ -36,13 +39,11 @@ if (isset($_POST['save'])) {
 		$disc = (int) $_POST['disc_forum'];
 		dbquery("UPDATE `discussions_set` SET `disc_forum` = '" . $disc . "' WHERE `id_user` = '$user[id]'");
 	}
-	$_SESSION['message'] = '更改成功';
-	header('Location: ?');
-	exit;
+	msg('更改成功');
 }
-$set['title'] = '设置-讨论';
-require_once '../../sys/inc/thead.php';
-title();
+
+$discSet = dbassoc(dbquery("SELECT * FROM `discussions_set` WHERE `id_user` = '" . $user['id'] . "' LIMIT 1"));
+
 err();
 aut();
 ?>
@@ -109,6 +110,5 @@ aut();
 <div class="foot">
 	<img src="/style/icons/str2.gif" alt="*"> <?= user::nick($user['id'],1,0,0) ?></a> | <b>讨论</b>
 </div>
-<?
-require_once '../../sys/inc/tfoot.php';
-?>
+
+<?php require_once '../../sys/inc/tfoot.php';
