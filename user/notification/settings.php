@@ -1,17 +1,17 @@
 <?php
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/user.php';
+require_once '../../sys/inc/start.php';
+require_once '../../sys/inc/compress.php';
+require_once '../../sys/inc/sess.php';
+require_once '../../sys/inc/home.php';
+require_once '../../sys/inc/settings.php';
+require_once '../../sys/inc/db_connect.php';
+require_once '../../sys/inc/ipua.php';
+require_once '../../sys/inc/fnc.php';
+require_once '../../sys/inc/user.php';
 
 only_reg();
-$set['title'] = '设置通知';
-include_once '../../sys/inc/thead.php';
+$set['title'] = '设置-关于我的';
+require_once '../../sys/inc/thead.php';
 title();
 
 $notSet = dbarray(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $user['id'] . "' LIMIT 1"));
@@ -20,7 +20,7 @@ if (isset($_POST['save'])) {
     if (isset($_POST['komm']) && ($_POST['komm'] == 0 || $_POST['komm'] == 1)) {
         dbquery("UPDATE `notification_set` SET `komm` = '" . intval($_POST['komm']) . "' WHERE `id_user` = '$user[id]'");
     }
-    $_SESSION['message'] = '更改已成功接受';
+    $_SESSION['message'] = '更改成功';
     header('Location: settings.php');
     exit;
 }
@@ -38,7 +38,7 @@ echo "<div class='webmenu last'>";
 echo "<a href='../discussions/settings.php'>讨论</a>";
 echo "</div>";
 echo "<div class='webmenu last'>";
-echo "<a href='../notification/settings.php' class='activ'>@提到我的</a>";
+echo "<a href='../notification/settings.php' class='activ'>关于我的</a>";
 echo "</div>";
 echo "<div class='webmenu last'>";
 echo "<a href='../info/settings.privacy.php' >隐私保护</a>";
@@ -53,14 +53,14 @@ echo "<div class='mess'>";
 echo "关于评论中的回复的通知";
 echo "</div>";
 echo "<div class='nav1'>";
-echo "<input name='komm' type='radio' " . ($notSet['komm'] == 1 ? ' checked="checked"' : null) . " value='1' /> 是的 ";
-echo "<input name='komm' type='radio' " . ($notSet['komm'] == 0 ? ' checked="checked"' : null) . " value='0' /> 否定 ";
+echo "<input name='komm' type='radio' " . ($notSet['komm'] == 1 ? ' checked="checked"' : null) . " value='1' /> 开启 ";
+echo "<input name='komm' type='radio' " . ($notSet['komm'] == 0 ? ' checked="checked"' : null) . " value='0' /> 关闭 ";
 echo "</div>";
 echo "<div class='main'>";
 echo "<input type='submit' name='save' value='保存' />";
 echo "</div>";
 echo "</form>";
 echo "<div class='foot'>";
-echo "<img src='../../style/icons/str2.gif' alt='*' /> <a href='index.php'>通知书</a> | <b>设置</b><br />";
+echo "<img src="/style/icons/str2.gif" alt="*"> <?= user::nick($user['id'],1,0,0) ?></a> | <b>关于我的</b>";
 echo "</div>";
-include_once '../../sys/inc/tfoot.php';
+require_once '../../sys/inc/tfoot.php';
