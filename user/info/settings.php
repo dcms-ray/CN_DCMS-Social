@@ -76,8 +76,7 @@ if (isset($_POST['save'])) {
 	}
 
 	if (!isset($err)) {
-		$_SESSION['message'] = '更改成功';
-		header("Location: ?");
+		msg('更改成功');
 	}
 }
 
