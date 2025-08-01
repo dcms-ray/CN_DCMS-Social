@@ -1,14 +1,14 @@
 <?php
 //个人资料页面
-include_once '../../sys//inc/start.php';
-include_once '../../sys//inc/compress.php';
-include_once '../../sys//inc/sess.php';
-include_once '../../sys//inc/home.php';
-include_once '../../sys//inc/settings.php';
-include_once '../../sys//inc/db_connect.php';
-include_once '../../sys//inc/ipua.php';
-include_once '../../sys//inc/fnc.php';
-include_once '../../sys//inc/user.php';
+require_once '../../sys//inc/start.php';
+require_once '../../sys//inc/compress.php';
+require_once '../../sys//inc/sess.php';
+require_once '../../sys//inc/home.php';
+require_once '../../sys//inc/settings.php';
+require_once '../../sys//inc/db_connect.php';
+require_once '../../sys//inc/ipua.php';
+require_once '../../sys//inc/fnc.php';
+require_once '../../sys//inc/user.php';
 
 // 检查用户是否登录
 if (isset($user)) $ank['id'] = $user['id'];
@@ -16,7 +16,7 @@ if (isset($_GET['id'])) $ank['id'] = intval($_GET['id']);
 if ($ank['id'] == 0) {
 	$ank = user::get_user($ank['id']);
 	$set['title'] = $ank['nick'] . ' - 个人资料 '; //网页标题
-	include_once '../../sys/inc/thead.php';
+	require_once '../../sys/inc/thead.php';
 	title();
 	aut();
 	/*
@@ -55,20 +55,20 @@ if ($ank['id'] == 0) {
 				}
 				echo "</div>";
 			}
-			include_once '../../sys/inc/tfoot.php';
+			require_once '../../sys/inc/tfoot.php';
 		}
 		if ($uSet['privat_str'] == 0) {	// 如果关闭
 			echo '<div class="mess">';
 			echo '用户已禁止查看他的页面！';
 			echo '</div>';
-			include_once '../../sys/inc/tfoot.php';
+			require_once '../../sys/inc/tfoot.php';
 		}
 	}
 	echo "<span class=\"err\">$ank[group_name]</span><br />";
 	if ($ank['ank_o_sebe'] != NULL) echo "<span class=\"ank_n\">关于自己:</span> <span class=\"ank_d\">$ank[ank_o_sebe]</span><br />";
 	if (isset($_SESSION['refer']) && $_SESSION['refer'] != NULL && otkuda($_SESSION['refer']))
 		echo "<div class='foot'>&laquo;<a href='$_SESSION[refer]'> 上一页</a><br /></div>";
-	include_once '../../sys/inc/tfoot.php';
+	require_once '../../sys/inc/tfoot.php';
 }
 
 // 检查用户是否存在
@@ -127,7 +127,7 @@ $displaystring = "" .
 	$sMinsText . " ";
 if ($timediff < 0) $displaystring = '日期已经到了';
 $set['title'] = $ank['nick'] . ' - 个人资料 '; //网页标题
-include_once '../../sys/inc/thead.php';
+require_once '../../sys/inc/thead.php';
 title();
 if ((!isset($_SESSION['refer']) || $_SESSION['refer'] == NULL)
 	&& isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != NULL &&
@@ -143,7 +143,6 @@ if (isset($user) && $ank['id'] == $user['id']) {
 	$pol = "<a href='edit.php?act=ank&amp;set=pol'>";
 	$mail = "<a href='edit.php?act=ank&amp;set=mail'>";
 	$icq = "<a href='edit.php?act=ank&amp;set=icq'>";
-	$skype = "<a href='edit.php?act=ank&amp;set=skype'>";
 	$mobile = "<a href='edit.php?act=ank&amp;set=mobile'>";
 	$a = "</a>";
 } else {
@@ -154,7 +153,6 @@ if (isset($user) && $ank['id'] == $user['id']) {
 	$pol =   "<font style='color : #005ba8; padding:1px;'>";
 	$mail =   "<font style='color : #005ba8; padding:1px;'>";
 	$icq =   "<font style='color : #005ba8; padding:1px;'>";
-	$skype =   "<font style='color : #005ba8; padding:1px;'>";
 	$mobile =   "<font style='color : #005ba8; padding:1px;'>";
 	$a = "</font>";
 }
@@ -375,11 +373,6 @@ if ($ank['ank_n_tel'] != NULL) {
 } else {
 	echo "$mobile<span class=\"ank_n\">电话:</span>$a<br />";
 }
-if ($ank['ank_skype'] != NULL) {
-	echo "$skype<span class=\"ank_n\">Skype:</span>$a <span class=\"ank_d\">$ank[ank_skype]</span><br />";
-} else {
-	echo "$skype<span class=\"ank_n\">Skype:</span>$a<br />";
-}
 echo "</div>";
 
 //--------------------管理用户----------------------//
@@ -470,4 +463,4 @@ if (isset($user['level']) && $user['level'] > $ank['level']) {
 if (user_access('adm_log_read') && $ank['level'] != 0 && ($ank['id'] == $user['id'] || $ank['level'] < $user['level']))
 	echo "<img src='../../style/icons/str.gif' alt='*' /> <a href='../../adm_panel/adm_log.php?id=$ank[id]'>管理日志</a><br />";
 echo "</div>";
-include_once '../../sys//inc/tfoot.php';
+require_once '../../sys//inc/tfoot.php';

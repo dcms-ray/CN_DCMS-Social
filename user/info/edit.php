@@ -1,17 +1,17 @@
 <?php
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/user.php';
+require_once '../../sys/inc/start.php';
+require_once '../../sys/inc/compress.php';
+require_once '../../sys/inc/sess.php';
+require_once '../../sys/inc/home.php';
+require_once '../../sys/inc/settings.php';
+require_once '../../sys/inc/db_connect.php';
+require_once '../../sys/inc/ipua.php';
+require_once '../../sys/inc/fnc.php';
+require_once '../../sys/inc/user.php';
 only_reg();
 
 $set['title']='编辑个人资料';
-include_once '../../sys/inc/thead.php';
+require_once '../../sys/inc/thead.php';
 title();
 aut();
 
@@ -99,16 +99,6 @@ if (isset($_GET['set'])) {
 			if ($user['ank_icq']=='null') $user['ank_icq']=NULL;
 			} else {
 				$err[] = '无效的QQ格式';
-			}
-		}
-
-		//-------------------skype---------------//
-		if (isset($_GET['set']) && $_GET['set']=='skype') {
-			if (isset($_POST['ank_skype']) && preg_match('#^([A-z0-9 \-]*)$#ui', $_POST['ank_skype'])) {
-				$user['ank_skype'] = $_POST['ank_skype'];
-				dbquery("UPDATE `user` SET `ank_skype` = '".my_esc($user['ank_skype'])."' WHERE `id` = '$user[id]' LIMIT 1");
-			} else {
-				$err[] = '无效的Skype账号';
 			}
 		}
 
@@ -257,7 +247,6 @@ if (isset($_GET['set'])) {
 	}
 	if (isset($_GET['set']) && $_GET['set']=='gorod') echo "城市:<br /><input type='text' name='ank_city' value='$user[ank_city]' maxlength='32' /><br />";
 	if (isset($_GET['set']) && $_GET['set']=='icq') echo "QQ:<br /><input type='text' name='ank_icq' value='$user[ank_icq]' maxlength='10' /><br />";
-	if (isset($_GET['set']) && $_GET['set']=='skype') echo "Skype<br /><input type='text' name='ank_skype' value='$user[ank_skype]' maxlength='16' /><br />";
 	if (isset($_GET['set']) && $_GET['set']=='mail') {
 		echo "E-mail:<br />
 			<input type='text' name='email' value='$user[email]' maxlength='32' /><br />
@@ -329,17 +318,10 @@ if (isset($_GET['set'])) {
 	} else {
 		echo "<br />";
 	}
-
-	echo "<a href='?set=skype'> <img src='/style/icons/str.gif' alt='*'>Skype</a> "; 
-	if ($user['ank_skype']) {
-		echo "&#62; $user[ank_skype]<br />";
-	} else {
-		echo "<br />";
-	}
 	echo "</div>";
 }
 
 echo "<div class='foot'><img src='/style/icons/str.gif' alt='*'> <a href='anketa.php'>查看资料</a><br />";
 if (isset($_SESSION['refer']) && $_SESSION['refer']!=NULL && otkuda($_SESSION['refer'])) echo "<img src='/style/icons/str2.gif' alt='*'> <a href='$_SESSION[refer]'> 上一页</a><br />";
 echo '</div>';
-include_once '../../sys/inc/tfoot.php';
+require_once '../../sys/inc/tfoot.php';
