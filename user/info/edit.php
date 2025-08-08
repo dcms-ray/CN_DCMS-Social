@@ -102,6 +102,16 @@ if (isset($_GET['set'])) {
 			}
 		}
 
+		//-------------------skype---------------//
+		if (isset($_GET['set']) && $_GET['set']=='skype') {
+			if (isset($_POST['ank_skype']) && preg_match('#^([A-z0-9 \-]*)$#ui', $_POST['ank_skype'])) {
+				$user['ank_skype'] = $_POST['ank_skype'];
+				dbquery("UPDATE `user` SET `ank_skype` = '".my_esc($user['ank_skype'])."' WHERE `id` = '$user[id]' LIMIT 1");
+			} else {
+				$err[] = '无效的Skype账号';
+			}
+		}
+
 		//----------------email------------------//
 		if (isset($_GET['set']) && $_GET['set']=='mail') {
 			if (isset($_POST['set_show_mail']) && $_POST['set_show_mail']==1) {
@@ -247,6 +257,7 @@ if (isset($_GET['set'])) {
 	}
 	if (isset($_GET['set']) && $_GET['set']=='gorod') echo "城市:<br /><input type='text' name='ank_city' value='$user[ank_city]' maxlength='32' /><br />";
 	if (isset($_GET['set']) && $_GET['set']=='icq') echo "QQ:<br /><input type='text' name='ank_icq' value='$user[ank_icq]' maxlength='10' /><br />";
+	if (isset($_GET['set']) && $_GET['set']=='skype') echo "Skype<br /><input type='text' name='ank_skype' value='$user[ank_skype]' maxlength='16' /><br />";
 	if (isset($_GET['set']) && $_GET['set']=='mail') {
 		echo "E-mail:<br />
 			<input type='text' name='email' value='$user[email]' maxlength='32' /><br />
@@ -315,6 +326,13 @@ if (isset($_GET['set'])) {
 	echo "<a href='?set=mail'> <img src='/style/icons/str.gif' alt='*'>E-Mail</a> ";
 	if ($user['email']) {
 		echo "&#62; $user[email]<br />";
+	} else {
+		echo "<br />";
+	}
+	
+	echo "<a href='?set=skype'> <img src='/style/icons/str.gif' alt='*'>Skype</a> "; 
+	if ($user['ank_skype']) {
+		echo "&#62; $user[ank_skype]<br />";
 	} else {
 		echo "<br />";
 	}
