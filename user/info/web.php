@@ -351,57 +351,55 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 
 
 			/*
-			===============================
-			展示最近添加的照片
-			===============================
+			================================
+			展示最近更新的相册
+			================================
 			*/
-			$sql = dbquery("SELECT * FROM `gallery_photo` WHERE `id_user` = '$ank[id]' ORDER BY `id` DESC LIMIT 10");
-			$coll = dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id_user` = '$ank[id]' ORDER BY `id` DESC"), 0);
+			$sql = dbquery("SELECT * FROM `gallery` WHERE `id_user` = '$ank[id]' ORDER BY `id` DESC LIMIT 5");
+			$coll = dbresult(dbquery("SELECT COUNT(*) FROM `gallery` WHERE `id_user` = '$ank[id]'"), 0);
+
+			// 展示相册
 			if ($coll > 0) {
-				echo "<div class='slim_header'>";
-				echo "<img src='/style/icons/pht2.png' alt='*' /> ";
-				echo "<a href='/photo/$ank[id]/'><b>照片</b></a> ";
-				echo " <span class='mm_counter'>" . dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id_user` = '$ank[id]'"), 0) . "</span>";
-				echo "</div>";
-				echo "<div class='nav3'>";
+    		echo "<div class='slim_header'>";
+    		echo "<img src='/style/icons/pht2.png' alt='*' /> ";
+    		echo "<a href='/photo/$ank[id]/'><b>最近更新的相册</b></a> ";
+    		echo "</div>";
+    	echo "<div class='nav3'>";
+
+    	while ($gallery = dbassoc($sql)) {
+        $canView = false;
+
+        // 判断相册的隐私设置
+        if ($gallery['privat'] == 2) {
+            // 仅自己可见
+            if (isset($user) && $user['id'] == $ank['id']) {
+                $canView = true;
+            }
+        } elseif ($gallery['privat'] == 1) {
+            // 仅朋友可见
+            if (isset($user) && ($user['id'] == $ank['id'] || $frend == 2)) {
+                $canView = true;
+            }
+        } else {
+            // 公开相册
+            $canView = true;
+        }
 				
-				while ($photo = dbassoc($sql)) {
-					// 获取相册信息
-					$gallery = dbassoc(dbquery("SELECT * FROM `gallery` WHERE `id` = '$photo[id_gallery]' AND `id_user` = '$ank[id]' LIMIT 1"));
-					
-					// 判断相册的隐私设置
-					$canView = false;
-					
-					if ($gallery['privat'] == 2) {
-						// 相册仅自己可见
-						if (isset($user) && $user['id'] == $ank['id']) {
-							$canView = true;
-						}
-					} elseif ($gallery['privat'] == 1) {
-						// 相册仅朋友可见
-						if (isset($user) && ($user['id'] == $ank['id'] || $frend == 2)) {
-							$canView = true;
-						}
-					} else {
-						// 相册没有隐私限制（公开）
-						$canView = true;
-					}
-			
-					// 如果相册设置了密码并且当前访问者不是自己，且没有输入密码，则不展示图片
-					if ($gallery['pass'] != NULL) {
-						if (!isset($user) || $user['id'] != $ank['id']) {
-							$canView = false; // 非自己且没有密码，不能查看
-						}
-					}
-			
-					// 如果满足查看条件，展示图片
-					if ($canView) {
-						echo "<a href='/photo/$ank[id]/$photo[id_gallery]/$photo[id]/'><img class='sto500' style='width:103px; height:103px; background-image:url(/photo/photo0/$photo[id].$photo[ras]);' src=''/></a>";
-					}
-				}
+        if ($gallery['pass'] != NULL) {
+            if (!isset($user) || $user['id'] != $ank['id']) {
+                $canView = false;
+            }
+        }
+
+        // 展示相册链接
+        if ($canView) {
+            echo "<div class='nav_item'>";
+            echo "<a href='/photo/$ank[id]/$gallery[id]/'>" . htmlspecialchars($gallery['name']) . "</a>";
+            echo "</div>";
+        }
+    	}
 				echo "</div>";
 			}
-
 
 			/*
 			=====================================
@@ -522,7 +520,7 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 			}
 			echo "</div>";
 			echo '<form action="someplace.html" method="post" name="myForm"><div id="formResponse">';
-			echo ' <a onclick="anketa.submit()" name="myForm"><div class="form_info">显示详细信息</div></a>';
+			echo ' <a onclick="anketa.submit()" name="myForm"><div class="form_info">查看更多</div></a>';
 			echo '</div></form>';
 			echo "<script type='text/javascript'>	
 			      var anketa = new DHTMLSuite.form({ formRef:'myForm',action:'/style/post-form/anketa.php?id=$ank[id]',responseEl:'formResponse'});	
