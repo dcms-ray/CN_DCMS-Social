@@ -492,7 +492,7 @@ if (!isset($hard_process)) {
 		if (function_exists('set_time_limit')) set_time_limit(600); // 将限制设置为 10 分钟
 		dbquery("UPDATE `cron` SET `time` = '" . time() . "' WHERE `id` = 'everyday'");
 		dbquery("DELETE FROM `guests` WHERE `date_last` < '" . (time() - 600) . "'");
-		dbquery("DELETE FROM `chat_post` WHERE `time` < '" . (time() - 60 * 60 * 24) . "'"); // 删除旧的聊天帖子
+		//dbquery("DELETE FROM `chat_post` WHERE `time` < '" . (time() - 60 * 60 * 24) . "'"); // 删除旧的聊天帖子
 		dbquery("DELETE FROM `user` WHERE `activation` != null AND `date_reg` < '" . (time() - 60 * 60 * 24) . "'"); // 删除未激活的账户
 
 		// 删除过期的 password reset token

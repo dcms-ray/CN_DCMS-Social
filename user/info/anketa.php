@@ -143,6 +143,7 @@ if (isset($user) && $ank['id'] == $user['id']) {
 	$pol = "<a href='edit.php?act=ank&amp;set=pol'>";
 	$mail = "<a href='edit.php?act=ank&amp;set=mail'>";
 	$icq = "<a href='edit.php?act=ank&amp;set=icq'>";
+	$skype = "<a href='edit.php?act=ank&amp;set=skype'>";
 	$mobile = "<a href='edit.php?act=ank&amp;set=mobile'>";
 	$a = "</a>";
 } else {
@@ -153,6 +154,7 @@ if (isset($user) && $ank['id'] == $user['id']) {
 	$pol =   "<font style='color : #005ba8; padding:1px;'>";
 	$mail =   "<font style='color : #005ba8; padding:1px;'>";
 	$icq =   "<font style='color : #005ba8; padding:1px;'>";
+	$skype =   "<font style='color : #005ba8; padding:1px;'>";
 	$mobile =   "<font style='color : #005ba8; padding:1px;'>";
 	$a = "</font>";
 }
@@ -372,6 +374,11 @@ if ($ank['ank_n_tel'] != NULL) {
 	echo "$mobile<span class=\"ank_n\">电话:</span>$a <span class=\"ank_d\">$ank[ank_n_tel]</span><br />";
 } else {
 	echo "$mobile<span class=\"ank_n\">电话:</span>$a<br />";
+}
+if ($ank['ank_skype'] != NULL) {
+	echo "$skype<span class=\"ank_n\">Skype:</span>$a <span class=\"ank_d\">$ank[ank_skype]</span><br />";
+} else {
+	echo "$skype<span class=\"ank_n\">Skype:</span>$a<br />";
 }
 echo "</div>";
 

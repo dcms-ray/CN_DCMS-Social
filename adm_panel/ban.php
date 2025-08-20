@@ -42,12 +42,13 @@ if (isset($_GET['delete']) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE
 	$ank2 = dbassoc(dbquery("SELECT * FROM `user` WHERE `id` = '$ban_info[id_ban]' LIMIT 1"));
 	if (($user['level'] > $ank2['level'] || $user['id'] == $ank2['id']) || $user['level'] == 4) {
 		dbquery("DELETE FROM `ban` WHERE `id` = '" . intval($_GET['delete']) . "' LIMIT 1");
-		admin_log('用户', '禁令', "从用户中删除违规 '[url=/amd_panel/ban.php?id=$ank[id]]$ank[nick][/url]'");
+		admin_log('用户', '禁令', '从用户中删除违规 [url=/amd_panel/ban.php?id=' . $ank['id'] . ']' . $ank['nick'] . '[/url]');
 		$_SESSION['message'] = '删除违规行为';
-		header("Location: ?id=$ank[id]");
+		header("Location: ?id={$ank['id']}");
 		exit;
-	} else
+	} else {
 		$err[] = '无权限';
+	}
 }
 
 if (isset($_GET['unset']) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `id_user` = '$ank[id]' AND `id` = '" . intval($_GET['unset']) . "'"), 0) && user_access('user_ban_unset')) {
@@ -59,8 +60,9 @@ if (isset($_GET['unset']) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE 
 		$_SESSION['message'] = '禁止时间重置为零';
 		header("Location: ?id=$ank[id]");
 		exit;
-	} else
+	} else {
 		$err[] = '无权限';
+	}
 }
 
 if (isset($_POST['ban_pr']) && isset($_POST['time']) && isset($_POST['vremja']) && (user_access('user_ban_set') || user_access('user_ban_set_h'))) {
@@ -74,7 +76,7 @@ if (isset($_POST['ban_pr']) && isset($_POST['time']) && isset($_POST['vremja']) 
 	$pochemu = $_POST['pochemu'];
 	$razdel = $_POST['razdel'];
 	$post = $_POST['post'];
-	$navsegda = $_POST['navsegda'];
+	$navsegda = $_POST['navsegda'] ?? 0;
 	$prich = $_POST['ban_pr'];
 	if (strlen2($prich) > 1024) {
 		$err[] = '信息太长了';
@@ -85,7 +87,7 @@ if (isset($_POST['ban_pr']) && isset($_POST['time']) && isset($_POST['vremja']) 
 	$prich = my_esc($prich);
 	if (!isset($err)) {
 		dbquery("INSERT INTO `ban` (`id_user`, `id_ban`, `prich`, `time`, `pochemu`, `razdel`, `post`, `navsegda`) VALUES ('$ank[id]', '$user[id]', '$prich', '$timeban', '$pochemu', '$razdel', '$post', '$navsegda')");
-		admin_log('用户', '禁令', "用户禁令 '[url=/adm_panel/ban.php?id=$ank[id]]$ank[nick][/url]' 直到 " . vremja($timeban) . " 由于 '$prich'");
+		admin_log('用户', '禁令', '用户禁令 [url=/adm_panel/ban.php?id=' . $ank['id'] . ']' . $ank . '[nick][/url] 直到 ' . vremja($timeban) . ' 由于 ' . $prich);
 		$_SESSION['message'] = '用户已成功被禁止';
 		header("Location: ?id=$ank[id]");
 		exit;
