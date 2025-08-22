@@ -247,7 +247,7 @@ if (isset($_POST['msg']) && isset($user)) {
 				]
 			)['count'];
 
-			if ($authorDiscCount == 0) {
+			if (!empty($notes['id_user']) && $authorDiscCount == 0) {
 				// 如果不是自己评论自己，创建作者的讨论记录
 				if ($notes['id_user'] != $user['id']) {
 					$db->insert(
