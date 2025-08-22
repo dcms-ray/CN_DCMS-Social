@@ -14,19 +14,23 @@ if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` 
 	header('Location: ../../user/ban.php?' . session_id());
 	exit;
 }
+
 $notes = dbassoc(dbquery("SELECT * FROM `notes` WHERE `id` = '" . intval($_GET['id']) . "' LIMIT 1"));
 if (!isset($notes['id'])) {
 	header('Location: index.php');
 	exit;
 }
-$query_result = dbquery("SELECT id FROM `user` WHERE id = {$notes['id_user']} LIMIT 1");
-if (dbrows($query_result) > 0) {
-	$avtor = user::get_user($notes['id_user']);
-}
-if (isset($user)) $count = dbresult(dbquery("SELECT COUNT(*) FROM `notes_count` WHERE `id_user` = '" . $user['id'] . "' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0);
+
+if ($notes['id_user'] !== NULL) $query_result = dbquery("SELECT id FROM `user` WHERE id = {$notes['id_user']} LIMIT 1");
+if (isset($query_result) && dbrows($query_result) > 0) $avtor = user::get_user($notes['id_user']);
+
 // 书签
 $markinfo = dbresult(dbquery("SELECT COUNT(*) FROM `bookmarks` WHERE `id_object` = '" . $notes['id'] . "' AND `type`='notes'"), 0);
-if (isset($user)) dbquery("UPDATE `notification` SET `read` = '1' WHERE `type` = 'notes_komm' AND `id_user` = '$user[id]' AND `id_object` = '$notes[id]'");
+
+if (isset($user)) {
+	$count = dbresult(dbquery("SELECT COUNT(*) FROM `notes_count` WHERE `id_user` = '" . $user['id'] . "' AND `id_notes` = '" . $notes['id'] . "' LIMIT 1"), 0);
+	dbquery("UPDATE `notification` SET `read` = '1' WHERE `type` = 'notes_komm' AND `id_user` = '$user[id]' AND `id_object` = '$notes[id]'");
+}
 
 
 /*
@@ -368,14 +372,23 @@ if (isset($user)) {
 
 echo "<div class=\"foot\">";
 echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记</a> | ";
-echo user::nick($notes['id_user'], 1, 0, 0);
+if ($notes['id_user'] === NULL) {
+	echo '???';
+} else {
+	echo user::nick($notes['id_user'], 1, 0, 0);
+}
 echo ' | <b>' . output_text($notes['name']) . '</b>';
 echo "</div>";
 
 echo "<div class='main'>";
 echo "<table style='width:110%;'><td style='width:4%;'>" . (empty($avtor['id']) ? '<img class="avatar" src="../../style/user/avatar.gif" height="50" width="50" alt="No Avatar">' : user::avatar($avtor['id'])) . "</td>";
-echo "<td style='width:96%;'> 作者: " . user::nick($notes['id_user'], 1, 1, 0) . " ";
-echo "(<img src='../../style/icons/them_00.png'>  " . vremja($notes['time']) . ")<br/>";
+echo "<td style='width:96%;'> 作者: ";
+if ($notes['id_user'] === NULL) {
+	echo '???';
+} else {
+	echo user::nick($notes['id_user'], 1, 1, 0);
+}
+echo " (<img src='../../style/icons/them_00.png'>  " . vremja($notes['time']) . ")<br/>";
 echo "<img src='../../style/icons/eye.png'> 预览: " . $notes['count'] . "</td></table></div>";
 
 $stat1 = $notes['msg'];

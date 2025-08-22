@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `notes` (
 	`name` varchar(32) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
 	`private` int(11) NOT NULL DEFAULT '0',	-- 日记隐私设置：0 公开；1 仅好友可见；2 仅自己可见
 	`tags` varchar(64) DEFAULT NULL,
-	`id_user` int(11) DEFAULT '0',
+	`id_user` int(11) NOT NULL, -- 发布日记的用户 ID
 	`private_komm` int(11) DEFAULT '0',
 	`count` int(11) DEFAULT '0',
 	`id_dir` int(11) DEFAULT '0',
