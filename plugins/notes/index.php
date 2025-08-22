@@ -126,7 +126,12 @@ while ($post = dbassoc($q)) {
 			$allowViewNote = false;
 		}
 	}
-	echo user::nick($post['id_user'], 1, 1, 0) . " : <a href='list.php?id=" . $post['id'] . "'>";
+	if ($post['id_user'] === NULL) {
+		echo '???';
+	} else {
+		echo user::nick($post['id_user'], 1, 1, 0);
+	}
+	echo " : <a href='list.php?id=" . $post['id'] . "'>";
 	if ($allowViewNote) {
 		echo text($post['name']);
 	} else {
