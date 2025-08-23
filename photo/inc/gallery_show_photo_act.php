@@ -35,11 +35,7 @@ if (
 ) {
 	// 记录管理员日志
 	if ($user['id'] != $ank['id']) {
-		admin_log(
-			'图片集锦',
-			'照片',
-			"删除用户的照片 '[url=/user/info.php?id=$ank[id]]" . user::nick($ank['id'], 1, 0, 0) . "[/url]'"
-		);
+		admin_log('图片集锦', '照片', '删除用户的照片 [url=/user/info.php?id=' . $ank['id'] . ']' . user::nick($ank['id'], 1, 0, 0) . '[/url]');
 	}
 
 	// 定义照片文件路径
