@@ -184,22 +184,61 @@ function save_settings($set) {
 	}
 }
 
-// 管理行动记录
-function admin_log($mod, $act, $opis) {
-	global $user;
+/**
+ * 写入管理操作日志
+ *
+ * @param string   $mod  模块名
+ * @param string   $act  动作名
+ * @param string   $opis 描述文本（可包含任意字符，无需转义）
+ *
+ * @return int 日志 id
+ * @throws Exception 抛出异常
+ */
+function admin_log(string $mod, string $act, string $opis): int {
+	global $db;
+	/* 开启事务，保证 mod / act 两条记录与 log 记录同时成功/失败 */
+	$db->beginTransaction();
 
-	$q = dbquery("SELECT * FROM `admin_log_mod` WHERE `name` = '" . my_esc($mod) . "' LIMIT 1");
-	if (dbrows($q) == 0) {
-		dbquery("INSERT INTO `admin_log_mod` (`name`) VALUES ('" . my_esc($mod) . "')");
-		$id_mod = dbinsertid();
-	} else $id_mod = dbresult($q, 0);
+	try {
+		/* 1. 确保模块存在，不存在则插入并返回 id */
+		$id_mod = $db->queryColumn(
+			'SELECT `id` FROM `admin_log_mod` WHERE `name` = ? LIMIT 1',
+			[$mod]
+		);
+		if ($id_mod === null) {
+			$id_mod = (int)$db->insert(
+				'INSERT INTO `admin_log_mod` (`name`) VALUES (?)',
+				[$mod]
+			);
+		}
 
-	$q2 = dbquery("SELECT * FROM `admin_log_act` WHERE `name` = '" . my_esc($act) . "' AND `id_mod` = '$id_mod' LIMIT 1");
-	if (dbrows($q2) == 0) {
-		dbquery("INSERT INTO `admin_log_act` (`name`, `id_mod`) VALUES ('" . my_esc($act) . "', '$id_mod')");
-		$id_act = dbinsertid();
-	} else $id_act = dbresult($q2, 0);
-	dbquery("INSERT INTO `admin_log` (`time`, `id_user`, `mod`, `act`, `opis`) VALUES ('" . time() . "','$user[id]', '$id_mod', '$id_act', '" . my_esc($opis) . "')");
+		/* 2. 确保动作存在，不存在则插入并返回 id */
+		$id_act = $db->queryColumn(
+			'SELECT `id` FROM `admin_log_act` WHERE `name` = ? AND `id_mod` = ? LIMIT 1',
+			[$act, $id_mod]
+		);
+		if ($id_act === null) {
+			$id_act = (int)$db->insert(
+				'INSERT INTO `admin_log_act` (`name`, `id_mod`) VALUES (?, ?)',
+				[$act, $id_mod]
+			);
+		}
+
+		/* 3. 插入真正的日志记录 */
+		$log_id = (int)$db->insert(
+			'INSERT INTO `admin_log` (`time`, `id_user`, `mod`, `act`, `opis`)
+			 VALUES (?, ?, ?, ?, ?)',
+			[time(), $GLOBALS['user']['id'], $id_mod, $id_act, $opis]
+		);
+
+		$db->commit();
+		return $log_id;
+
+	} catch (Exception $e) {
+		/* 任何一步出错都回滚并向上传递 */
+		$db->rollBack();
+		throw $e;
+	}
 }
 
 /**
