@@ -1,13 +1,13 @@
 <?
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/user.php';
+require_once '../../sys/inc/start.php';
+require_once '../../sys/inc/compress.php';
+require_once '../../sys/inc/sess.php';
+require_once '../../sys/inc/home.php';
+require_once '../../sys/inc/settings.php';
+require_once '../../sys/inc/db_connect.php';
+require_once '../../sys/inc/ipua.php';
+require_once '../../sys/inc/fnc.php';
+require_once '../../sys/inc/user.php';
 only_reg();
 // Очистка гостей
 if (isset($_GET['truncate'])) {
@@ -16,7 +16,7 @@ if (isset($_GET['truncate'])) {
 }
 //网页标题
 $set['title'] = '谁来看我？';
-include_once '../../sys/inc/thead.php';
+require_once '../../sys/inc/thead.php';
 title();
 aut();
 echo '<div class="foot">';
@@ -45,6 +45,10 @@ while ($post = dbarray($q)) {
 		$num = 0;
 	}
 	/*---------------------------*/
+	if ($ank == false) {
+		echo "[已删除]";
+		echo ' <span>' . vremja($post['time']) . '</span><br />';
+	} else{
 	echo user::nick($ank['id'],1,1,0);
 	if ($post['read'] == 1)
 		echo ' <span class="time" style="color:red">' . vremja($post['time']) . '</span><br />';
@@ -52,6 +56,7 @@ while ($post = dbarray($q)) {
 		echo ' <span>' . vremja($post['time']) . '</span><br />';
 	echo '<a href="/user/mail.php?id=' . $ank['id'] . '"><img src="/style/icons/pochta.gif" alt="*" /> 信息</a> ';
 	echo '</div>';
+	}
 	// 帖子显示为已读
 	dbquery("UPDATE `my_guests` SET `read` = '0' WHERE `id` = '$post[id]' LIMIT 1");
 }
@@ -64,4 +69,4 @@ echo '<div class="foot">';
 echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($user['id'],1,0,0) .' | ';
 echo '<b>谁来看我？</b>';
 echo '</div>';
-include_once '../../sys/inc/tfoot.php';
+require_once '../../sys/inc/tfoot.php';

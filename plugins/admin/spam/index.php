@@ -1,15 +1,15 @@
 <?php
-include_once '../../../sys/inc/start.php';
-include_once '../../../sys/inc/compress.php';
-include_once '../../../sys/inc/sess.php';
-include_once '../../../sys/inc/home.php';
-include_once '../../../sys/inc/settings.php';
-include_once '../../../sys/inc/db_connect.php';
-include_once '../../../sys/inc/ipua.php';
-include_once '../../../sys/inc/fnc.php';
-include_once '../../../sys/inc/user.php';
+require_once '../../../sys/inc/start.php';
+require_once '../../../sys/inc/compress.php';
+require_once '../../../sys/inc/sess.php';
+require_once '../../../sys/inc/home.php';
+require_once '../../../sys/inc/settings.php';
+require_once '../../../sys/inc/db_connect.php';
+require_once '../../../sys/inc/ipua.php';
+require_once '../../../sys/inc/fnc.php';
+require_once '../../../sys/inc/user.php';
 $set['title'] = '投诉'; //网页标题
-include_once '../../../sys/inc/thead.php';
+require_once '../../../sys/inc/thead.php';
 title();
 err();
 aut(); // 授权形式
@@ -108,8 +108,14 @@ if (user_access('adm_panel_show')) {
 			$anketa = user::get_user($status['id_user']);
 			echo user::nick($anketa['id'])  . "<br />";
 		}
-		echo "<b>申诉:</b> <a href='../../../user/info.php?id=$ank[id]'>$ank[nick]</a>";
-		echo " " . medal($ank['id']) . " " . online($ank['id']) . " (" . vremja($post['time']) . ")<br />";
+
+    if ($ank == false) {
+			echo "<b>申诉:</b> [已删除]<br />";
+    } else {
+			echo "<b>申诉:</b> <a href='../../../user/info.php?id={$ank['id']}'>{$ank['nick']}</a>";
+      echo " " . medal($ank['id']) . " " . online($ank['id']) . " (" . vremja($post['time']) . ")<br />";
+    }
+  	
 		if ($post['razdel'] == 'mail' || $post['razdel'] == 'guest' || $post['razdel'] == 'forum' || $post['razdel'] == 'stena')
 			echo "<b>通信:</b> <font color='red' style='border-bottom: 1px solid green;'>" . output_text($post['spam']) . "<br /></font>";
 		echo "<b>评论:</b> " . output_text($post['msg']) . "<br />";
@@ -130,4 +136,4 @@ if (user_access('adm_panel_show')) {
 	echo "<img src='../../../style/icons/str2.gif' alt='*'> <a href='../'>管理员</a><br />";
 	echo "</div>";
 }
-include_once '../../../sys/inc/tfoot.php';
+require_once '../../../sys/inc/tfoot.php';
