@@ -1,13 +1,13 @@
 <?php
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/user.php';
+require_once '../../sys/inc/start.php';
+require_once '../../sys/inc/compress.php';
+require_once '../../sys/inc/sess.php';
+require_once '../../sys/inc/home.php';
+require_once '../../sys/inc/settings.php';
+require_once '../../sys/inc/db_connect.php';
+require_once '../../sys/inc/ipua.php';
+require_once '../../sys/inc/fnc.php';
+require_once '../../sys/inc/user.php';
 
 /* 屏蔽封禁用户 */
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'notes' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0')"), 0) != 0) {
@@ -72,7 +72,7 @@ if (isset($_GET['spam']) && isset($user)) {
 		}
 	}
 	$set['title'] = '日记 ' . text($notes['name']) . '';
-	include_once '../../sys/inc/thead.php';
+	require_once '../../sys/inc/thead.php';
 	title();
 	aut();
 	err();
@@ -102,7 +102,7 @@ if (isset($_GET['spam']) && isset($user)) {
 	echo "<div class='foot'>";
 	echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='?id=$notes[id]&amp;page=" . intval($_GET['page']) . "'>返回</a><br />";
 	echo "</div>";
-	include_once '../../sys/inc/tfoot.php';
+	require_once '../../sys/inc/tfoot.php';
 }
 
 // 查看记录
@@ -125,7 +125,7 @@ if ($notes['private'] == 1 && (empty($user) || ($user['id'] != $notes['id_user']
 }
 
 $set['meta_description'] = text($notes['msg']);
-include_once '../../sys/inc/thead.php';
+require_once '../../sys/inc/thead.php';
 
 if (isset($_POST['msg']) && isset($user)) {
 	$msg = $_POST['msg'];
@@ -315,14 +315,14 @@ err();
 if ($notes['private'] == 1 && (empty($user) || ($user['id'] != $notes['id_user'] && $frend != 2  && !user_access('notes_delete')))) {
 	msg('日记只提供给朋友');
 	echo "  <div class='foot'><a href='index.php'>返回</a><br /></div>";
-	include_once '../../sys/inc/tfoot.php';
+	require_once '../../sys/inc/tfoot.php';
 }
 if ($notes['private'] == 2 && (empty($user) || ($user['id'] != $notes['id_user']  && !user_access('notes_delete')))) {
 	msg('用户已禁止查看日记');
 	echo "  <div class='foot'>";
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
-	include_once '../../sys/inc/tfoot.php';
+	require_once '../../sys/inc/tfoot.php';
 }
 
 if (isset($user) && isset($_GET['delete']) && $_GET['delete'] == 'note' && ($user['id'] == $notes['id_user'] || user_access('notes_delete'))) {
@@ -330,7 +330,7 @@ if (isset($user) && isset($_GET['delete']) && $_GET['delete'] == 'note' && ($use
 	echo "你真的想删除日记吗 " . output_text($notes['name']) . "?<br />";
 	echo "[<a href='delete.php?id={$notes['id']}'><img src='../../style/icons/ok.gif'> 删除</a>] [<a href='list.php?id={$notes['id']}'><img src='../../style/icons/delete.gif'> 取消</a>] ";
 	echo "</center>";
-	include_once '../../sys/inc/tfoot.php';
+	require_once '../../sys/inc/tfoot.php';
 }
 
 if (isset($user)) {
@@ -389,7 +389,7 @@ if ($notes['id_user'] === NULL) {
 	echo user::nick($notes['id_user'], 1, 1, 0);
 }
 echo " (<img src='../../style/icons/them_00.png'>  " . vremja($notes['time']) . ")<br/>";
-echo "<img src='../../style/icons/eye.png'> 预览: " . $notes['count'] . "</td></table></div>";
+echo "<img src='../../style/icons/eye.png'> 阅读量: " . $notes['count'] . "</td></table></div>";
 
 $stat1 = $notes['msg'];
 if (!$set['web']) $mn = 20;
@@ -521,7 +521,7 @@ if ($notes['private_komm'] == 1 && $user['id'] != $avtor['id'] && $frend != 2  &
 	echo "  <div class='foot'>";
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
-	include_once '../../sys/inc/tfoot.php';
+	require_once '../../sys/inc/tfoot.php';
 }
 
 if ($notes['private_komm'] == 2 && $user['id'] != $avtor['id'] && !user_access('notes_delete')) {
@@ -529,14 +529,14 @@ if ($notes['private_komm'] == 2 && $user['id'] != $avtor['id'] && !user_access('
 	echo "  <div class='foot'>";
 	echo "<a href='index.php'>返回</a><br />";
 	echo "   </div>";
-	include_once '../../sys/inc/tfoot.php';
+	require_once '../../sys/inc/tfoot.php';
 }
 
 // 发送评论表单
 if (isset($user)) {
 	echo "<form method=\"post\" name='message' action=\"?id=" . intval($_GET['id']) . "&amp;page=$page" . $go_otv . "\">";
 	if ($set['web'] && is_file('../../style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
-		include_once '../../style/themes/' . $set['set_them'] . '/altername_post_form.php';
+		require_once '../../style/themes/' . $set['set_them'] . '/altername_post_form.php';
 	} else {
 		echo "$tPanel<textarea name=\"msg\">$otvet</textarea><br />";
 	}
@@ -549,4 +549,4 @@ echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php'>日记<
 echo ' | <b>' . output_text($notes['name']) . '</b>';
 echo "</div>";
 
-include_once '../../sys/inc/tfoot.php';
+require_once '../../sys/inc/tfoot.php';
