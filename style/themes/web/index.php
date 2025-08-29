@@ -1,4 +1,4 @@
-<?PHP
+<?php
 // 获取在线用户数
 $k_post = $db->queryColumn("SELECT COUNT(DISTINCT ul.id_user) AS online_users FROM `user_log` ul WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0)");
 // 获取在线用户列表
@@ -104,20 +104,23 @@ if ($k_post > 0) {
 }
 
 /* 日记 */
-$plus = dbresult(dbquery("SELECT COUNT(`id`)FROM `notes` WHERE `time`>'" . ($time - 86000) . "'"), 0);
-$count = dbresult(dbquery("SELECT COUNT(`id`)FROM `notes`"), 0);
-if ($plus > 0) {
-		$e = $count . " + " . $plus;
+$notes_plus = dbresult(dbquery("SELECT COUNT(`id`)FROM `notes` WHERE `time`>'" . (time() - 86000) . "'"), 0);
+$notes_count = dbresult(dbquery("SELECT COUNT(`id`)FROM `notes`"), 0);
+if ($notes_plus > 0) {
+	$notes_e = $notes_count . " + " . $notes_plus;
 } else {
-		$e = $count;
+	$notes_e = $notes_count;
 }
 
-echo '<div style="padding: 6px 10px;" class="foot"><a href="/plugins/notes/"><b>日记</b> (' . $e . ')</a></div>';
+echo '<a href="./plugins/notes/"><div class="my">';
+echo '<img src="./style/icons/dnev.png" alt="*" /> 日记 (' . $notes_e . ')';
+echo '</div></a>';
 
 $q = dbquery("SELECT * FROM `notes` ORDER BY `time` DESC LIMIT 5");
 if (dbrows($q) == 0) {
-		echo '<div class="nav2 main_no_notes_nav2">没有记录</div>';
+	echo '<div class="nav2 mess main_no_notes_nav2">没有记录</div>';
 } else {
+	echo '<div class="mess">';
 	while ($post = dbassoc($q)) {
 		if ($post['private'] == 0) {
 			$allowViewNote = true;
@@ -142,7 +145,7 @@ if (dbrows($q) == 0) {
 
 		$count_comm = dbresult(dbquery("SELECT COUNT(`id`) FROM `notes_komm` WHERE `id_notes`='" . $post['id'] . "'"), 0);
 
-		echo "<div class='nav2'>";
+		echo '<div class="nav2">';
 		echo user::nick($post['id_user'], 1, 1, 0);
 		echo ' : <a href="/plugins/notes/list.php?id=' . $post['id'] . '"><span style="color:#06f">';
 		if ($allowViewNote) {
@@ -164,12 +167,8 @@ if (dbrows($q) == 0) {
 		}
 		echo '</small></div>';
 	}
+	echo '</div>';
 }
-echo '<div class="nav1">';
-if (isset($user)) {
-	echo '<a href="/plugins/notes/add.php">写日记</a>';
-}
-echo '<span style="float:right;"><a href="/plugins/notes/">所有日记&rarr;</a></span><br /></div>';
 
 /*  聊天室 */
 echo "<a href='/chat'><div class='my'>";
