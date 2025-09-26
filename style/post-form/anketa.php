@@ -19,7 +19,7 @@ if (isset($_GET['id'])) {
         $mat_pol = "<a href='/user/info/edit.php?act=ank_web&amp;set=mat_pol'>";
         $mail = "<a href='/user/info/edit.php?act=ank_web&amp;set=mail'>";
         $icq = "<a href='/user/info/edit.php?act=ank_web&amp;set=icq'>";
-        $skype = "<a href='/user/info/edit.php?act=ank_web&amp;set=skype'>";
+        $xmpp = "<a href='/user/info/edit.php?act=ank_web&amp;set=xmpp'>";
         $mobile = "<a href='/user/info/edit.php?act=ank_web&amp;set=mobile'>";
         $a = "</a>";
     } else {
@@ -27,7 +27,7 @@ if (isset($_GET['id'])) {
         $osebe =   "<font style='padding:1px; color : #005ba8; padding:1px;'>";
         $mail =   "<font style='padding:1px; color : #005ba8; padding:1px;'>";
         $icq =   "<font style='padding:1px; color : #005ba8; padding:1px;'>";
-        $skype =   "<font style='padding:1px; color : #005ba8; padding:1px;'>";
+        $xmpp =   "<font style='padding:1px; color : #005ba8; padding:1px;'>";
         $mobile =   "<font style='padding:1px; color : #005ba8; padding:1px;'>";
         $a = "</font>";
     }
@@ -66,10 +66,10 @@ if (isset($_GET['id'])) {
     } else {
         echo "$mobile<span class=\"ank_n\">电话:</span>$a<br />";
     }
-    if ($ank['ank_skype'] != NULL) {
-        echo "$skype<span class=\"ank_n\">Skype:</span>$a <span class=\"ank_d\">$ank[ank_skype]</span><br />";
+    if ($ank['ank_xmpp'] != NULL) {
+        echo "$xmpp<span class=\"ank_n\">XMPP:</span>$a <a href=\"xmpp:$ank[ank_xmpp]\" title=\"发送消息\" class=\"ank_d\">$ank[ank_xmpp]</a><br />";
     } else {
-        echo "$skype<span class=\"ank_n\">Skype:</span>$a<br />";
+        echo "$xmpp<span class=\"ank_n\">XMPP:</span>$a<br />";
     }
     echo "</div>";
     echo "</div>";
