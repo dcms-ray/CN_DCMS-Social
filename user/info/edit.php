@@ -257,7 +257,7 @@ if (isset($_GET['set'])) {
 	}
 	if (isset($_GET['set']) && $_GET['set']=='gorod') echo "城市:<br /><input type='text' name='ank_city' value='$user[ank_city]' maxlength='32' /><br />";
 	if (isset($_GET['set']) && $_GET['set']=='icq') echo "QQ:<br /><input type='text' name='ank_icq' value='$user[ank_icq]' maxlength='10' /><br />";
-	if (isset($_GET['set']) && $_GET['set']=='xmpp') echo "XMPP<br /><input type='text' name='ank_xmpp' value='$user[ank_xmpp]' maxlength='16' /><br />";
+	if (isset($_GET['set']) && $_GET['set']=='xmpp') echo "XMPP<br /><input type='text' name='ank_xmpp' value='$user[ank_xmpp]' maxlength='32' /><br />";
 	if (isset($_GET['set']) && $_GET['set']=='mail') {
 		echo "E-mail:<br />
 			<input type='text' name='email' value='$user[email]' maxlength='32' /><br />
