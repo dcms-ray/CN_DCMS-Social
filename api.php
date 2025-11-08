@@ -694,14 +694,17 @@ switch ($action) {
 			}
 
 			// 评论区
-			$k_post = $db->queryColumn('SELECT COUNT(*) FROM `notes_komm` WHERE `id_notes` = ?', [$post['id']]);
-			$k_page = k_page($k_post, $set['p_str']);
-			$page = page($k_page);
-			$start = $set['p_str'] * $page - $set['p_str'];
+			$note_comment = [];
+			if ($allowViewNote) {
+				$k_post = $db->queryColumn('SELECT COUNT(*) FROM `notes_komm` WHERE `id_notes` = ?', [$post['id']]);
+				$k_page = k_page($k_post, $set['p_str']);
+				$page = page($k_page);
+				$start = $set['p_str'] * $page - $set['p_str'];
 
-			$comment_rows = $db->queryAll("SELECT * FROM `notes_komm` WHERE `id_notes` = ? ORDER BY `time` LIMIT $start, $set[p_str]", [$post['id']]);
-			foreach ($comment_rows as $comment_post) {
-				$note_comment[] = $comment_post;
+				$comment_rows = $db->queryAll("SELECT * FROM `notes_komm` WHERE `id_notes` = ? ORDER BY `time` LIMIT $start, $set[p_str]", [$post['id']]);
+				foreach ($comment_rows as $comment_post) {
+					$note_comment[] = $comment_post;
+				}
 			}
 
 			$response = array(
