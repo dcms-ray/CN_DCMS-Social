@@ -76,6 +76,28 @@ if ($k_post == 0) {
 }
 $num = 0;
 while ($post = dbassoc($q)) {
+	if ($post['private'] == 0) {
+		$allowViewNote = true;
+	} else {
+		if (isset($user)) {
+			if ($post['private'] == 1) {
+				$frend = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE (`user` = '{$user['id']}' AND `frend` = '{$post['id_user']}') OR (`user` = '{$post['id_user']}' AND `frend` = '{$user['id']}') LIMIT 1"), 0);
+				if ($user['id'] == $post['id_user'] || $frend == 2  || user_access('notes_delete')) {
+					$allowViewNote = true;
+				} else {
+					$allowViewNote = false;
+				}
+			} elseif ($post['private'] == 2 && ($user['id'] == $post['id_user'] || user_access('notes_delete'))) {
+				$allowViewNote = true;
+			} else {
+				$allowViewNote = false;
+			}
+		} else {
+			$allowViewNote = false;
+		}
+	}
+
+
 	/*-----------代码-----------*/
 	if ($num == 0) {
 		echo '<div class="nav1">';
@@ -86,9 +108,13 @@ while ($post = dbassoc($q)) {
 	}
 	/*---------------------------*/
 	echo "<img src='../../style/icons/dnev.png' alt='*'> ";
-	echo "<a href='list.php?id={$post['id']}'>" . text($post['name']) . "</a>";
+	if ($allowViewNote) {
+		echo "<a href='list.php?id={$post['id']}'>" . text($post['name']) . "</a>";
+	} else {
+		echo '[不可见]';
+	}
 	echo " <span style='time'>(" . vremja($post['time']) . ")</span> <br />";
-	$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = '{$post['id']}' AND `time` > '" . mktime(0, 0, 0) . "'"), 0);
+	//$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id` = '{$post['id']}' AND `time` > '" . mktime(0, 0, 0) . "'"), 0);
 	echo "   </div>";
 }
 echo "</table>";
@@ -98,5 +124,6 @@ if (isset($_GET['sort'])) {
 } else {
 	$dop = '';
 }
+
 if ($k_page > 1) str('?id=' . $ank['id'] . '&amp;' . $dop . '', $k_page, $page); // 输出页数
 include_once '../../sys/inc/tfoot.php';
