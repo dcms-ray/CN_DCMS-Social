@@ -73,6 +73,7 @@ switch ($action) {
 			http_response_code(403);
 			$response = ['status' => 'error', 'message' => 'missing required parameters'];
 		}
+		break;
 
 	case 'logout':
 		// 退出登录
@@ -84,6 +85,7 @@ switch ($action) {
 			http_response_code(403);
 			$response['status'] = 'error';
 		}
+		break;
 
 	case 'register':
 		// 注册
@@ -200,6 +202,7 @@ switch ($action) {
 				http_response_code(400);
 			}
 		}
+		break;
 
 	case 'get-captcha-url':
 		// 获取 Captcha URL 和 Captcha token
@@ -222,6 +225,7 @@ switch ($action) {
 			$response['captcha_token'],
 			$expiry_time
 		]);
+		break;
 
 	case 'activation-account':
 		// 激活账号
@@ -252,6 +256,7 @@ switch ($action) {
 			$response['message'] = 'missing parameters';
 			http_response_code(400);
 		}
+		break;
 
 	case 'forgot-password':
 		// 忘记密码
@@ -307,6 +312,7 @@ switch ($action) {
 			$response['status'] = 'error';
 			$response['message'] = 'missing parameters';
 		}
+		break;
 
 	case 'online-users':
 		$results = $db->queryAll('SELECT ul.id, ul.id_user, ul.last_online, ul.url FROM `user_log` ul WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0) ORDER BY ul.last_online DESC');
@@ -339,6 +345,7 @@ switch ($action) {
 			http_response_code(404);
 			$response['status'] = 'error';
 		}
+		break;
 
 	// 留言板相关
 	case 'guest-msg-list':
@@ -350,6 +357,7 @@ switch ($action) {
 		$results = $db->queryAll("SELECT * FROM `guest` ORDER BY id DESC LIMIT $start, $set[p_str]");
 
 		$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
+		break;
 
 	case 'guest-msg-add':
 		if (isset($_POST['msg'])) {
@@ -414,6 +422,7 @@ switch ($action) {
 			$response['status'] = 'error';
 			$response['message'] = 'msg not found';
 		}
+		break;
 
 	case 'guest-msg-delete':
 		if (isset($user)) {
@@ -444,6 +453,7 @@ switch ($action) {
 		} else {
 			$response = ['status' => 'error', 'message' => 'not login'];
 		}
+		break;
 
 	case 'guest-users-list':
 		$k_post = $db->query("SELECT COUNT(DISTINCT ul.id_user) AS online_users
@@ -471,17 +481,20 @@ switch ($action) {
 								LIMIT $start, $set[p_str]");
 
 		$response = ['status' => 'success', 'data' => $query, 'all_pages' => $k_page];
+		break;
 
 	// 聊天室相关
 	case 'chat-rooms-list':
 		$results = $db->queryAll('SELECT * FROM `chat_rooms` ORDER BY `pos` ASC');
 		$response['status'] = 'success';
 		$response['data'] = $results;
+		break;
 
 	case 'chat-users-list':
 		$results = $db->queryAll('SELECT * FROM `chat_who`');
 		$response['status'] = 'success';
 		$response['data'] = $results;
+		break;
 
 	case 'chat-msg-list':
 		if (isset($_GET['room'])) {
@@ -502,6 +515,7 @@ switch ($action) {
 		} else {
 			$response = ['status' => 'error', 'message' => 'room id not found'];
 		}
+		break;
 
 	case 'chat-msg-get':
 		if (isset($_GET['room'])) {
@@ -522,6 +536,7 @@ switch ($action) {
 		} else {
 			$response = ['status' => 'error', 'message' => 'room id not found'];
 		}
+		break;
 
 	case 'chat-msg-add':
 		if (isset($user)) {
@@ -573,14 +588,139 @@ switch ($action) {
 			$response['status'] = 'error';
 			$response['message'] = 'not login';
 		}
+		break;
+
+	// 日记相关
+	case 'note-list':
+		try {
+			$k_post = $db->queryColumn('SELECT COUNT(*) FROM `notes`');
+			$k_page = k_page($k_post, $set['p_str']);
+			$page = page($k_page);
+			$start = $set['p_str'] * $page - $set['p_str'];
+			$order = 'order by `time` desc';
+
+			$q = dbquery("SELECT * FROM `notes` $order LIMIT $start, $set[p_str]");
+			$json = array();
+			while ($post = dbassoc($q)) {
+				if ($post['private'] == 0) {
+					$allowViewNote = true;
+				} else {
+					if (isset($user)) {
+						if ($post['private'] == 1) {
+							$frend = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE (`user` = '{$user['id']}' AND `frend` = '{$post['id_user']}') OR (`user` = '{$post['id_user']}' AND `frend` = '{$user['id']}') LIMIT 1"), 0);
+							if ($user['id'] == $post['id_user'] || $frend == 2  || user_access('notes_delete')) {
+								$allowViewNote = true;
+							} else {
+								$allowViewNote = false;
+							}
+						} elseif ($post['private'] == 2 && ($user['id'] == $post['id_user'] || user_access('notes_delete'))) {
+							$allowViewNote = true;
+						} else {
+							$allowViewNote = false;
+						}
+					} else {
+						$allowViewNote = false;
+					}
+				}
+
+				// 追加到结果集
+				$json[$post['id']] = array(
+					'title' => $allowViewNote ? $post['name'] : NULL, // 如果无权限查看，则抹掉 name 字段
+					'date' => date('Y-m-d H:i:s', $post['time']),
+					'id_user' => $post['id_user'],
+					'count' => $post['count'],
+					'id_dir' => $post['id_dir'],
+					'type' => $post['type'],
+					'private' => $post['private'],
+					'share' => $post['share'],
+					'share_id' => $post['share_id'],
+					'share_text' => $post['share_text'],
+					'share_name' => $post['share_name'],
+					'share_id_user' => $post['share_id_user'],
+					'share_type' => $post['share_type'],
+					'share_user' => $post['share_user']
+				);
+			}
+
+			$response = array(
+				'status' => 'success',
+				'data' => $json
+			);
+
+		} catch (\Exception $e) {
+			$response = array(
+				'status' => 'error',
+				'message' => $e->getMessage()
+			);
+		}
+		break;
+
+	case 'note-get':
+		try {
+			if (!isset($_GET['id'])) throw new \Exception('id not found');
+
+			$post = $db->query('SELECT * FROM `notes` WHERE `id` = ? LIMIT 1', [$_GET['id']]);
+
+			if (empty($post)) throw new \Exception('note not exist');
+
+			if ($post['private'] == 0) {
+				$allowViewNote = true;
+			} else {
+				if (isset($user)) {
+					if ($post['private'] == 1) {
+						$frend = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE (`user` = '{$user['id']}' AND `frend` = '{$post['id_user']}') OR (`user` = '{$post['id_user']}' AND `frend` = '{$user['id']}') LIMIT 1"), 0);
+						if ($user['id'] == $post['id_user'] || $frend == 2  || user_access('notes_delete')) {
+							$allowViewNote = true;
+						} else {
+							$allowViewNote = false;
+						}
+					} elseif ($post['private'] == 2 && ($user['id'] == $post['id_user'] || user_access('notes_delete'))) {
+						$allowViewNote = true;
+					} else {
+						$allowViewNote = false;
+					}
+				} else {
+					$allowViewNote = false;
+				}
+			}
+			$response = array(
+				'status' => 'success',
+				'data' => array(
+					'title' => $allowViewNote ? $post['name'] : NULL,
+					'msg' => $allowViewNote ? $post['msg'] : NULL,
+					'date' => date('Y-m-d H:i:s', $post['time']),
+					'tags' => $allowViewNote ? $post['tags'] : NULL,
+					'id_user' => $post['id_user'],
+					'count' => $post['count'],
+					'id_dir' => $post['id_dir'],
+					'type' => $post['type'],
+					'private' => $post['private'],
+					'share' => $post['share'],
+					'share_id' => $post['share_id'],
+					'share_text' => $post['share_text'],
+					'share_name' => $post['share_name'],
+					'share_id_user' => $post['share_id_user'],
+					'share_type' => $post['share_type'],
+					'share_user' => $post['share_user']
+				)
+			);
+		} catch (\Exception $e) {
+			$response = array(
+				'status' => 'error',
+				'message' => $e->getMessage()
+			);
+		}
+		break;
 
 	default:
 		// 检查登录状态
 		if (isset($user)) {
-			$response['status'] = 'success';
-			$response['message'] = "Hello {$user['nick']}";
+			$response = array(
+				'status' => 'success',
+				'message' => "Hello {$user['nick']}"
+			);
 		} else {
-			$response['status'] = 'error';
+			$response = array('status' => 'error');
 		}
 }
 
