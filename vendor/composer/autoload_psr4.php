@@ -11,6 +11,7 @@ return array(
     'Psr\\Cache\\' => array($vendorDir . '/psr/cache/src'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'IPLib\\' => array($vendorDir . '/mlocati/ip-lib/src'),
+    'GuGuan123\\dcms\\' => array($baseDir . '/src'),
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Detection\\' => array($vendorDir . '/mobiledetect/mobiledetectlib/src'),
     'Composer\\CaBundle\\' => array($vendorDir . '/composer/ca-bundle/src'),
