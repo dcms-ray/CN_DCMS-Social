@@ -228,7 +228,7 @@ if ($set['use_mysqli'] == 1) {
 		// 遍历并优化每个表
 		foreach ($tables as $table) {
 			$tableName = reset($table); // 获取表名（第一个键值）
-			$db->dbquery("OPTIMIZE TABLE `$tableName`");
+			$db->query("OPTIMIZE TABLE `$tableName`");
 		}
 	}
 }
