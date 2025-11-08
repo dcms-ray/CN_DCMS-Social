@@ -48,7 +48,7 @@ echo '<div style="padding: 6px 10px;" class="foot"><a href="/plugins/notes/"><b>
 
 $q = dbquery("SELECT * FROM `notes` ORDER BY `time` DESC LIMIT 3");
 if (dbrows($q) == 0) {
-		echo '<div class="nav2 main_no_notes_nav2">没有记录</div>';
+	echo '<div class="nav2 main_no_notes_nav2">没有记录</div>';
 } else {
 	while ($post = dbassoc($q)) {
 		if ($post['private'] == 0) {
