@@ -811,3 +811,69 @@ API地址：https://[网站域名]/api.php
         "message": "not login"
     }
     ```
+
+### 4. 日记相关
+
+#### 4.1 查看日记列表
+
+- **请求URL**: `?action=note-list&page=<int>`
+- **请求方式**: GET
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "data": {
+            "<int>": {
+                "title": "<string>|NULL",
+                "date": "<string>",
+                "id_user": "<int>",
+                "count": "<int>",
+                "id_dir": "<int>",
+                "type": "<int>",
+                "private": "<int>"
+            },
+            "<int>": {...}
+        },
+        "all_pages": "<int>"
+    }
+    ```
+
+    id: 日记ID
+
+#### 4.2 查看某篇日记
+
+- **请求URL**: `?action=note-get&id=<int>&page=<int>`
+- **请求方式**: GET
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "data": {
+            "title": "<string>|NULL",
+            "msg": "<string>|NULL",
+            "date": "<string>",
+            "id_user": "<int>",
+            "count": "<int>",
+            "id_dir": "<int>",
+            "type": "<int>",
+            "private": "<int>"
+            "comment_list": [
+                {
+                    "id": "<int>",
+                    "id_user": "<int>",
+                    "id_notes": "<int>",
+                    "msg": "<string>|NULL",
+                    "time": "<int>"
+                },
+                {...}
+            ]
+        },
+        "all_comment_pages": "<int>"
+    }
+    ```
+
+    id: 日记ID
