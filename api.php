@@ -36,554 +36,552 @@ if (empty($set['api']) || $set['api'] == '0') {
 	]));
 }
 
-// 处理登录
-if (isset($_GET['action']) && $_GET['action'] == 'login') {	// 检查用户是否已经提交登录表单
-	if (isset($_POST['nick']) && isset($_POST['password'])) {
-		// 选择了“记住我”
-		if (isset($_POST['aut_save']) && $_POST['aut_save'] == '1') {
-			$expiration = time() + 60 * 60 * 24 * 365;
-		} else {
-			$expiration = time() + 3600 * 24;
-		}
-		$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['password'], $expiration);
-		if ($authManagerLoginResult['status']) {
-			// 登录成功
+$action = $_GET['action'] ?? NULL;
 
-			// 在 session 存储用户ID与登录记录ID
-			$_SESSION['id_user'] = $authManagerLoginResult['data']['user_id'];
-			$_SESSION['login_id'] = $authManagerLoginResult['data']['login_id'];
-
-			setcookie('auth_token', $authManagerLoginResult['data']['token'], $expiration, '/');
-
-			// 设置响应为成功
-			$response = [
-				'status' => 'success',
-				'message' => 'login successful',
-				'data' => $authManagerLoginResult['data']
-			];
-		} else {
-			// 登录失败
-			http_response_code(403);
-			$response = ['status' => 'error', 'message' => 'incorrect username or password'];
-		}
-	} else {
-		http_response_code(403);
-		$response = ['status' => 'error', 'message' => 'missing required parameters'];
-	}
-
-
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'logout') {
-	// 退出登录
-	setcookie('auth_token', '', time() - 3600, '/');
-	session_destroy();
-	if (isset($user) && $authManager->logout($user['login_id'])) {
-		$response['status'] = 'success';
-	} else {
-		http_response_code(403);
-		$response['status'] = 'error';
-	}
-
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'register') {
-	// 注册
-	try {
-		if ($set['reg_select'] == 'close') {
-			// 管理员已关闭注册
-			throw new Exception('registration is closed');
-		}
-
-		// 验证验证码
-		if (!isset($_POST['captcha']) || !isset($_POST['captcha_token'])) {
-			throw new Exception('verification code is required');
-		}
-	
-		// 验证码验证逻辑
-		$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
-		if ($validateCaptchaToken['status'] != 'success') {
-			throw new Exception($validateCaptchaToken['message']);
-		}
-	
-		// 检查必要参数
-		if (!isset($_POST['reg_nick'])) {
-			// 缺少昵称参数
-			throw new Exception('nick is missing');
-		}
-		if (!isset($_POST['password'])) {
-			// 缺少密码参数
-			throw new Exception('password is missing');
-		}
-	
-		// 先检查邮箱（如果启用了邮件验证）
-		if ($set['reg_select'] == 'open_mail' && empty($_POST['email'])) {
-			throw new Exception('email is missing');
-		}
-		if (isset($_POST['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-			throw new Exception('invalid email address');
-		}
-
-		// 检查昵称
-		if (!preg_match("#^([A-Za-z0-9\-\_\ ])+$#", $_POST['reg_nick'])) {
-			// 昵称含有非法字符
-			throw new Exception('invalid characters in nick');
-		}
-		$nickLength = strlen2($_POST['reg_nick']);
-		if ($nickLength < 3) throw new Exception('nick too short');
-		if ($nickLength > 32) throw new Exception('nick too long');
-
-		// 检查用户昵称和电子邮件是否已存在
-		if ($db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = ?", [$_POST['reg_nick']])['COUNT(*)'] > 0) {
-			throw new Exception('nick already registered');
-		} elseif (isset($_POST['email']) && $db->query("SELECT COUNT(*) FROM `reg_mail` WHERE `mail` = ?", [$_POST['email']])['COUNT(*)'] != 0) {
-			throw new Exception('email already registered');
-		}
-
-		// 检查密码
-		$passwordLength = strlen2($_POST['password']);
-		if ($passwordLength < 6) throw new Exception('password too short');
-		if ($passwordLength > 32) throw new Exception('password too long');
-
-		// 如果开启了邮箱验证，创建激活码
-		if ($set['reg_select'] == 'open_mail') $activation = md5(random_bytes(16));
-
-		// 注册用户
-		$id_reg = $db->insert("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `pol`, `activation`, `email`) VALUES (?, ?, ?, ?, ?, ?)", [
-			$_POST['reg_nick'],
-			password_hash($_POST['password'], PASSWORD_DEFAULT),
-			time(),
-			intval((isset($_POST['pol']) && ($_POST['pol'] == '1')) ? 1 : 0),
-			($set['reg_select'] == 'open_mail') ? $activation : NULL,
-			$_POST['email'] ?? null
-		]);
-
-		// 邮件激活逻辑
-		if ($set['reg_select'] == 'open_mail') {
-			$subject = "帐户激活";
-			$regmail = "你好！ {$_POST['reg_nick']}<br />
-						要激活您的帐户，请点击链接:<br />
-						<a href='" . get_http_type() . "://{$_SERVER['HTTP_HOST']}/user/reg.php?id=$id_reg&amp;activation=$activation'>点击激活帐户</a><br />
-						如果帐户在24小时内未激活，它将被删除。<br />
-						真诚的，网站管理团队";
-
-
-			// 调用封装的发送邮件函数
-			$emailResult = sendEmail($subject, $regmail, $_POST['email'], $_POST['reg_nick']);
-
-			if ($emailResult['status'] == 'success') {
-				// 如果邮件发送成功
-				$response['status'] = 'success';
-				$response['data']['user_id'] = $id_reg;
-				$response['message'] = "verification email sent";
+switch ($action) {
+	// 处理登录
+	case 'login':
+		if (isset($_POST['nick']) && isset($_POST['password'])) {
+			// 选择了“记住我”
+			if (isset($_POST['aut_save']) && $_POST['aut_save'] == '1') {
+				$expiration = time() + 60 * 60 * 24 * 365;
 			} else {
-				// 如果邮件发送失败
-				$response['status'] = 'error';
-				$response['message'] = $emailResult['message'];
+				$expiration = time() + 3600 * 24;
+			}
+			$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['password'], $expiration);
+			if ($authManagerLoginResult['status']) {
+				// 登录成功
+
+				// 在 session 存储用户ID与登录记录ID
+				$_SESSION['id_user'] = $authManagerLoginResult['data']['user_id'];
+				$_SESSION['login_id'] = $authManagerLoginResult['data']['login_id'];
+
+				setcookie('auth_token', $authManagerLoginResult['data']['token'], $expiration, '/');
+
+				// 设置响应为成功
+				$response = [
+					'status' => 'success',
+					'message' => 'login successful',
+					'data' => $authManagerLoginResult['data']
+				];
+			} else {
+				// 登录失败
+				http_response_code(403);
+				$response = ['status' => 'error', 'message' => 'incorrect username or password'];
 			}
 		} else {
-			// 如果没有开启邮箱验证，直接注册
-			$response['message'] = 'registration successful';
-			$response['data']['user_id'] = $id_reg;
-			$response['status'] = 'success';
-		}
-	} catch (Exception $e) {
-		$response['status'] = 'error';
-		$response['message'] = $e->getMessage();
-
-		// 设置 HTTP Code
-		if ($response['message'] == 'registration is closed') {
-			http_response_code(405);
-		} elseif ($response['message'] == 'nick already registered' || $response['message'] == 'email already registered') {
 			http_response_code(403);
-		} elseif (isset($emailResult['status']) && $emailResult['status'] == 'error') {
-			http_response_code(500);
-		} else {
-			http_response_code(400);
+			$response = ['status' => 'error', 'message' => 'missing required parameters'];
 		}
-	}
 
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'get-captcha-url') {
-	// 获取 Captcha URL 和 Captcha token
-
-	// 生成5位验证码
-	$captcha_value = rand(10000, 99999);
-	$expiry_time = time() + 600;  // 设置过期时间为 10 分钟后
-
-	// 生成随机的 iv（初始化向量）
-	$iv = openssl_random_pseudo_bytes(16);
-
-	$response['status'] = 'success';
-	// 给验证码添加过期时间，加密后进行 base64 编码，与 base64 编码过的 iv 拼装在一起作为 captcha_token
-	$response['captcha_token'] = base64_encode(openssl_encrypt($captcha_value . '.' . (time() + 600), 'aes-256-cbc', $set['shif'], 0, $iv)) . '.' . base64_encode($iv);
-	// 生成验证码图片 URL
-	$response['captcha_url'] = "/captcha.php?captcha_token={$response['captcha_token']}";
-
-	// 插入数据库，保存生成的 token，状态为 'unused'
-	$db->insert("INSERT INTO captcha_tokens (captcha_token, expires_at, status) VALUES (?, FROM_UNIXTIME(?), 'unused')", [
-		$response['captcha_token'],
-		$expiry_time
-	]);
-
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'activation-account') {
-	// 激活账号
-
-	if ($set['reg_select'] == 'close') {
-		$response['status'] = 'error';
-		$response['message'] = "Registration is closed";
-	} elseif (isset($_GET['id']) && isset($_GET['activation'])) {
-		if ($db->query("SELECT COUNT(*) FROM `user` WHERE `id` = :id AND `activation` = :activation", [':id' => intval($_GET['id']), ':activation' => $_GET['activation']])['COUNT(*)'] == 1) {
-			// 更新激活状态
-			$db->update("UPDATE `user` SET `activation` = NULL WHERE `id` = :id LIMIT 1", [':id' => intval($_GET['id'])]);
-	
-			// 获取用户信息
-			$user = $db->query("SELECT * FROM `user` WHERE `id` = :id LIMIT 1", [':id' => intval($_GET['id'])]);
-	
-			// 插入激活邮件记录
-			$db->insert("INSERT INTO `reg_mail` (`id_user`, `mail`) VALUES (:id_user, :mail)", [
-				':id_user' => $user['id'],
-				':mail' => $user['email']
-			]);
-	
-			// 显示激活成功消息并设置会话
+	case 'logout':
+		// 退出登录
+		setcookie('auth_token', '', time() - 3600, '/');
+		session_destroy();
+		if (isset($user) && $authManager->logout($user['login_id'])) {
 			$response['status'] = 'success';
-			$response['message'] = "account activated";
+		} else {
+			http_response_code(403);
+			$response['status'] = 'error';
 		}
-	} else {
-		$response['status'] = 'error';
-		$response['message'] = 'missing parameters';
-		http_response_code(400);
-	}
 
+	case 'register':
+		// 注册
+		try {
+			if ($set['reg_select'] == 'close') {
+				// 管理员已关闭注册
+				throw new Exception('registration is closed');
+			}
 
-} elseif (isset($_GET['action']) && $_GET['action'] == 'forgot-password') {
-	// 忘记密码
-	if (isset($_POST['nick']) && isset($_POST['email']) && isset($_POST['captcha']) && isset($_POST['captcha_token'])) {
-		$result = $db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = :nick", [':nick' => $_POST['nick']]);
+			// 验证验证码
+			if (!isset($_POST['captcha']) || !isset($_POST['captcha_token'])) {
+				throw new Exception('verification code is required');
+			}
+		
+			// 验证码验证逻辑
+			$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
+			if ($validateCaptchaToken['status'] != 'success') {
+				throw new Exception($validateCaptchaToken['message']);
+			}
+		
+			// 检查必要参数
+			if (!isset($_POST['reg_nick'])) {
+				// 缺少昵称参数
+				throw new Exception('nick is missing');
+			}
+			if (!isset($_POST['password'])) {
+				// 缺少密码参数
+				throw new Exception('password is missing');
+			}
+		
+			// 先检查邮箱（如果启用了邮件验证）
+			if ($set['reg_select'] == 'open_mail' && empty($_POST['email'])) {
+				throw new Exception('email is missing');
+			}
+			if (isset($_POST['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+				throw new Exception('invalid email address');
+			}
 
-		if ($result && $result['COUNT(*)'] == 1) {
-			$result = $db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = :nick AND `email` = :email", [
-				':nick' => $_POST['nick'],
-				':email' => $_POST['email']
+			// 检查昵称
+			if (!preg_match("#^([A-Za-z0-9\-\_\ ])+$#", $_POST['reg_nick'])) {
+				// 昵称含有非法字符
+				throw new Exception('invalid characters in nick');
+			}
+			$nickLength = strlen2($_POST['reg_nick']);
+			if ($nickLength < 3) throw new Exception('nick too short');
+			if ($nickLength > 32) throw new Exception('nick too long');
+
+			// 检查用户昵称和电子邮件是否已存在
+			if ($db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = ?", [$_POST['reg_nick']])['COUNT(*)'] > 0) {
+				throw new Exception('nick already registered');
+			} elseif (isset($_POST['email']) && $db->query("SELECT COUNT(*) FROM `reg_mail` WHERE `mail` = ?", [$_POST['email']])['COUNT(*)'] != 0) {
+				throw new Exception('email already registered');
+			}
+
+			// 检查密码
+			$passwordLength = strlen2($_POST['password']);
+			if ($passwordLength < 6) throw new Exception('password too short');
+			if ($passwordLength > 32) throw new Exception('password too long');
+
+			// 如果开启了邮箱验证，创建激活码
+			if ($set['reg_select'] == 'open_mail') $activation = md5(random_bytes(16));
+
+			// 注册用户
+			$id_reg = $db->insert("INSERT INTO `user` (`nick`, `pass`, `date_reg`, `pol`, `activation`, `email`) VALUES (?, ?, ?, ?, ?, ?)", [
+				$_POST['reg_nick'],
+				password_hash($_POST['password'], PASSWORD_DEFAULT),
+				time(),
+				intval((isset($_POST['pol']) && ($_POST['pol'] == '1')) ? 1 : 0),
+				($set['reg_select'] == 'open_mail') ? $activation : NULL,
+				$_POST['email'] ?? null
 			]);
-			if ($result && $result['COUNT(*)'] == 1) {
-				// 生成链接Token
-				$token = bin2hex(random_bytes(32));
-				// 插入数据库，存储 token 和创建时间
-				$db->query("INSERT INTO `password_reset_tokens` (`user_id`, `token`) VALUES (:user_id, :token)", [
-					':user_id' => $userId,
-					':token' => $token
-				]);
 
-				$user2 = $db->query("SELECT * FROM `user` WHERE `nick` = :nick LIMIT 1", [':nick' => $_POST['nick']]);
-				$subject = "密码恢复";
-				$regmail = "你好！ $user2[nick]<br />
-							您已激活密码恢复<br />
-							要设置新密码，请点击链接:<br />
-							<a href='" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
-							此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
+			// 邮件激活逻辑
+			if ($set['reg_select'] == 'open_mail') {
+				$subject = "帐户激活";
+				$regmail = "你好！ {$_POST['reg_nick']}<br />
+							要激活您的帐户，请点击链接:<br />
+							<a href='" . get_http_type() . "://{$_SERVER['HTTP_HOST']}/user/reg.php?id=$id_reg&amp;activation=$activation'>点击激活帐户</a><br />
+							如果帐户在24小时内未激活，它将被删除。<br />
+							真诚的，网站管理团队";
+
 
 				// 调用封装的发送邮件函数
-				$emailResult = sendEmail($subject, $regmail, $user2['email'], $user2['nick']);
+				$emailResult = sendEmail($subject, $regmail, $_POST['email'], $_POST['reg_nick']);
 
 				if ($emailResult['status'] == 'success') {
 					// 如果邮件发送成功
 					$response['status'] = 'success';
-					$response['message'] = "password reset email sent";
+					$response['data']['user_id'] = $id_reg;
+					$response['message'] = "verification email sent";
 				} else {
 					// 如果邮件发送失败
-					http_response_code(500);
 					$response['status'] = 'error';
 					$response['message'] = $emailResult['message'];
 				}
 			} else {
+				// 如果没有开启邮箱验证，直接注册
+				$response['message'] = 'registration successful';
+				$response['data']['user_id'] = $id_reg;
+				$response['status'] = 'success';
+			}
+		} catch (Exception $e) {
+			$response['status'] = 'error';
+			$response['message'] = $e->getMessage();
+
+			// 设置 HTTP Code
+			if ($response['message'] == 'registration is closed') {
+				http_response_code(405);
+			} elseif ($response['message'] == 'nick already registered' || $response['message'] == 'email already registered') {
+				http_response_code(403);
+			} elseif (isset($emailResult['status']) && $emailResult['status'] == 'error') {
+				http_response_code(500);
+			} else {
 				http_response_code(400);
-				$response['status'] = 'error';
-				$response['message'] = 'invalid email address';
+			}
+		}
+
+	case 'get-captcha-url':
+		// 获取 Captcha URL 和 Captcha token
+
+		// 生成5位验证码
+		$captcha_value = rand(10000, 99999);
+		$expiry_time = time() + 600;  // 设置过期时间为 10 分钟后
+
+		// 生成随机的 iv（初始化向量）
+		$iv = openssl_random_pseudo_bytes(16);
+
+		$response['status'] = 'success';
+		// 给验证码添加过期时间，加密后进行 base64 编码，与 base64 编码过的 iv 拼装在一起作为 captcha_token
+		$response['captcha_token'] = base64_encode(openssl_encrypt($captcha_value . '.' . (time() + 600), 'aes-256-cbc', $set['shif'], 0, $iv)) . '.' . base64_encode($iv);
+		// 生成验证码图片 URL
+		$response['captcha_url'] = "/captcha.php?captcha_token={$response['captcha_token']}";
+
+		// 插入数据库，保存生成的 token，状态为 'unused'
+		$db->insert("INSERT INTO captcha_tokens (captcha_token, expires_at, status) VALUES (?, FROM_UNIXTIME(?), 'unused')", [
+			$response['captcha_token'],
+			$expiry_time
+		]);
+
+	case 'activation-account':
+		// 激活账号
+
+		if ($set['reg_select'] == 'close') {
+			$response['status'] = 'error';
+			$response['message'] = "Registration is closed";
+		} elseif (isset($_GET['id']) && isset($_GET['activation'])) {
+			if ($db->query("SELECT COUNT(*) FROM `user` WHERE `id` = :id AND `activation` = :activation", [':id' => intval($_GET['id']), ':activation' => $_GET['activation']])['COUNT(*)'] == 1) {
+				// 更新激活状态
+				$db->update("UPDATE `user` SET `activation` = NULL WHERE `id` = :id LIMIT 1", [':id' => intval($_GET['id'])]);
+		
+				// 获取用户信息
+				$user = $db->query("SELECT * FROM `user` WHERE `id` = :id LIMIT 1", [':id' => intval($_GET['id'])]);
+		
+				// 插入激活邮件记录
+				$db->insert("INSERT INTO `reg_mail` (`id_user`, `mail`) VALUES (:id_user, :mail)", [
+					':id_user' => $user['id'],
+					':mail' => $user['email']
+				]);
+		
+				// 显示激活成功消息并设置会话
+				$response['status'] = 'success';
+				$response['message'] = "account activated";
 			}
 		} else {
+			$response['status'] = 'error';
+			$response['message'] = 'missing parameters';
 			http_response_code(400);
-			$response['status'] = 'error';
-			$response['message'] = 'nick not found';
 		}
-	} else {
-		$response['status'] = 'error';
-		$response['message'] = 'missing parameters';
-	}
 
+	case 'forgot-password':
+		// 忘记密码
+		if (isset($_POST['nick']) && isset($_POST['email']) && isset($_POST['captcha']) && isset($_POST['captcha_token'])) {
+			$result = $db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = :nick", [':nick' => $_POST['nick']]);
 
-} elseif (isset($_GET['action']) && $_GET['action'] == 'online-users') {
-	$results = $db->queryAll('SELECT ul.id, ul.id_user, ul.last_online, ul.url FROM `user_log` ul WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0) ORDER BY ul.last_online DESC');
+			if ($result && $result['COUNT(*)'] == 1) {
+				$result = $db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = :nick AND `email` = :email", [
+					':nick' => $_POST['nick'],
+					':email' => $_POST['email']
+				]);
+				if ($result && $result['COUNT(*)'] == 1) {
+					// 生成链接Token
+					$token = bin2hex(random_bytes(32));
+					// 插入数据库，存储 token 和创建时间
+					$db->query("INSERT INTO `password_reset_tokens` (`user_id`, `token`) VALUES (:user_id, :token)", [
+						':user_id' => $userId,
+						':token' => $token
+					]);
 
-	$response = ['status' => 'success', 'users' => array_map(function($user) {
-		return [
-			'id' => $user['id_user'],
-			'last_online' => $user['last_online']
-		];
-	}, $results)];
+					$user2 = $db->query("SELECT * FROM `user` WHERE `nick` = :nick LIMIT 1", [':nick' => $_POST['nick']]);
+					$subject = "密码恢复";
+					$regmail = "你好！ $user2[nick]<br />
+								您已激活密码恢复<br />
+								要设置新密码，请点击链接:<br />
+								<a href='" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
+								此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
 
+					// 调用封装的发送邮件函数
+					$emailResult = sendEmail($subject, $regmail, $user2['email'], $user2['nick']);
 
-} elseif (isset($_GET['action']) && $_GET['action'] == 'user-info') {
-	$user_info = user::get_user(($_GET['id'] ?? ($user ?? 0)));
-	if ($user_info) {
-		$response = [
-			'status' => 'success',
-			'data' => [
-				'id' => $user_info['id'],
-				'nick' => $user_info['nick'],
-				'date_reg' => $user_info['date_reg'],
-				'balls' => $user_info['balls'],
-				'browser' => $user_info['browser'],
-				'money' => $user_info['money'],
-				'group_name' => $user_info['group_name'],
-				'pol' => $user_info['pol'],
-				'date_last' => $user_info['date_last']
-			]
-		];
-	} else {
-		http_response_code(404);
-		$response['status'] = 'error';
-	}
-} elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-list') {
-	$k_post = $db->queryColumn("SELECT COUNT(id) FROM `guest`");
-	$k_page = k_page($k_post, $set['p_str']);
-	$page = page($k_page);
-	$start = $set['p_str'] * $page - $set['p_str'];
-
-	$results = $db->queryAll("SELECT * FROM `guest` ORDER BY id DESC LIMIT $start, $set[p_str]");
-
-	$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-add') {
-	if (isset($_POST['msg'])) {
-		// 检查是否有违禁词
-		$mat = antimat($_POST['msg']);
-		if ($mat) {
-			$response['status'] = 'error';
-			$response['message'] = 'forbidden strings: ' . $mat;
-		} elseif (strlen2($_POST['msg']) > 1024) {
-			$response['status'] = 'error';
-			$response['message'] = 'content too long';
-		} elseif (strlen2($_POST['msg']) < 2) {
-			$response['status'] = 'error';
-			$response['message'] = 'content too short';
-		} else {
-			if (isset($user)) {
-				// 获取该用户的上一条消息
-				$lastMessage = $db->query('SELECT `msg`, `time` FROM `guest` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [($user['id']) ?? 0]);
-				if ($lastMessage && $lastMessage['msg'] == $_POST['msg'] && (time() - $lastMessage['time']) < 300) {
-					$response['status'] = 'error';
-					$response['message'] = 'duplicate content';
-				} else {
-					// 活动积分的累积
-					include_once 'sys/add/user.active.php';
-					
-					// 添加通知信息
-					if (isset($ank_reply['id'])) {
-						$notifiacation = dbassoc(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $ank_reply['id'] . "' LIMIT 1"));
-						if ($notifiacation['komm'] == 1 && $ank_reply['id'] != $user['id'])
-							dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$ank_reply[id]', 0, 'guest', '$time')");
+					if ($emailResult['status'] == 'success') {
+						// 如果邮件发送成功
+						$response['status'] = 'success';
+						$response['message'] = "password reset email sent";
+					} else {
+						// 如果邮件发送失败
+						http_response_code(500);
+						$response['status'] = 'error';
+						$response['message'] = $emailResult['message'];
 					}
-					$db->insert('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [$user['id'], $time, $_POST['msg']]);
-					$response['status'] = 'success';
+				} else {
+					http_response_code(400);
+					$response['status'] = 'error';
+					$response['message'] = 'invalid email address';
 				}
-			} elseif (isset($set['write_guest']) && $set['write_guest'] == 1) {
-				if (isset($_POST['captcha']) && isset($_POST['captcha_token'])) {
-					$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
-					if ($validateCaptchaToken['status'] == 'success') {
-						// 获取上一条消息
-						$lastMessage = $db->query('SELECT `msg`, `time` FROM `guest` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [0]);
-						if ($lastMessage && $lastMessage['msg'] == $_POST['msg'] && (time() - $lastMessage['time']) < 300) {
-							$response['status'] = 'error';
-							$response['message'] = 'duplicate content';
+			} else {
+				http_response_code(400);
+				$response['status'] = 'error';
+				$response['message'] = 'nick not found';
+			}
+		} else {
+			$response['status'] = 'error';
+			$response['message'] = 'missing parameters';
+		}
+
+	case 'online-users':
+		$results = $db->queryAll('SELECT ul.id, ul.id_user, ul.last_online, ul.url FROM `user_log` ul WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0) ORDER BY ul.last_online DESC');
+
+		$response = ['status' => 'success', 'users' => array_map(function($user) {
+			return [
+				'id' => $user['id_user'],
+				'last_online' => $user['last_online']
+			];
+		}, $results)];
+
+	case 'user-info':
+		$user_info = user::get_user(($_GET['id'] ?? ($user ?? 0)));
+		if ($user_info) {
+			$response = [
+				'status' => 'success',
+				'data' => [
+					'id' => $user_info['id'],
+					'nick' => $user_info['nick'],
+					'date_reg' => $user_info['date_reg'],
+					'balls' => $user_info['balls'],
+					'browser' => $user_info['browser'],
+					'money' => $user_info['money'],
+					'group_name' => $user_info['group_name'],
+					'pol' => $user_info['pol'],
+					'date_last' => $user_info['date_last']
+				]
+			];
+		} else {
+			http_response_code(404);
+			$response['status'] = 'error';
+		}
+
+	// 留言板相关
+	case 'guest-msg-list':
+		$k_post = $db->queryColumn("SELECT COUNT(id) FROM `guest`");
+		$k_page = k_page($k_post, $set['p_str']);
+		$page = page($k_page);
+		$start = $set['p_str'] * $page - $set['p_str'];
+
+		$results = $db->queryAll("SELECT * FROM `guest` ORDER BY id DESC LIMIT $start, $set[p_str]");
+
+		$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
+
+	case 'guest-msg-add':
+		if (isset($_POST['msg'])) {
+			// 检查是否有违禁词
+			$mat = antimat($_POST['msg']);
+			if ($mat) {
+				$response['status'] = 'error';
+				$response['message'] = 'forbidden strings: ' . $mat;
+			} elseif (strlen2($_POST['msg']) > 1024) {
+				$response['status'] = 'error';
+				$response['message'] = 'content too long';
+			} elseif (strlen2($_POST['msg']) < 2) {
+				$response['status'] = 'error';
+				$response['message'] = 'content too short';
+			} else {
+				if (isset($user)) {
+					// 获取该用户的上一条消息
+					$lastMessage = $db->query('SELECT `msg`, `time` FROM `guest` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [($user['id']) ?? 0]);
+					if ($lastMessage && $lastMessage['msg'] == $_POST['msg'] && (time() - $lastMessage['time']) < 300) {
+						$response['status'] = 'error';
+						$response['message'] = 'duplicate content';
+					} else {
+						// 活动积分的累积
+						include_once 'sys/add/user.active.php';
+						
+						// 添加通知信息
+						if (isset($ank_reply['id'])) {
+							$notifiacation = dbassoc(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $ank_reply['id'] . "' LIMIT 1"));
+							if ($notifiacation['komm'] == 1 && $ank_reply['id'] != $user['id'])
+								dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$ank_reply[id]', 0, 'guest', '$time')");
+						}
+						$db->insert('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [$user['id'], $time, $_POST['msg']]);
+						$response['status'] = 'success';
+					}
+				} elseif (isset($set['write_guest']) && $set['write_guest'] == 1) {
+					if (isset($_POST['captcha']) && isset($_POST['captcha_token'])) {
+						$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
+						if ($validateCaptchaToken['status'] == 'success') {
+							// 获取上一条消息
+							$lastMessage = $db->query('SELECT `msg`, `time` FROM `guest` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [0]);
+							if ($lastMessage && $lastMessage['msg'] == $_POST['msg'] && (time() - $lastMessage['time']) < 300) {
+								$response['status'] = 'error';
+								$response['message'] = 'duplicate content';
+							} else {
+								$msgId = $db->insert('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [0, $time, $_POST['msg']]);
+								$response = ['status' => 'success', 'id' => $msgId];
+							}
 						} else {
-							$msgId = $db->insert('INSERT INTO `guest` (id_user, time, msg) values(?, ?, ?)', [0, $time, $_POST['msg']]);
-							$response = ['status' => 'success', 'id' => $msgId];
+							$response['status'] = 'error';
+							$response['message'] = $validateCaptchaToken['message'];
 						}
 					} else {
 						$response['status'] = 'error';
-						$response['message'] = $validateCaptchaToken['message'];
+						$response['message'] = 'captcha not found';
 					}
 				} else {
 					$response['status'] = 'error';
-					$response['message'] = 'captcha not found';
-				}
-			} else {
-				$response['status'] = 'error';
-				$response['message'] = 'not login';
-			}
-		}
-	} else {
-		$response['status'] = 'error';
-		$response['message'] = 'msg not found';
-	}
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'guest-msg-delete') {
-	if (isset($user)) {
-		if (isset($_POST['id'])) {
-			$post = $db->query('SELECT * FROM `guest` WHERE `id` = ? LIMIT 1', [$_POST['id']]);
-			if (empty($post['id'])) {
-				$response = ['status' => 'error', 'message' => 'msg not exist'];
-			} else {
-				if ($post['id_user'] == 0) {
-					$ank['id'] = 0;
-					$ank['pol'] = 'guest';
-					$ank['level'] = 0;
-					$ank['nick'] = '客人';
-				} else {
-					$ank = user::get_user($post['id_user']);
-				}
-				if (user_access('guest_delete') || $user['id'] == $post['id_user']) {
-					if ($user['id'] != $post['id_user']) admin_log('留言板', '删除邮件', '从中删除消息 ' . $ank['nick']);
-					$db->delete('DELETE FROM guest WHERE id = ?', [$post['id']]);
-					$response['status'] = 'success';
-				} else {
-					$response = ['status' => 'error', 'message' => 'no permissions'];
+					$response['message'] = 'not login';
 				}
 			}
 		} else {
-			$response = ['status' => 'error', 'message' => 'msg id not found'];
+			$response['status'] = 'error';
+			$response['message'] = 'msg not found';
 		}
-	} else {
-		$response = ['status' => 'error', 'message' => 'not login'];
-	}
 
-} elseif (isset($_GET['action']) && $_GET['action'] == 'guest-users-list') {
-	$k_post = $db->query("SELECT COUNT(DISTINCT ul.id_user) AS online_users
-	                      FROM `user_log` ul
-	                      WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
-	                          AND ul.ban = 0
-	                          AND ul.url LIKE '/guest/%'
-	                          AND ul.last_online = (
-	                              SELECT MAX(last_online)
-	                              FROM `user_log` ul2
-	                              WHERE ul2.id_user = ul.id_user
-	                                  AND ul2.last_online > NOW() - INTERVAL 100 SECOND
-	                                  AND ul2.ban = 0
-	                          )");
-	$k_page = k_page($k_post['online_users'], $set['p_str']);
-	$page = page($k_page);
-	$start = $set['p_str'] * $page - $set['p_str'];
-
-	$query = $db->queryAll("SELECT DISTINCT ul.id_user, ul.last_online
-	                        FROM `user_log` ul
-	                        WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
-	                            AND ul.ban = 0
-	                            AND ul.url LIKE '/guest/%'
-	                        ORDER BY ul.last_online DESC
-					        LIMIT $start, $set[p_str]");
-
-	$response = ['status' => 'success', 'data' => $query, 'all_pages' => $k_page];
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-rooms-list') {
-	$results = $db->queryAll('SELECT * FROM `chat_rooms` ORDER BY `pos` ASC');
-	$response['status'] = 'success';
-	$response['data'] = $results;
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-users-list') {
-	$results = $db->queryAll('SELECT * FROM `chat_who`');
-	$response['status'] = 'success';
-	$response['data'] = $results;
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-msg-list') {
-	if (isset($_GET['room'])) {
-		$room = $db->query('SELECT * FROM `chat_rooms` WHERE `id` = ? LIMIT 1', [intval($_GET['room'])]);
-		if (empty($room)) {
-			$response = ['status' => 'error', 'message' => 'room not found'];
-		} else {
-			$k_post = $db->queryColumn("SELECT COUNT(*) FROM `chat_post` WHERE `room` = '$room[id]' AND (`privat`='0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ")");
-			$k_page = k_page($k_post, $set['p_str']);
-			$page = page($k_page);
-			$start = $set['p_str'] * $page - $set['p_str'];
-
-			$results = $db->queryAll("SELECT * FROM `chat_post` WHERE `room` = ? AND (`privat`= '0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") ORDER BY id DESC LIMIT {$start}, {$set['p_str']}", [
-				$room['id']
-			]);
-			$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
-		}
-	} else {
-		$response = ['status' => 'error', 'message' => 'room id not found'];
-	}
-
-} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-msg-get') {
-	if (isset($_GET['room'])) {
-		$room = $db->query('SELECT * FROM `chat_rooms` WHERE `id` = ? LIMIT 1', [intval($_GET['room'])]);
-		if (empty($room)) {
-			$response = ['status' => 'error', 'message' => 'room not found'];
-		} else {
-			if (isset($_GET['id'])) {
-				$results = $db->queryAll("SELECT * FROM `chat_post` WHERE `room` = ? AND (`privat`= '0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") AND `id` > ? ORDER BY id ASC LIMIT {$set['p_str']}", [
-					$room['id'],
-					$_GET['id'] // 最后一条已获取的消息ID
-				]);
-				$response = ['status' => 'success', 'data' => $results];
+	case 'guest-msg-delete':
+		if (isset($user)) {
+			if (isset($_POST['id'])) {
+				$post = $db->query('SELECT * FROM `guest` WHERE `id` = ? LIMIT 1', [$_POST['id']]);
+				if (empty($post['id'])) {
+					$response = ['status' => 'error', 'message' => 'msg not exist'];
+				} else {
+					if ($post['id_user'] == 0) {
+						$ank['id'] = 0;
+						$ank['pol'] = 'guest';
+						$ank['level'] = 0;
+						$ank['nick'] = '客人';
+					} else {
+						$ank = user::get_user($post['id_user']);
+					}
+					if (user_access('guest_delete') || $user['id'] == $post['id_user']) {
+						if ($user['id'] != $post['id_user']) admin_log('留言板', '删除邮件', '从中删除消息 ' . $ank['nick']);
+						$db->delete('DELETE FROM guest WHERE id = ?', [$post['id']]);
+						$response['status'] = 'success';
+					} else {
+						$response = ['status' => 'error', 'message' => 'no permissions'];
+					}
+				}
 			} else {
 				$response = ['status' => 'error', 'message' => 'msg id not found'];
 			}
+		} else {
+			$response = ['status' => 'error', 'message' => 'not login'];
 		}
-	} else {
-		$response = ['status' => 'error', 'message' => 'room id not found'];
-	}
 
-} elseif (isset($_GET['action']) && $_GET['action'] == 'chat-msg-add') {
-	if (isset($user)) {
+	case 'guest-users-list':
+		$k_post = $db->query("SELECT COUNT(DISTINCT ul.id_user) AS online_users
+							FROM `user_log` ul
+							WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
+								AND ul.ban = 0
+								AND ul.url LIKE '/guest/%'
+								AND ul.last_online = (
+									SELECT MAX(last_online)
+									FROM `user_log` ul2
+									WHERE ul2.id_user = ul.id_user
+										AND ul2.last_online > NOW() - INTERVAL 100 SECOND
+										AND ul2.ban = 0
+								)");
+		$k_page = k_page($k_post['online_users'], $set['p_str']);
+		$page = page($k_page);
+		$start = $set['p_str'] * $page - $set['p_str'];
+
+		$query = $db->queryAll("SELECT DISTINCT ul.id_user, ul.last_online
+								FROM `user_log` ul
+								WHERE ul.last_online > NOW() - INTERVAL 100 SECOND
+									AND ul.ban = 0
+									AND ul.url LIKE '/guest/%'
+								ORDER BY ul.last_online DESC
+								LIMIT $start, $set[p_str]");
+
+		$response = ['status' => 'success', 'data' => $query, 'all_pages' => $k_page];
+
+	// 聊天室相关
+	case 'chat-rooms-list':
+		$results = $db->queryAll('SELECT * FROM `chat_rooms` ORDER BY `pos` ASC');
+		$response['status'] = 'success';
+		$response['data'] = $results;
+
+	case 'chat-users-list':
+		$results = $db->queryAll('SELECT * FROM `chat_who`');
+		$response['status'] = 'success';
+		$response['data'] = $results;
+
+	case 'chat-msg-list':
 		if (isset($_GET['room'])) {
 			$room = $db->query('SELECT * FROM `chat_rooms` WHERE `id` = ? LIMIT 1', [intval($_GET['room'])]);
 			if (empty($room)) {
 				$response = ['status' => 'error', 'message' => 'room not found'];
-			} elseif (isset($_POST['msg'])) {
-				$msg = $_POST['msg'];
-				$mat = antimat($msg);
-				if ($mat) {
-					$response['status'] = 'error';
-					$response['message'] = 'forbidden strings: ' . $mat;
-				} elseif (strlen2($msg) > 1024) {
-					$response['status'] = 'error';
-					$response['message'] = 'content too long';
-				} elseif (strlen2($msg) < 2) {
-					$response['status'] = 'error';
-					$response['message'] = 'content too short';
-				} else {
-					// 获取该用户的上一条消息
-					$lastMessage = $db->query('SELECT `msg`, `time` FROM `chat_post` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [$user['id']]);
-					if ($lastMessage && $lastMessage['msg'] == $msg && (time() - $lastMessage['time']) < 300) {
-						$response['status'] = 'error';
-						$response['message'] = 'duplicate content';
-					} else {
-						if (isset($_POST['privat'])) {
-							$priv = abs(intval($_POST['privat']));
-						} else {
-							$priv = 0;
-						}
-						$msgId = $db->insert('INSERT INTO `chat_post` (`id_user`, `time`, `msg`, `room`, `privat`) values(?, ?, ?, ?, ?)',[
-							$user['id'],
-							$time,
-							$msg,
-							$room['id'],
-							$priv
-						]);
-						$response = ['status' => 'success', 'id' => $msgId];
-					}
-				}
 			} else {
-				$response = ['status' => 'error', 'message' => 'msg not found'];
+				$k_post = $db->queryColumn("SELECT COUNT(*) FROM `chat_post` WHERE `room` = '$room[id]' AND (`privat`='0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ")");
+				$k_page = k_page($k_post, $set['p_str']);
+				$page = page($k_page);
+				$start = $set['p_str'] * $page - $set['p_str'];
+
+				$results = $db->queryAll("SELECT * FROM `chat_post` WHERE `room` = ? AND (`privat`= '0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") ORDER BY id DESC LIMIT {$start}, {$set['p_str']}", [
+					$room['id']
+				]);
+				$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
 			}
 		} else {
 			$response = ['status' => 'error', 'message' => 'room id not found'];
 		}
-	} else {
-		$response['status'] = 'error';
-		$response['message'] = 'not login';
-	}
 
-} else {
-	// 检查登录状态
-	if (isset($user)) {
-		$response['status'] = 'success';
-		$response['message'] = "Hello {$user['nick']}";
-	} else {
-		$response['status'] = 'error';
-	}
+	case 'chat-msg-get':
+		if (isset($_GET['room'])) {
+			$room = $db->query('SELECT * FROM `chat_rooms` WHERE `id` = ? LIMIT 1', [intval($_GET['room'])]);
+			if (empty($room)) {
+				$response = ['status' => 'error', 'message' => 'room not found'];
+			} else {
+				if (isset($_GET['id'])) {
+					$results = $db->queryAll("SELECT * FROM `chat_post` WHERE `room` = ? AND (`privat`= '0'" . (isset($user) ? " OR `privat` = '$user[id]'" : null) . ") AND `id` > ? ORDER BY id ASC LIMIT {$set['p_str']}", [
+						$room['id'],
+						$_GET['id'] // 最后一条已获取的消息ID
+					]);
+					$response = ['status' => 'success', 'data' => $results];
+				} else {
+					$response = ['status' => 'error', 'message' => 'msg id not found'];
+				}
+			}
+		} else {
+			$response = ['status' => 'error', 'message' => 'room id not found'];
+		}
+
+	case 'chat-msg-add':
+		if (isset($user)) {
+			if (isset($_GET['room'])) {
+				$room = $db->query('SELECT * FROM `chat_rooms` WHERE `id` = ? LIMIT 1', [intval($_GET['room'])]);
+				if (empty($room)) {
+					$response = ['status' => 'error', 'message' => 'room not found'];
+				} elseif (isset($_POST['msg'])) {
+					$msg = $_POST['msg'];
+					$mat = antimat($msg);
+					if ($mat) {
+						$response['status'] = 'error';
+						$response['message'] = 'forbidden strings: ' . $mat;
+					} elseif (strlen2($msg) > 1024) {
+						$response['status'] = 'error';
+						$response['message'] = 'content too long';
+					} elseif (strlen2($msg) < 2) {
+						$response['status'] = 'error';
+						$response['message'] = 'content too short';
+					} else {
+						// 获取该用户的上一条消息
+						$lastMessage = $db->query('SELECT `msg`, `time` FROM `chat_post` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [$user['id']]);
+						if ($lastMessage && $lastMessage['msg'] == $msg && (time() - $lastMessage['time']) < 300) {
+							$response['status'] = 'error';
+							$response['message'] = 'duplicate content';
+						} else {
+							if (isset($_POST['privat'])) {
+								$priv = abs(intval($_POST['privat']));
+							} else {
+								$priv = 0;
+							}
+							$msgId = $db->insert('INSERT INTO `chat_post` (`id_user`, `time`, `msg`, `room`, `privat`) values(?, ?, ?, ?, ?)',[
+								$user['id'],
+								$time,
+								$msg,
+								$room['id'],
+								$priv
+							]);
+							$response = ['status' => 'success', 'id' => $msgId];
+						}
+					}
+				} else {
+					$response = ['status' => 'error', 'message' => 'msg not found'];
+				}
+			} else {
+				$response = ['status' => 'error', 'message' => 'room id not found'];
+			}
+		} else {
+			$response['status'] = 'error';
+			$response['message'] = 'not login';
+		}
+
+	default:
+		// 检查登录状态
+		if (isset($user)) {
+			$response['status'] = 'success';
+			$response['message'] = "Hello {$user['nick']}";
+		} else {
+			$response['status'] = 'error';
+		}
 }
 
 header('Content-type: application/json');
