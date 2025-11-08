@@ -356,7 +356,7 @@ switch ($action) {
 
 		$results = $db->queryAll("SELECT * FROM `guest` ORDER BY id DESC LIMIT $start, $set[p_str]");
 
-		$response = ['status' => 'success', 'data' => $results, 'all_pages' => $k_page];
+		$response = array('status' => 'success', 'data' => $results, 'all_pages' => $k_page);
 		break;
 
 	case 'guest-msg-add':
@@ -593,65 +593,72 @@ switch ($action) {
 	// 日记相关
 	case 'note-list':
 		try {
+			// 总日记数
 			$k_post = $db->queryColumn('SELECT COUNT(*) FROM `notes`');
-			$k_page = k_page($k_post, $set['p_str']);
-			$page = page($k_page);
-			$start = $set['p_str'] * $page - $set['p_str'];
-			$order = 'order by `time` desc';
 
-			$q = dbquery("SELECT * FROM `notes` $order LIMIT $start, $set[p_str]");
-			$json = array();
-			while ($post = dbassoc($q)) {
+			// 处理分页
+			$k_page = k_page($k_post, $set['p_str']);
+			$page   = page($k_page);
+			$start  = $set['p_str'] * $page - $set['p_str'];
+
+			// 排序方式
+			$sortir = in_array($_GET['sort'] ?? '', ['count', 'time'], true) ? $_GET['sort'] : 'time';
+
+			// 取当前页数据
+			$rows = $db->queryAll("SELECT * FROM `notes` ORDER BY `{$sortir}` DESC LIMIT {$start}, {$set['p_str']}");
+
+
+			// 循环处理每条日记
+			$json = [];
+			foreach ($rows as $post) {
+				// 权限判断部分
+				$allowViewNote = false;
 				if ($post['private'] == 0) {
 					$allowViewNote = true;
 				} else {
 					if (isset($user)) {
 						if ($post['private'] == 1) {
-							$frend = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE (`user` = '{$user['id']}' AND `frend` = '{$post['id_user']}') OR (`user` = '{$post['id_user']}' AND `frend` = '{$user['id']}') LIMIT 1"), 0);
-							if ($user['id'] == $post['id_user'] || $frend == 2  || user_access('notes_delete')) {
-								$allowViewNote = true;
-							} else {
-								$allowViewNote = false;
-							}
+							$frend = $db->queryColumn('SELECT COUNT(*) FROM `frends` WHERE (`user` = :uid AND `frend` = :author) OR (`user` = :author2 AND `frend` = :uid2) LIMIT 1', [
+								':uid'     => $user['id'],
+								':author'  => $post['id_user'],
+								':author2' => $post['id_user'],
+								':uid2'    => $user['id']
+							]);
+							if ($user['id'] == $post['id_user'] || $frend == 2 || user_access('notes_delete')) $allowViewNote = true;
 						} elseif ($post['private'] == 2 && ($user['id'] == $post['id_user'] || user_access('notes_delete'))) {
 							$allowViewNote = true;
-						} else {
-							$allowViewNote = false;
 						}
-					} else {
-						$allowViewNote = false;
 					}
 				}
 
-				// 追加到结果集
-				$json[$post['id']] = array(
-					'title' => $allowViewNote ? $post['name'] : NULL, // 如果无权限查看，则抹掉 name 字段
-					'date' => date('Y-m-d H:i:s', $post['time']),
-					'id_user' => $post['id_user'],
-					'count' => $post['count'],
-					'id_dir' => $post['id_dir'],
-					'type' => $post['type'],
-					'private' => $post['private'],
-					'share' => $post['share'],
-					'share_id' => $post['share_id'],
-					'share_text' => $post['share_text'],
-					'share_name' => $post['share_name'],
-					'share_id_user' => $post['share_id_user'],
-					'share_type' => $post['share_type'],
-					'share_user' => $post['share_user']
-				);
+				$json[$post['id']] = [
+					'title'          => $allowViewNote ? $post['name'] : null,
+					'date'           => date('Y-m-d H:i:s', $post['time']),
+					'id_user'        => $post['id_user'],
+					'count'          => $post['count'],
+					'id_dir'         => $post['id_dir'],
+					'type'           => $post['type'],
+					'private'        => $post['private'],
+					'share'          => $post['share'],
+					'share_id'       => $post['share_id'],
+					'share_text'     => $post['share_text'],
+					'share_name'     => $post['share_name'],
+					'share_id_user'  => $post['share_id_user'],
+					'share_type'     => $post['share_type'],
+					'share_user'     => $post['share_user']
+				];
 			}
 
-			$response = array(
+			$response = [
 				'status' => 'success',
-				'data' => $json
-			);
-
+				'data'   => $json,
+				'all_pages' => $k_page
+			];
 		} catch (\Exception $e) {
-			$response = array(
-				'status' => 'error',
+			$response = [
+				'status'  => 'error',
 				'message' => $e->getMessage()
-			);
+			];
 		}
 		break;
 
@@ -668,7 +675,9 @@ switch ($action) {
 			} else {
 				if (isset($user)) {
 					if ($post['private'] == 1) {
-						$frend = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE (`user` = '{$user['id']}' AND `frend` = '{$post['id_user']}') OR (`user` = '{$post['id_user']}' AND `frend` = '{$user['id']}') LIMIT 1"), 0);
+						$frend = $db->queryColumn("SELECT COUNT(*) FROM `frends` WHERE (`user` = ? AND `frend` = ?) OR (`user` = ? AND `frend` = ?) LIMIT 1", [
+							$user['id'], $post['id_user'], $post['id_user'], $user['id']
+						]);
 						if ($user['id'] == $post['id_user'] || $frend == 2  || user_access('notes_delete')) {
 							$allowViewNote = true;
 						} else {
@@ -683,6 +692,18 @@ switch ($action) {
 					$allowViewNote = false;
 				}
 			}
+
+			// 评论区
+			$k_post = $db->queryColumn('SELECT COUNT(*) FROM `notes_komm` WHERE `id_notes` = ?', [$post['id']]);
+			$k_page = k_page($k_post, $set['p_str']);
+			$page = page($k_page);
+			$start = $set['p_str'] * $page - $set['p_str'];
+
+			$comment_rows = $db->queryAll("SELECT * FROM `notes_komm` WHERE `id_notes` = ? ORDER BY `time` LIMIT $start, $set[p_str]", [$post['id']]);
+			foreach ($comment_rows as $comment_post) {
+				$note_comment[] = $comment_post;
+			}
+
 			$response = array(
 				'status' => 'success',
 				'data' => array(
@@ -701,7 +722,9 @@ switch ($action) {
 					'share_name' => $post['share_name'],
 					'share_id_user' => $post['share_id_user'],
 					'share_type' => $post['share_type'],
-					'share_user' => $post['share_user']
+					'share_user' => $post['share_user'],
+					'comment_list' =>  $note_comment,
+					'all_comment_pages' => $k_page
 				)
 			);
 		} catch (\Exception $e) {
