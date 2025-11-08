@@ -16,16 +16,17 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
+namespace GuGuan123\dcms\Services;
 
 class AuthManager
 {
 	private array $set;
-	private Database $db;
+	private \GuGuan123\dcms\Database $db;
 	private array $clientDetails;
 	private bool $webbrowser;
 	private const JWT_ALGORITHM = 'HS256';
 
-	public function __construct(array $set, Database $db, array $clientDetails, bool $webbrowser) {
+	public function __construct(array $set, \GuGuan123\dcms\Database $db, array $clientDetails, bool $webbrowser) {
 		$this->set = $set;
 		$this->db = $db;
 		$this->clientDetails = $clientDetails;
@@ -198,7 +199,7 @@ class AuthManager
 	private function jwtGetUserInfo(string $jwt): array {
 		try {
 			$decoded = \Firebase\JWT\JWT::decode($jwt, new \Firebase\JWT\Key($this->set['shif'], self::JWT_ALGORITHM));
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			return ['status' => false, 'message' => 'Failed to decode JWT: ' . $e->getMessage()];
 		}
 

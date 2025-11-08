@@ -1,4 +1,5 @@
 <?php
+// src/database.php
 /*
  * MIT License
  * 
@@ -16,6 +17,7 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
+namespace GuGuan123\dcms;
 
 /**
  * Database 类用于简化与数据库的交互。
@@ -48,7 +50,7 @@
  * echo $deleted ? 'Delete successful' : 'Delete failed';
  */
 class Database {
-	/** @var PDO PDO实例 */
+	/** @var \PDO PDO实例 */
 	private $pdo;
 
 	/**
@@ -63,19 +65,19 @@ class Database {
 	 *                      - username: 数据库用户名
 	 *                      - password: 数据库密码
 	 *                      - timezone: 时区设置（可选）
-	 * @throws Exception 如果数据库连接失败，抛出异常
+	 * @throws \Exception 如果数据库连接失败，抛出异常
 	 */
 	public function __construct(array $config) {
 		try {
 			$dsn = sprintf("%s:host=%s;dbname=%s", $config['driver'] ?? 'mysql', $config['host'], $config['dbname']);
-			$this->pdo = new PDO($dsn, $config['username'], $config['password']);
-			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+			$this->pdo = new \PDO($dsn, $config['username'], $config['password']);
+			$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 			if (isset($config['timezone'])) {
 				$this->pdo->exec("SET time_zone = '" . $config['timezone'] . "';");
 			}
-		} catch (PDOException $e) {
-			throw new Exception("Database connection failed: " . $e->getMessage());
+		} catch (\PDOException $e) {
+			throw new \Exception("Database connection failed: " . $e->getMessage());
 		}
 	}
 
@@ -84,16 +86,16 @@ class Database {
 	 * 
 	 * @param string $sql SQL语句
 	 * @param array $params 绑定参数数组
-	 * @return PDOStatement 返回PDOStatement对象
-	 * @throws Exception 如果执行失败，抛出异常
+	 * @return \PDOStatement 返回PDOStatement对象
+	 * @throws \Exception 如果执行失败，抛出异常
 	 */
 	public function executeStatement($sql, $params = []) {
 		try {
 			$stmt = $this->pdo->prepare($sql);
 			$stmt->execute($params);
 			return $stmt;
-		} catch (PDOException $e) {
-			throw new Exception("Statement execution failed: " . $e->getMessage());
+		} catch (\PDOException $e) {
+			throw new \Exception("Statement execution failed: " . $e->getMessage());
 		}
 	}
 
@@ -105,7 +107,7 @@ class Database {
 	 * @param int $fetchMode 获取模式，默认PDO::FETCH_ASSOC
 	 * @return array|null 返回查询结果数组，如果没有结果返回null
 	 */
-	public function query($sql, $params = [], $fetchMode = PDO::FETCH_ASSOC) {
+	public function query($sql, $params = [], $fetchMode = \PDO::FETCH_ASSOC) {
 		$result = $this->executeStatement($sql, $params)->fetch($fetchMode);
 		return $result === false ? null : $result;
 	}
@@ -118,7 +120,7 @@ class Database {
 	 * @param int $fetchMode 获取模式，默认PDO::FETCH_ASSOC
 	 * @return array 返回查询结果数组
 	 */
-	public function queryAll($sql, $params = [], $fetchMode = PDO::FETCH_ASSOC) {
+	public function queryAll($sql, $params = [], $fetchMode = \PDO::FETCH_ASSOC) {
 		return $this->executeStatement($sql, $params)->fetchAll($fetchMode);
 	}
 
