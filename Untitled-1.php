@@ -27,82 +27,40 @@ if (isset($_POST['browser-info'])) {
 }
 
 
+$path = "."; 
+// 获取字节数
+$totalByte = disk_total_space($path);
+$freeByte = disk_free_space($path);
+$usedByte = $totalByte - $freeByte;
+// 计算使用百分比
+$usedPercent = round(($usedByte / $totalByte) * 100, 2);
+function formatSize($bytes) {
+    $units = array('B', 'KB', 'MB', 'GB', 'TB');
+    for ($i = 0; $bytes >= 1024 && $i < 4; $i++) {
+        $bytes /= 1024;
+    }
+    return round($bytes, 2) . ' ' . $units[$i];
+}
+
 title();
 aut();
-if (isset($_SESSION['captcha']) && isset($_POST['chislo'])) {
-	if ($_SESSION['captcha'] == $_POST['chislo']) {
-		msg('验证通过');
-	} else {
-		$err = '验证码错误';
-	}
-}
 err();
 ?>
 
 PHP 时间：<?php echo date('Y-m-d H:i:s'); ?><br>
 数据库时间：<?php echo dbresult(dbquery("SELECT NOW() AS db_time"), 0, 'db_time'); ?><br>
-时区：<?php echo date_default_timezone_get(); ?><br>
-时差偏移量：<?php echo date('P'); ?><br>
+数据库时区：<?php echo date_default_timezone_get(); ?><br>
+网站当前时区：<?php echo date_default_timezone_get(); ?><br>
+<hr>
+总空间: <?php echo formatSize($totalByte); ?><br>
+已用空间: <?php echo formatSize($usedByte) . ' (' . $usedPercent . '%)'; ?><br>
+剩余空间: <?php echo formatSize($freeByte); ?><br>
+<hr>
 当前用户ID：<?php echo $user['id'] ?? 'N/A' ?><br>
 当前登录方式为：<?php echo $user['type_input'] ?? 'N/A' ?><br>
 当前设备类型为：<?php echo $webbrowser ? 'PC' : 'NoPC'; ?><br>
 当前设备UA为：<?php echo $ua; ?><br>
 当前设备IP为：<?php echo $ip; ?><br>
-网站当前时区：<?php echo date_default_timezone_get(); ?><br>
-<form method='post'>验证码测试：<img src='/captcha.php' alt='验证码图像' /><br /><input name='chislo' type='text' /><br/><input type='submit' value='继续' /></form>
-
-<hr />
-
-<!-- 按钮，用于触发浏览器信息显示 -->
-<button id="show-info-button">Show Browser Info</button>
-
-<!-- 用来显示浏览器信息的区域 -->
-<div id="browser-info-container"></div>
-
-<script type="module">
-	// 使用 import 加载外部脚本
-	import browserModule from "https://passer-by.com/browser/src/browser.js";
-
-	// 异步获取浏览器信息
-	async function getBrowserInfo() {
-		// 使用 browserModule.getInfo() 获取浏览器信息
-		let browserInfo = await browserModule.getInfo();
-		console.log(browserInfo);
-		return browserInfo;
-	}
-
-	getBrowserInfo().then(browserInfo => {
-		// 将数据上传到服务器
-		fetch('', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded', // 使用表单数据格式
-			},
-			body: `browser-info=${encodeURIComponent(JSON.stringify(browserInfo))}`, // 将浏览器信息作为表单数据发送
-		})
-		.then(response => response.json()) // 解析响应为 JSON
-		.then(data => {
-			console.log('服务器响应:', data);
-			// 可以在这里显示上传成功的消息
-		})
-		.catch(error => {
-			console.error('上传数据失败:', error);
-		});
-	});
-
-	// 获取按钮元素
-	const showInfoButton = document.getElementById('show-info-button');
-
-	// 获取浏览器信息并显示的事件处理函数
-	showInfoButton.addEventListener('click', () => {
-		getBrowserInfo().then(browserInfo => {
-			// 获取用于显示设备信息的 HTML 元素
-			const infoContainer = document.getElementById('browser-info-container');
-			// 将浏览器信息渲染到该元素
-			infoContainer.innerHTML = `<pre>${JSON.stringify(browserInfo, null, 2)}</pre>`;
-		});
-	});
-</script>
 
 <?php
 require_once 'sys/inc/tfoot.php';
