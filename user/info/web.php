@@ -255,7 +255,6 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 			<?php
 			echo '<table>';
 			/*---------------------------朋友-----------------------------*/
-			$k_f = dbresult(dbquery("SELECT COUNT(id) FROM `frends_new` WHERE `to` = '$ank[id]' LIMIT 1"), 0);
 			$k_fr = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE `user` = '$ank[id]' AND `i` = '1'"), 0);
 			$res = dbquery("select `frend` from `frends` WHERE `user` = '$ank[id]' AND `i` = '1'");
 			echo '<a class="top_nav" href="/user/frends/?id=' . $ank['id'] . '">朋友 (' . $k_fr . '</b>/';
@@ -264,7 +263,10 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				if (dbresult(dbquery("SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = '$k_fr[frend]' AND ul.ban = 0 AND ul.last_online > NOW() - INTERVAL 10 MINUTE ORDER BY ul.last_online DESC LIMIT 1;"), 0) != 0) $i++;
 			}
 			echo $i;
-			if ($k_f > 0 && $ank['id'] == $user['id']) echo " +" . $k_f . "";
+			if (isset($user['id'])) {
+				$k_f = dbresult(dbquery("SELECT COUNT(id) FROM `frends_new` WHERE `to` = '$ank[id]' LIMIT 1"), 0);
+				if ($k_f > 0 && $ank['id'] == $user['id']) echo " +" . $k_f . "";
+			}
 			echo ")</a>";
 			/*--------------------------------------------------------------*/
 			/*------------------------相片册---------------------------*/
