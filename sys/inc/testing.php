@@ -94,7 +94,7 @@ if (empty($set['siteurl'])) {
 } else {
 	$test_url = $set['siteurl'] . '/sys/inc/mod_rewrite.test';
 }
-if (trim(file_get_contents(get_http_type() . "://{$_SERVER['HTTP_HOST']}/sys/inc/mod_rewrite.test")) == 'mod_rewrite-ok') {
+if (trim(file_get_contents($test_url)) == 'mod_rewrite-ok') {
 	echo "<span class='on'>mod_rewrite: OK</span><br />";
 } elseif (function_exists('apache_get_modules')) {
 	$apache_mod = apache_get_modules();
