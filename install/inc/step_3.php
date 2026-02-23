@@ -18,7 +18,7 @@ if (isset($_SESSION['mysql_ok']) && $_SESSION['mysql_ok'] == true) {
 		exit;
 	}
 } elseif (isset($_POST['host']) && isset($_POST['user']) && isset($_POST['pass']) && isset($_POST['db'])) {
-	if (!($mydb = @mysqli_connect($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['db']))) {
+	if (!($mydb = mysqli_connect($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['db']))) {
 		$err[] = '无法连接到服务器 ';
 	} else {
 		$set['sql_db_name'] = $_SESSION['db'] = $_POST['db'];
