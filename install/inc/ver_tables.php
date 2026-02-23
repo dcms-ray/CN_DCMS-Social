@@ -12,7 +12,6 @@ while ($filetables = readdir($opdirtables)) {
 	if (preg_match('#\.sql$#i', $filetables)) {
 		$table_name = preg_replace('#\.sql$#i', '', $filetables);
 		if (!isset($_ver_table[$table_name])) {
-			echo '正在创建表: ' . $table_name . ' (' . $filetables . ')<br>';
 			include_once check_replace(H.'sys/inc/sql_parser.php');
 			$sql = SQLParser::getQueriesFromFile(H . 'install/db_tables/' . $filetables);
 			for ($i = 0; $i < count($sql); $i++) {
