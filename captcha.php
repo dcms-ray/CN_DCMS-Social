@@ -1,6 +1,4 @@
 <?php
-define('H', $_SERVER['DOCUMENT_ROOT'] . '/');
-
 // 加载网站设置
 function setget() {
 	$set = array();
@@ -9,12 +7,12 @@ function setget() {
 	$set_replace = array();
 
 	// 正在加载默认设置。消除未定义变量的缺失
-	$default = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/default.ini', true);
+	$default = parse_ini_file(__DIR__ . '/sys/dat/default.ini', true);
 	$set_default = $default['DEFAULT'];
 	$set_replace = $default['REPLACE'];
 
-	if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/settings.php')) {
-		$set_dynamic = require_once($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/settings.php');
+	if (file_exists(__DIR__ . '/sys/dat/settings.php')) {
+		$set_dynamic = require_once(__DIR__ . '/sys/dat/settings.php');
 	} else {
 		http_response_code(506);
 		exit;
