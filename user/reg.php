@@ -15,9 +15,7 @@ require_once '../sys/inc/thead.php';
 title();
 aut();
 
-if ($set['guest_select'] == '1') {
-	msg("登录后才能访问该网站");
-}
+if ($set['guest_select'] == '1') msg("登录后才能访问该网站");
 
 // 验证码
 if ((!isset($_SESSION['refer']) || $_SESSION['refer'] == NULL)
@@ -74,7 +72,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 			$subject = "帐户激活";
 			$regmail = "你好！ {$_SESSION['reg_nick']}<br />
 			            要激活您的帐户，请点击链接:<br />
-			            <a href='" . get_http_type() . "://{$set['hostname']}/user/reg.php?id={$id_reg}&amp;activation={$activation}'>" . get_http_type() . "://{$set['hostname']}/user/reg.php?id=" . dbinsertid() . "&amp;activation={$activation}</a><br />
+			            <a href='" . $set['siteurl'] . "/user/reg.php?id={$id_reg}&amp;activation={$activation}'>" . $set['siteurl'] . "/user/reg.php?id=" . dbinsertid() . "&amp;activation={$activation}</a><br />
 			            如果帐户在24小时内未激活，它将被删除<br />
 			            真诚的，网站管理<br />";
 
@@ -136,7 +134,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 		msg('注册成功！');
 
 		echo "如果您的浏览器不支持Cookie，您可以创建一个自动登录书签<br />";
-		echo "<input type='text' value='" . get_http_type() . "://{$_SERVER['SERVER_NAME']}/user/login.php?id={$user['id']}&amp;pass=" . htmlspecialchars($_POST['pass1']) . "' /><br />";
+		echo "<input type='text' value='" .$set['siteurl'] . "/user/login.php?id={$user['id']}&amp;pass=" . htmlspecialchars($_POST['pass1']) . "' /><br />";
 		if ($set['reg_select'] == 'open_mail') unset($user);
 		echo "<div class='foot'>";
 		echo "&raquo;<a href='info/settings.php'>我的设置</a><br />";

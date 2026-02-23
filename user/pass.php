@@ -35,7 +35,7 @@ if (isset($_POST['nick']) && isset($_POST['mail']) && $_POST['nick'] != NULL && 
 		$regmail = "你好！ {$user2['nick']}<br />
 		            您已激活密码恢复<br />
 		            要设置新密码，请点击链接:<br />
-		            <a href='" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
+		            <a href='" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
 		            此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
 
 		// 调用封装的发送邮件函数
@@ -84,7 +84,7 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 		} else {
 			err();
 			aut();
-			echo "<form action='/user/pass.php?id={$_GET['id']}&amp;token=" . esc($_GET['token'], 1) . "&amp;{$passgen}' method=\"post\">";
+			echo "<form action='?id={$_GET['id']}&amp;token=" . esc($_GET['token'], 1) . "&amp;{$passgen}' method=\"post\">";
 			echo "用户名:<br />";
 			echo "<input type=\"text\" disabled='disabled' value='{$user2['nick']}' maxlength=\"32\" size=\"16\" /><br />";
 			echo "新密码:<br /><input type='password' name='pass1' value='' /><br />";
@@ -114,11 +114,11 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 
 	echo '<div class="foot">
 		尚未登记？<br/>
-		<a href="/user/reg.php">注册账号</a><br/>
+		<a href="reg.php">注册账号</a><br/>
 		</div>
 		<div class="foot">
 		已经注册？ <br/>
-		<a href="/user/aut.php">登录账号</a><br/>
+		<a href="aut.php">登录账号</a><br/>
 		</div>';
 }
 

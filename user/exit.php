@@ -16,7 +16,7 @@ if (setget('exit', 1) == 1) {
 			$authManager->logout($user['login_id']);
 			setcookie('auth_token', '', time() - 3600, '/');
 			session_destroy();
-			header('Location: ../?' . session_id());
+			header('Location: ..');
 			exit();
 		} else {
 			header('Location: ' . $_POST['return']);
@@ -26,7 +26,7 @@ if (setget('exit', 1) == 1) {
 } else {
 	setcookie('auth_token', '', time() - 3600, '/');
 	session_destroy();
-	header('Location: ../?' . session_id());
+	header('Location: ..');
 	exit();
 }
 
@@ -37,7 +37,7 @@ aut();
 
 ?>
 <form  method="post">
-你确定退出登录吗?
+	你确定退出登录吗?
 	<input type="hidden" name="return" value="<?php echo $_SERVER['HTTP_REFERER']; ?>">
 	<input type="submit" name="confirm_yes" value="是的,我确定">
 	<input type="submit" name="confirm_no" value="不是,我手滑了">

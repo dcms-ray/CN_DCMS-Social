@@ -163,7 +163,7 @@ switch ($action) {
 				$subject = "帐户激活";
 				$regmail = "你好！ {$_POST['reg_nick']}<br />
 							要激活您的帐户，请点击链接:<br />
-							<a href='" . get_http_type() . "://{$_SERVER['HTTP_HOST']}/user/reg.php?id=$id_reg&amp;activation=$activation'>点击激活帐户</a><br />
+							<a href='" . $set['siteurl'] . "/user/reg.php?id=$id_reg&amp;activation=$activation'>点击激活帐户</a><br />
 							如果帐户在24小时内未激活，它将被删除。<br />
 							真诚的，网站管理团队";
 
@@ -282,7 +282,7 @@ switch ($action) {
 					$regmail = "你好！ $user2[nick]<br />
 								您已激活密码恢复<br />
 								要设置新密码，请点击链接:<br />
-								<a href='" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
+								<a href='" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
 								此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
 
 					// 调用封装的发送邮件函数
