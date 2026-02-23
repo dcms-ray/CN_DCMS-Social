@@ -4,7 +4,7 @@ echo "<div class='title'>网站菜单</div>";
 $q_menu = dbquery("SELECT * FROM `menu` ORDER BY `pos` ASC");
 while ($post_menu = dbassoc($q_menu)) {
 	if ($post_menu['type'] == 'link') {
-		echo "<a href='$post_menu[url]'>";
+		echo '<a href="' . $set['siteurl'] . $post_menu[url]'">';
 	} else {
 		echo "<div class='menu_razd'>";
 	}
