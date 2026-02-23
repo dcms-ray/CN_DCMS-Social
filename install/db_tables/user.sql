@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `user` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`nick` varchar(32) NOT NULL,
-	`pass` VARCHAR(255) NOT NULL,
+	`pass` varchar(255) NOT NULL,
 	`activation` varchar(32) DEFAULT NULL,
 	`ban` int(11) NOT NULL DEFAULT '0',
 	`ban_pr` varchar(64) DEFAULT NULL,
@@ -47,6 +47,5 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`identity` varchar(100) DEFAULT NULL,
 	`money` int(11) DEFAULT '0',
 	PRIMARY KEY (`id`),
-	UNIQUE KEY `nick` (`nick`),
-	KEY `url` (`url`)
-) DEFAULT AUTO_INCREMENT=1;
+	UNIQUE KEY `nick` (`nick`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1;
