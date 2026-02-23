@@ -16,7 +16,7 @@ function check_replace($source2) {
 	// 计算替换路径
 	$replace_file = str_ireplace($h, $replace, (string)$source);
 	// 检查是否启用了替换功能
-	if (setget('replace', 1) == 1) {
+	if (function_exists('setget') && setget('replace', 1) == 1) {
 		// 如果替换文件存在，返回替换路径
 		if (file_exists($replace_file)) {
 			return $replace_file;
