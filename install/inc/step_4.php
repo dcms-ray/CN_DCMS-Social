@@ -103,7 +103,7 @@ if (isset($_SESSION['adm_reg_ok']) && $_SESSION['adm_reg_ok'] == true) {
 		}
 	}
 	echo "<hr />";
-	echo "<form method=\"get\" action=\"index.php\">";
+	echo '<form method="get" action="' .  $set['siteurl'] . '">';
 	echo "<input name='gen' value='$passgen' type='hidden' />";
 	echo "<input name=\"step\" value=\"" . ($_SESSION['install_step'] + 1) . "\" type=\"hidden\" />";
 	echo "<input value='完成安装' type=\"submit\" />";
