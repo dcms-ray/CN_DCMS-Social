@@ -16,9 +16,6 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
-
-require_once __DIR__ . '/classes/database.php'; // 引入数据库操作类
-
 // 初始化全局变量
 try {
 	$db = new GuGuan123\dcms\Database([
