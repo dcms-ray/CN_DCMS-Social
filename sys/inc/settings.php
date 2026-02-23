@@ -39,7 +39,7 @@ function getSet() {
 		exit;
 	} else {
 		http_response_code(500);
-		echo 'sys/dat/settings.php 消失了';
+		echo 'sys/dat/settings.php 消失了' . PHP_EOL;
 		exit;
 	}
 
