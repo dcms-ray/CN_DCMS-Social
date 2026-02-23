@@ -47,6 +47,7 @@ aut();
 err();
 ?>
 
+siteurl：<?php echo $set['siteurl']; ?><br>
 PHP 时间：<?php echo date('Y-m-d H:i:s'); ?><br>
 数据库时间：<?php echo dbresult(dbquery("SELECT NOW() AS db_time"), 0, 'db_time'); ?><br>
 数据库时区：<?php echo date_default_timezone_get(); ?><br>
