@@ -76,7 +76,7 @@ class ClientDetails
 			'X-Real-IP'                   => $this->getXRealIp($cdnIpRanges),
 			'CF-Connecting-IP' => $this->getCfConnectingIp($cdnIpRanges),
 			'True-Client-IP'         => $this->getTrueClientIp($cdnIpRanges),
-			'disabled',   default => $_SERVER['REMOTE_ADDR'],
+			default => $_SERVER['REMOTE_ADDR'],
 		};
 	}
 
