@@ -27,3 +27,5 @@ if (!is_file(__DIR__ . '/../../sys/dat/default.ini')) {
 }
 
 $tmp_set = $set = parse_ini_file(__DIR__ . '/../../sys/dat/default.ini', false);
+
+$set['siteurl'] = get_http_type() . $_SERVER['HTTP_HOST'] . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
