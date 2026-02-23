@@ -17,14 +17,18 @@ while ($filetables = readdir($opdirtables)) {
 			$sql = SQLParser::getQueriesFromFile(H . 'install/db_tables/' . $filetables);
 			for ($i = 0; $i < count($sql); $i++) {
 				$k_sql++; // 查询计数器（用于安装程序）
-				if (mysqli_query($mydb, $sql[$i])) {
-					$ok_sql++; // 成功查询计数器（用于安装程序）
-				} else {
+				try {
+					if (mysqli_query($mydb, $sql[$i])) {
+						$ok_sql++; // 成功查询计数器（用于安装程序）
+					}
+				} catch (mysqli_sql_exception $e) {
 					// 如果执行失败，直接报错并抓出文件名
-					die('<br><strong style="color:red;">哎呀！SQL 执行出错啦！</strong><br>' .
-						'错误文件: <b>install/db_tables/' . $filetables . '</b><br>' .
-						'具体错误: ' . mysqli_error($mydb) . '<br>' .
-						'出错的 SQL 语句: <pre>' . $sql[$i] . '</pre>');
+					echo '<br><div style="border:2px solid red; padding:10px; background:#fff0f0;">';
+					echo '出错的文件: <b>install/db_tables/' . $filetables . '</b><br>';
+					echo '报错信息: ' . $e->getMessage() . '<br>';
+					echo '坏掉的 SQL 语句: <pre>' . htmlspecialchars($sql[$i]) . '</pre>';
+					echo '</div>';
+					exit;
 				}
 			}
 		}
