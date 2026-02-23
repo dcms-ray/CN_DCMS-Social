@@ -37,8 +37,8 @@ if (file_exists(H . "style/themes/{$set['set_them']}/head.php")) {
 	<html>
 	<head>
 		<title>' . $set['title'] . '</title> <!-- 设置页面标题 -->
-		<link rel="shortcut icon" href="/favicon.ico" /> <!-- 网站图标 -->
-		<link rel="stylesheet" href="/style/themes/' . $set['set_them'] . '/style.css" type="text/css" /> <!-- 引入样式表 -->
+		<link rel="shortcut icon" href="' . $set['siteurl'] . '/favicon.ico" /> <!-- 网站图标 -->
+		<link rel="stylesheet" href="' . $set['siteurl'] . '/style/themes/' . $set['set_them'] . '/style.css" type="text/css" /> <!-- 引入样式表 -->
 	</head>
 	<body>
 		<div class="body">'; // 页面主体
@@ -49,9 +49,9 @@ if (isset($user['level']) && $user['level'] > 4) {
 	if (setget('toolbar', 1) == 1) {
 		$status_version_data = getLatestStableRelease();
 		echo '<div class="mess">
-		      <b>Admin Tool</b> :: <a href="/">网站首页</a> | <a href="/plugins/admin/">管理员</a> | <a href="/adm_panel/">控制面板</a> v' . $set['dcms_version'];
+		      <b>Admin Tool</b> :: <a href="' . $set['siteurl'] . '">网站首页</a> | <a href="' . $set['siteurl'] . '/plugins/admin/">管理员</a> | <a href="' . $set['siteurl'] . '/adm_panel/">控制面板</a> v' . $set['dcms_version'];
 		if (isset($status_version_data['version']) && version_compare($set['dcms_version'], $status_version_data['version']) < 0) {
-			echo '<center><font color="red">有一个新版本 - ' . $status_version_data['version'] . '! <a href="/adm_panel/update.php">详细</a></font></center>';
+			echo '<center><font color="red">有一个新版本 - ' . $status_version_data['version'] . '! <a href="' . $set['siteurl'] . '/adm_panel/update.php">详细</a></font></center>';
 		}
 		echo '</div>';
 	}
@@ -59,7 +59,7 @@ if (isset($user['level']) && $user['level'] > 4) {
 
 // 检查网站是否关闭，并可能显示警告消息
 if (empty(setget('job', 1))) {
-	if (isset($user) and $user['level'] >= 5) echo "<div style='color:red' class='err'>注意！网站已经关闭<a href='/adm_panel/settings_sys.php?'>管理员</a></div>"; // 提示网站关闭
+	if (isset($user) and $user['level'] >= 5) echo "<div style='color:red' class='err'>注意！网站已经关闭<a href='{$set['siteurl']}/adm_panel/settings_sys.php?'>管理员</a></div>"; // 提示网站关闭
 }
 
 // 显示会话消息
@@ -75,5 +75,5 @@ if (isset($_SESSION['err'])) {
 }
 
 header_html(); // 调用头部HTML输出函数
-echo '<link rel="stylesheet" href="/style/system.css" type="text/css" /> <!-- 引入系统样式表 -->
+echo '<link rel="stylesheet" href="' . $set['siteurl'] . '/style/system.css" type="text/css" /> <!-- 引入系统样式表 -->
 		<div id="load"></div>'; // 创建一个加载区域
