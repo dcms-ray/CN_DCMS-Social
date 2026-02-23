@@ -81,11 +81,11 @@ class captcha
 			$n = $this->str[$i]; // 获取验证码字符串的每个字符
 			// 根据支持的图像格式加载对应的数字图像
 			if ($this->png) {
-				$num[$n] = imagecreatefrompng(H . '/style/captcha/' . $n . '.png');
+				$num[$n] = imagecreatefrompng('style/captcha/' . $n . '.png');
 			} elseif ($this->gif) {
-				$num[$n] = imagecreatefromgif(H . '/style/captcha/' . $n . '.gif');
+				$num[$n] = imagecreatefromgif('style/captcha/' . $n . '.gif');
 			} elseif ($this->jpg) {
-				$num[$n] = imagecreatefromjpeg(H . '/style/captcha/' . $n . '.jpg');
+				$num[$n] = imagecreatefromjpeg('style/captcha/' . $n . '.jpg');
 			}
 			// 将数字图像复制到验证码图像上
 			imagecopy($this->img, $num[$n], $i * 15 + 10, 8, 0, 0, 15, 20);
