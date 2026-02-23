@@ -70,8 +70,8 @@ if (ini_get('session.use_trans_sid') == true) {
 	echo "<span class='on'>session.use_trans_sid: OK</span><br />";
 } else {
 	echo "<span class='off'>session.use_trans_sid: OFF</span><br />";
-	$err[] = '在没有COOKIE支持的浏览器上，会话将丢失';
-	$err[] = '加到根部 .htaccess 字符串 <b>php_value session.use_trans_sid 1</b>';
+	echo '在没有COOKIE支持的浏览器上，会话将丢失';
+	echo '加到根部 .htaccess 字符串 <b>php_value session.use_trans_sid 1</b>';
 }
 if (ini_get('magic_quotes_gpc') == 0) {
 	echo "<span class='on'>magic_quotes_gpc: 0 (OK)</span><br />";
@@ -126,7 +126,7 @@ if (extension_loaded('pdo')) {
 	echo "<span class='on'>PDO: OK</span><br />";
 } else {
 	echo "<span class='off'>PDO: OFF</span><br />";
-    $err[] = "呜呜，没有 PDO 扩展是无法工作的喵...";
+    $err[] = "呜呜，没有 PDO 扩展，DCMS是无法工作的喵...";
 }
 if (function_exists('iconv')) {
 	echo "<span class='on'>Iconv: OK</span><br />";
