@@ -32,7 +32,7 @@ function getSet() {
 	// 检查 install 目录是否存在，如果存在就转跳到引擎安装界面
 	if (file_exists(__DIR__ . '/../dat/settings.php')) {
 		$set_dynamic = require_once(__DIR__ . '/../dat/settings.php');
-	} elseif (file_exists(__DIR__ . '/../../install/index.php') && isset($in_index_page) && $in_index_page == true) {
+	} elseif (file_exists(__DIR__ . '/../../install/index.php') && isset($current_page) && $current_page == 'index') {
 		header('Location: install/');
 		exit;
 	} else {
