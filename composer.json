@@ -20,6 +20,7 @@
 		"mobiledetect/mobiledetectlib": "^4.8",
 		"firebase/php-jwt": "^6.10",
 		"phpmailer/phpmailer": "^6.9",
-		"james-heinrich/getid3": "^1.9"
+		"james-heinrich/getid3": "^1.9",
+		"intervention/image": "^3.11"
 	}
 }
