@@ -10,23 +10,6 @@ require_once 'sys/inc/fnc.php';
 require_once 'sys/inc/user.php';
 require_once 'sys/inc/thead.php';
 
-
-// 检查是否有 `browser-info` 数据，并处理浏览器信息
-if (isset($_POST['browser-info'])) {
-	// 获取浏览器信息
-	$browserInfo = $_POST['browser-info'];
-
-	// 你可以将浏览器信息保存到数据库或文件
-	// 例如，将浏览器信息写入日志文件
-	file_put_contents('browser_info_log.json', $browserInfo . "\n", FILE_APPEND);
-
-	// 输出成功响应
-	header('Content-Type: application/json');
-	echo json_encode(['status' => 'success', 'message' => 'Browser info uploaded successfully']);
-	exit;
-}
-
-
 $path = "."; 
 // 获取字节数
 $totalByte = disk_total_space($path);
@@ -47,6 +30,7 @@ aut();
 err();
 ?>
 
+当前版本：<?php echo $set['dcms_version']; ?><br>
 siteurl：<?php echo $set['siteurl']; ?><br>
 PHP 时间：<?php echo date('Y-m-d H:i:s'); ?><br>
 数据库时间：<?php echo dbresult(dbquery("SELECT NOW() AS db_time"), 0, 'db_time'); ?><br>
