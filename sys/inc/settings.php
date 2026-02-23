@@ -24,6 +24,8 @@ function getSet() {
 	$set_dynamic = array();
 	$set_replace = array();
 
+	global $current_page;
+
 	// 正在加载默认设置。消除未定义变量的缺失
 	$default = parse_ini_file(__DIR__ . '/../dat/default.ini', true);
 	$set_default = $default['DEFAULT'];
