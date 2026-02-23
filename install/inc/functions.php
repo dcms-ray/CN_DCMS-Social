@@ -109,3 +109,4 @@ function delete_dir($dir) {
 }
 
 include_once __DIR__ . '/../../sys/fnc/get_http_type.php';
+include_once __DIR__ . '/../../sys/fnc/check_replace.php';

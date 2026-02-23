@@ -70,8 +70,8 @@ if (ini_get('session.use_trans_sid') == true) {
 	echo "<span class='on'>session.use_trans_sid: OK</span><br />";
 } else {
 	echo "<span class='off'>session.use_trans_sid: OFF</span><br />";
-	echo '在没有COOKIE支持的浏览器上，会话将丢失';
-	echo '加到根部 .htaccess 字符串 <b>php_value session.use_trans_sid 1</b>';
+	echo '在没有COOKIE支持的浏览器上，会话将丢失<br />';
+	echo '加到根部 .htaccess 字符串 <b>php_value session.use_trans_sid 1</b><br />';
 }
 if (ini_get('magic_quotes_gpc') == 0) {
 	echo "<span class='on'>magic_quotes_gpc: 0 (OK)</span><br />";
