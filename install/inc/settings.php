@@ -21,7 +21,7 @@ if (is_file(__DIR__ . '/../../sys/dat/settings.php')) {
 	exit;
 }
 
-if (is_file(__DIR__ . '/../../sys/dat/default.ini')) {
+if (!is_file(__DIR__ . '/../../sys/dat/default.ini')) {
 	echo '找不到必须的前置配置文件（sys/dat/default.ini）';
 	exit;
 }
