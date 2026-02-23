@@ -121,7 +121,12 @@ if (function_exists('mysqli_info')) {
 	echo "<span class='on'>MySQLi: OK</span><br />";
 } else {
 	echo "<span class='off'>MySQLi: OFF</span><br />";
-	$err[] = '没有MySQLi，工作是不可能的';
+}
+if (extension_loaded('pdo')) {
+	echo "<span class='on'>PDO: OK</span><br />";
+} else {
+	echo "<span class='off'>PDO: OFF</span><br />";
+    $err[] = "呜呜，没有 PDO 扩展是无法工作的喵...";
 }
 if (function_exists('iconv')) {
 	echo "<span class='on'>Iconv: OK</span><br />";

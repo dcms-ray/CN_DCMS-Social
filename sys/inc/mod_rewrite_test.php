@@ -1,2 +1,2 @@
 <?php
-echo 'mod_rewrite-ok';
+echo 'mod_rewrite-ok' . PHP_EOL;
