@@ -1,4 +1,5 @@
 <?php
+$in_index_page = true;
 require_once 'sys/inc/start.php';
 require_once 'sys/inc/compress.php';
 require_once 'sys/inc/sess.php';
