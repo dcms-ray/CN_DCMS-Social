@@ -23,13 +23,13 @@ if (!isset($_SESSION['category']) || dbresult(dbquery("SELECT COUNT(*) FROM `smi
 $q = dbquery("SELECT * FROM `smile` WHERE `dir`='".intval($_SESSION['category'])."' ORDER BY id DESC ");
 echo '<div class="layer">';
 while($post = dbarray($q)) {
-	echo '<a href="javascript:emoticon(\''.$post['smile'].'\')"><img src="/files/smiles/' . $post['id'] . '.gif" title="' . text($post['smile']) . '" /></a>';
+	echo '<a href="javascript:emoticon(\''.$post['smile'].'\')"><img src="../../files/smiles/' . $post['id'] . '.gif" title="' . text($post['smile']) . '" /></a>';
 }
 echo '</div>';
 
-$q = dbquery("SELECT * FROM `smile_dir` ORDER BY id ASC");
 echo '<div class="title">分类</div>';
+$q = dbquery("SELECT * FROM `smile_dir` ORDER BY id ASC");
 while ($dir = dbassoc($q)) {
-	echo '<a onclick="showContent2(\'/style/post-form/smiles.php?dir='.$dir['id'].'\')" class="onclick">' . text($dir['name']) . '</a> ';
+	echo '<a onclick="showContent2(\'?dir=' . $dir['id'] . '\')" class="onclick">' . text($dir['name']) . '</a> ';
 	echo '('.dbresult(dbquery("SELECT COUNT(*) FROM `smile` WHERE `dir` = '$dir[id]'"),0).') ';
 }
