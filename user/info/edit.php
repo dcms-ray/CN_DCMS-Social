@@ -121,9 +121,9 @@ if (isset($_GET['set'])) {
 				$user['set_show_mail'] = 0;
 				dbquery("UPDATE `user` SET `set_show_mail` = '0' WHERE `id` = '$user[id]' LIMIT 1");
 			}
-			if (isset($_POST['email']) && ($_POST['email']==null || preg_match('#^[A-z0-9-\._]+@[A-z0-9]{2,}\.[A-z]{2,4}$#ui',$_POST['email']))) {
-				$user['email']=$_POST['email'];
-				dbquery("UPDATE `user` SET `email` = '$user[email]' WHERE `id` = '$user[id]' LIMIT 1");
+			if (isset($_POST['email']) && ($_POST['email']==null || filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))) {
+				$user['email'] = $_POST['email'];
+				$db->update('UPDATE user SET email = ? WHERE id = ? LIMIT 1', [$user['email'], $user['id']]);
 			} else {
 				$err[] = '无效的电子邮件';
 			}
