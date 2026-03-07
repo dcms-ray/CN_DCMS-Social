@@ -93,7 +93,6 @@ if (isset($_POST['title']) && isset($_POST['msg'])) {
 					dbquery("UPDATE `tape` SET `count` = '" . ($tape['count'] + 1) . "', `read` = '0', `time` = '$time' WHERE `id_user` = '$a[id]' AND `type` = 'notes' AND `id_file` = '$st' LIMIT 1");
 				}
 			}
-			dbquery("OPTIMIZE TABLE `notes`");
 			$_SESSION['message'] = '日记创建成功';
 			header("Location: list.php?id=$st");
 			$_SESSION['captcha'] = NULL;

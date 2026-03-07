@@ -738,6 +738,74 @@ switch ($action) {
 		}
 		break;
 
+	case 'note-add':
+		try {
+			if (isset($user)) throw new \Exception('not login');
+			if (empty($_POST['title'])) throw new \Exception('title not found');
+			if (empty($_POST['msg'])) throw new \Exception('msg not found');
+			if (($user['rating'] < 2 || $user['group_access'] < 6 )) {
+				if (empty($_POST['chislo'])) throw new \Exception('chislo not found');
+				if (empty($_POST['captcha_token'])) throw new \Exception('captcha_token not found');
+				$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
+				if ($validateCaptchaToken['status'] != 'success') throw new \Exception($validateCaptchaToken['message']);
+			}
+
+			$msg = my_esc($_POST['msg']);
+			$id_dir = intval($_POST['id_dir']);
+			if (isset($_POST['private'])) {
+				$privat = intval($_POST['private']);
+			} else {
+				$privat = 0;
+			}
+			if (isset($_POST['private_komm'])) {
+				$privat_komm = intval($_POST['private_komm']);
+			} else {
+				$privat_komm = 0;
+			}
+			if (strlen2($title) > 32) throw new \Exception('title too long');
+			if (strlen2($msg) > 30000) throw new \Exception('content too long');
+			if (strlen2($msg) < 2) throw new \Exception('content too short');
+			$st = $db->insert('INSERT INTO `notes` (`time`, `msg`, `name`, `id_user`, `private`, `private_komm`, `id_dir`, `type`) values(?, ?, ?, ?, ?, ?, ?, ?)', [
+				$time,
+				$msg,
+				$title,
+				$user['id'],
+				$privat,
+				$privat_komm,
+				$id_dir,
+				0
+			]);
+			if($privat != 2) {
+				$db->query('insert into `stena`(`id_stena`,`id_user`,`time`,`info`,`info_1`,`type`) values(?, ?, ?, ?, ?, ?)', [
+					$user['id'],
+					$user['id'],
+					$time,
+					'新日记',
+					$st,
+					'note'
+				]);
+			}
+
+			$q = dbquery("SELECT * FROM `frends` WHERE `user` = '" . $user['id'] . "' AND `i` = '1'");
+			while ($f = dbarray($q)) {
+				$a = user::get_user($f['frend']);
+				$lentaSet = dbarray(dbquery("SELECT * FROM `tape_set` WHERE `id_user` = '".$a['id']."' LIMIT 1")); // 常规功能区设置
+				if ($f['lenta_notes'] == 1 && $lentaSet['lenta_notes'] == 1 ) // 邮件过滤器
+				if (dbresult(dbquery("SELECT COUNT(*) FROM `tape` WHERE `id_user` = '$a[id]' AND `type` = 'notes' AND `id_file` = '$st' LIMIT 1"), 0) == 0) {
+					dbquery("INSERT INTO `tape` (`id_user`, `avtor`, `type`, `time`, `id_file`, `count`) values('$a[id]', '$user[id]', 'notes', '$time', '$st', '1')");
+				} else {
+					$tape = dbarray(dbquery("SELECT * FROM `tape` WHERE `type` = 'notes' AND `id_file` = '$st'"));
+					dbquery("UPDATE `tape` SET `count` = '" . ($tape['count'] + 1) . "', `read` = '0', `time` = '$time' WHERE `id_user` = '$a[id]' AND `type` = 'notes' AND `id_file` = '$st' LIMIT 1");
+				}
+			}
+			$response = ['status' => 'success', 'id' => $st];
+		} catch (\Exception $e) {
+			$response = array(
+				'status' => 'error',
+				'message' => $e->getMessage()
+			);
+		}
+
 	default:
 		// 检查登录状态
 		if (isset($user)) {
