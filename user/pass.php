@@ -21,8 +21,7 @@ if (isset($_POST['nick']) && isset($_POST['mail']) && $_POST['nick'] != NULL && 
 	// 检查验证码
 	if (!isset($_SESSION['captcha']) || !isset($_POST['chislo']) || $_SESSION['captcha'] != $_POST['chislo']) {
 		$err[] = '验证码错误或无效';
-	}
-	if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "'"), 0) == 0) {
+	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "'"), 0) == 0) {
 		$err = "使用此用户名的用户未注册";
 	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "' AND `email` = '" . my_esc($_POST['mail']) . "'"), 0) == 0) {
 		$err = '无效的电子邮件地址或丢失的电子邮件信息';
