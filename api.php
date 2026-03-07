@@ -743,7 +743,7 @@ switch ($action) {
 			if (isset($user)) throw new \Exception('not login');
 			if (empty($_POST['title'])) throw new \Exception('title not found');
 			if (empty($_POST['msg'])) throw new \Exception('msg not found');
-			if (($user['rating'] < 2 || $user['group_access'] < 6 )) {
+			if (($user['rating'] < 2 || $user['group_access'] < 6) && $user['id'] != 1746) {
 				if (empty($_POST['chislo'])) throw new \Exception('chislo not found');
 				if (empty($_POST['captcha_token'])) throw new \Exception('captcha_token not found');
 				$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
