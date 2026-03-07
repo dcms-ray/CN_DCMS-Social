@@ -762,13 +762,13 @@ switch ($action) {
 			} else {
 				$privat_komm = 0;
 			}
-			if (strlen2($title) > 32) throw new \Exception('title too long');
+			if (strlen2($_POST['title']) > 32) throw new \Exception('title too long');
 			if (strlen2($msg) > 30000) throw new \Exception('content too long');
 			if (strlen2($msg) < 2) throw new \Exception('content too short');
 			$st = $db->insert('INSERT INTO `notes` (`time`, `msg`, `name`, `id_user`, `private`, `private_komm`, `id_dir`, `type`) values(?, ?, ?, ?, ?, ?, ?, ?)', [
-				$time,
+				time(),
 				$msg,
-				$title,
+				$_POST['title'],
 				$user['id'],
 				$privat,
 				$privat_komm,
@@ -779,7 +779,7 @@ switch ($action) {
 				$db->query('insert into `stena`(`id_stena`,`id_user`,`time`,`info`,`info_1`,`type`) values(?, ?, ?, ?, ?, ?)', [
 					$user['id'],
 					$user['id'],
-					$time,
+					time(),
 					'新日记',
 					$st,
 					'note'

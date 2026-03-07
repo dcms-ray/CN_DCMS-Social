@@ -877,3 +877,82 @@ API地址：https://[网站域名]/api.php
     ```
 
     id: 日记ID
+
+#### 4.3 添加日记
+
+- **请求URL**: `?action=note-add`
+- **请求方式**: POST
+
+- **请求参数**:
+
+    ```x-www-form-urlencoded
+    title=<string>&msg=<string>&chislo=<string>&captcha_token=<string>&private=<int>&private_komm=<int>
+    ```
+
+    title: 日记标题，msg: 日记正文，chislo: 验证码，captcha_token：验证码token，private: 隐私设置(0->公开, 1->仅好友可见, 2->仅自己可见)，private_komm: 隐私密码
+    * 管理员不需要虽然验证码和验证码token；隐私设置和密码是可选项
+
+- **响应内容**:
+
+    ```json
+    {
+        "status": "success",
+        "id": "<int>"
+    }
+    ```
+
+- **可能的报错内容**:
+
+    缺少标题：
+
+    ```json
+    {
+        "status": "error",
+        "message": "title not found"
+    }
+    ```
+
+    标题过长:
+
+    ```json
+    {
+        "status": "error",
+        "message": "title too long"
+    }
+    ```
+
+    缺少信息内容:
+
+    ```json
+    {
+        "status": "error",
+        "message": "msg not found"
+    }
+    ```
+
+    内容过长:
+
+    ```json
+    {
+        "status": "error",
+        "message": "content too long"
+    }
+    ```
+
+    内容过短:
+
+    ```json
+    {
+        "status": "error",
+        "message": "content too short"
+    }
+    ```
+
+    需要登录:
+
+    ```json
+    {
+        "status": "error",
+        "message": "not login"
+    }
+    ```
