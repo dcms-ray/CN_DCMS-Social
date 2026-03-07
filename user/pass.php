@@ -18,6 +18,10 @@ title();
 dbquery("DELETE FROM `password_reset_tokens` WHERE `created_at` < '" . date('Y-m-d H:i:s') . "'");
 
 if (isset($_POST['nick']) && isset($_POST['mail']) && $_POST['nick'] != NULL && $_POST['mail'] != NULL) {
+	// 检查验证码
+	if (!isset($_SESSION['captcha']) || !isset($_POST['chislo']) || $_SESSION['captcha'] != $_POST['chislo']) {
+		$err[] = '验证码错误或无效';
+	}
 	if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "'"), 0) == 0) {
 		$err = "使用此用户名的用户未注册";
 	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "' AND `email` = '" . my_esc($_POST['mail']) . "'"), 0) == 0) {
@@ -107,6 +111,7 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 	echo "<input type=\"text\" name=\"nick\" title=\"用户名\" value=\"\" maxlength=\"32\" size=\"16\" /><br />";
 	echo "E-mail:<br />";
 	echo "<input type=\"text\" name=\"mail\" title=\"E-mail\" value=\"\" maxlength=\"32\" size=\"16\" /><br />";
+	echo "<img src='../captcha.php' width='100' height='30' alt='验证码图像' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
 	echo "<input type=\"submit\" value=\"下一步\" title=\"下一步\" />";
 	echo "</form>";
 	echo "设置新密码的链接将发送到您的电子邮件。<br />";
