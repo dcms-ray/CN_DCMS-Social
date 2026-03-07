@@ -74,8 +74,6 @@ aut();
 		<option <?php echo (setget('mail_transport_type', 'mail') == 'smtp' ? 'selected="selected"' : null); ?> value="smtp">SMTP</option>
 	</select><br />
 
-
-
 	* 以下设置仅在 SMTP 模式可用：<br />
 	发件人地址：<br />
 	<input name="set_email_from" value="<?php echo ($set['set_email_from'] ?? NULL); ?>" type="email" /><br />
@@ -101,8 +99,8 @@ aut();
 
 	SMTP 加密方式：<br />
 	<select name="smtp_secure">
-		<option <?php echo (setget('smtp_secure', 'tls') == 'tls' ? 'selected="selected"' : null); ?> value="mail">TLS</option>
-		<option <?php echo (setget('smtp_secure', 'tls') == 'ssl' ? 'selected="selected"' : null); ?> value="smtp">SSL</option>
+		<option <?php echo (setget('smtp_secure', 'tls') == 'tls' ? 'selected="selected"' : null); ?> value="starttls">显式 TLS</option>
+		<option <?php echo (setget('smtp_secure', 'tls') == 'ssl' ? 'selected="selected"' : null); ?> value="tls">隐式 TLS</option>
 		<option <?php echo (setget('smtp_secure', 'tls') == 'none' ? 'selected="selected"' : null); ?> value="smtp">不加密</option>
 	</select><br />
 
