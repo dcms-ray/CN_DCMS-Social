@@ -63,7 +63,7 @@ class captcha
 	function __construct($str) {
 		// 检查GD库是否启用
 		if (!function_exists('gd_info')) {
-			header('Location: /style/errors/gd_err.gif');
+			header('Location: style/errors/gd_err.gif');
 			exit;
 		}
 		// 检查支持的图像格式

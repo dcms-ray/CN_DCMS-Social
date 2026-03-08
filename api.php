@@ -99,13 +99,14 @@ switch ($action) {
 			if (!isset($_POST['captcha']) || !isset($_POST['captcha_token'])) {
 				throw new Exception('verification code is required');
 			}
-		
+
+			$Captcha = new GuGuan123\dcms\Services\Captcha($set, $db);
 			// 验证码验证逻辑
-			$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
+			$validateCaptchaToken = $Captcha->validateToken($_POST['captcha'], $_POST['captcha_token']);
 			if ($validateCaptchaToken['status'] != 'success') {
 				throw new Exception($validateCaptchaToken['message']);
 			}
-		
+
 			// 检查必要参数
 			if (!isset($_POST['reg_nick'])) {
 				// 缺少昵称参数
@@ -115,7 +116,7 @@ switch ($action) {
 				// 缺少密码参数
 				throw new Exception('password is missing');
 			}
-		
+
 			// 先检查邮箱（如果启用了邮件验证）
 			if ($set['reg_select'] == 'open_mail' && empty($_POST['email'])) {
 				throw new Exception('email is missing');
@@ -206,25 +207,8 @@ switch ($action) {
 
 	case 'get-captcha-url':
 		// 获取 Captcha URL 和 Captcha token
-
-		// 生成5位验证码
-		$captcha_value = rand(10000, 99999);
-		$expiry_time = time() + 600;  // 设置过期时间为 10 分钟后
-
-		// 生成随机的 iv（初始化向量）
-		$iv = openssl_random_pseudo_bytes(16);
-
-		$response['status'] = 'success';
-		// 给验证码添加过期时间，加密后进行 base64 编码，与 base64 编码过的 iv 拼装在一起作为 captcha_token
-		$response['captcha_token'] = base64_encode(openssl_encrypt($captcha_value . '.' . (time() + 600), 'aes-256-cbc', $set['shif'], 0, $iv)) . '.' . base64_encode($iv);
-		// 生成验证码图片 URL
-		$response['captcha_url'] = "/captcha.php?captcha_token={$response['captcha_token']}";
-
-		// 插入数据库，保存生成的 token，状态为 'unused'
-		$db->insert("INSERT INTO captcha_tokens (captcha_token, expires_at, status) VALUES (?, FROM_UNIXTIME(?), 'unused')", [
-			$response['captcha_token'],
-			$expiry_time
-		]);
+		$Captcha = new GuGuan123\dcms\Services\Captcha($set, $db);
+		$response = $Captcha->createToken();
 		break;
 
 	case 'activation-account':
@@ -394,7 +378,8 @@ switch ($action) {
 					}
 				} elseif (isset($set['write_guest']) && $set['write_guest'] == 1) {
 					if (isset($_POST['captcha']) && isset($_POST['captcha_token'])) {
-						$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
+						$Captcha = new GuGuan123\dcms\Services\Captcha($set, $db);
+						$validateCaptchaToken = $Captcha->validateToken($_POST['captcha'], $_POST['captcha_token']);
 						if ($validateCaptchaToken['status'] == 'success') {
 							// 获取上一条消息
 							$lastMessage = $db->query('SELECT `msg`, `time` FROM `guest` WHERE id_user = ? ORDER BY `time` DESC LIMIT 1', [0]);
@@ -746,7 +731,8 @@ switch ($action) {
 			if (($user['rating'] < 2 || $user['group_access'] < 6) && $user['id'] != 1746) {
 				if (empty($_POST['chislo'])) throw new \Exception('chislo not found');
 				if (empty($_POST['captcha_token'])) throw new \Exception('captcha_token not found');
-				$validateCaptchaToken = validateCaptchaToken($_POST['captcha'], $_POST['captcha_token']);
+				$Captcha = new GuGuan123\dcms\Services\Captcha($set, $db);
+				$validateCaptchaToken = $Captcha->validateToken($_POST['captcha'], $_POST['captcha_token']);
 				if ($validateCaptchaToken['status'] != 'success') throw new \Exception($validateCaptchaToken['message']);
 			}
 
