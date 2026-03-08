@@ -182,7 +182,7 @@ if (isset($_GET['delete']) && $_GET['delete'] != 'all') {
 		echo $mess['msg'];
 		echo '</div>';
 		echo "<form method='post' name='delete' action='?delete={$mess['id']}'>";
-		echo '<input type="hidden" name="continue" value="ok">';
+		echo '<input type="hidden" name="continue" value="yes">';
 		echo '<input value="确认删除" type="submit">';
 		echo '</form>';
 		require_once '../sys/inc/tfoot.php';
