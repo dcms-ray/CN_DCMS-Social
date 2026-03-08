@@ -190,7 +190,7 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				/*-------------------------------------------------------------*/
 				/*--------------------消息 -----------------------------------*/
 				echo "<div class='main'>";
-				echo ' <a href="mail.php?id=' . $ank['id'] . '><img src="../style/icons/pochta.gif" alt="*"> 私信</a> ';
+				echo ' <a href="mail.php?id=' . $ank['id'] . '><img src="../style/icons/pochta.gif" alt="*" /> 私信</a> ';
 				echo "</div>";
 				/*----------------------------------------------------------------*/
 				/*
