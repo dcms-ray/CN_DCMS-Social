@@ -245,56 +245,71 @@ switch ($action) {
 	case 'forgot-password':
 		// 忘记密码
 		if (isset($_POST['nick']) && isset($_POST['email']) && isset($_POST['captcha']) && isset($_POST['captcha_token'])) {
-			$result = $db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = :nick", [':nick' => $_POST['nick']]);
+			// 验证验证码
+			if (!isset($_POST['captcha']) || !isset($_POST['captcha_token'])) {
+				throw new Exception('verification code is required');
+			}
 
-			if ($result && $result['COUNT(*)'] == 1) {
-				$result = $db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = :nick AND `email` = :email", [
-					':nick' => $_POST['nick'],
-					':email' => $_POST['email']
-				]);
+			$Captcha = new GuGuan123\dcms\Services\Captcha($set, $db);
+			// 验证码验证逻辑
+			$validateCaptchaToken = $Captcha->validateToken($_POST['captcha'], $_POST['captcha_token']);
+			if ($validateCaptchaToken['status'] != 'success') {
+				$response = array(
+					'status' => 'error',
+					'message' => $validateCaptchaToken['message']
+				);
+			} else {
+				$result = $db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = :nick", [':nick' => $_POST['nick']]);
+
 				if ($result && $result['COUNT(*)'] == 1) {
-					// 生成链接Token
-					$token = bin2hex(random_bytes(32));
-					// 插入数据库，存储 token 和创建时间
-					$db->query("INSERT INTO `password_reset_tokens` (`user_id`, `token`) VALUES (:user_id, :token)", [
-						':user_id' => $userId,
-						':token' => $token
+					$result = $db->query("SELECT COUNT(*) FROM `user` WHERE `nick` = :nick AND `email` = :email", [
+						':nick' => $_POST['nick'],
+						':email' => $_POST['email']
 					]);
+					if ($result && $result['COUNT(*)'] == 1) {
+						// 生成链接Token
+						$token = bin2hex(random_bytes(32));
+						// 插入数据库，存储 token 和创建时间
+						$db->query("INSERT INTO `password_reset_tokens` (`user_id`, `token`) VALUES (:user_id, :token)", [
+							':user_id' => $userId,
+							':token' => $token
+						]);
 
-					$user2 = $db->query("SELECT * FROM `user` WHERE `nick` = :nick LIMIT 1", [':nick' => $_POST['nick']]);
-					$subject = "密码恢复";
-					$regmail = "你好！ $user2[nick]<br />
-								您已激活密码恢复<br />
-								要设置新密码，请点击链接:<br />
-								<a href='" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
-								此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
+						$user2 = $db->query("SELECT * FROM `user` WHERE `nick` = :nick LIMIT 1", [':nick' => $_POST['nick']]);
+						$subject = "密码恢复";
+						$regmail = "你好！ $user2[nick]<br />
+									您已激活密码恢复<br />
+									要设置新密码，请点击链接:<br />
+									<a href='" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
+									此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
 
-					// 调用封装的发送邮件函数
-					$emailResult = sendEmail($subject, $regmail, $user2['email'], $user2['nick']);
+						// 调用封装的发送邮件函数
+						$emailResult = sendEmail($subject, $regmail, $user2['email'], $user2['nick']);
 
-					if ($emailResult['status'] == 'success') {
-						// 如果邮件发送成功
-						$response['status'] = 'success';
-						$response['message'] = "password reset email sent";
+						if ($emailResult['status'] == 'success') {
+							// 如果邮件发送成功
+							$response['status'] = 'success';
+							$response['message'] = "password reset email sent";
+						} else {
+							// 如果邮件发送失败
+							http_response_code(500);
+							$response['status'] = 'error';
+							$response['message'] = $emailResult['message'];
+						}
 					} else {
-						// 如果邮件发送失败
-						http_response_code(500);
+						http_response_code(400);
 						$response['status'] = 'error';
-						$response['message'] = $emailResult['message'];
+						$response['message'] = 'invalid email address';
 					}
 				} else {
 					http_response_code(400);
 					$response['status'] = 'error';
-					$response['message'] = 'invalid email address';
+					$response['message'] = 'nick not found';
 				}
 			} else {
-				http_response_code(400);
 				$response['status'] = 'error';
-				$response['message'] = 'nick not found';
+				$response['message'] = 'missing parameters';
 			}
-		} else {
-			$response['status'] = 'error';
-			$response['message'] = 'missing parameters';
 		}
 		break;
 
