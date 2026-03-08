@@ -17,9 +17,9 @@ only_reg();
 
 if(isset($_GET['send']) AND isset($_POST['send'])) {
 	$ank = $db->query('SELECT * FROM user WHERE nick = ? LIMIT 1', [$_POST['komu']]);
-	if($ank->fetchColumn() == 0) {
-		/* 检查是否有这样一个昵称的性别 */
-		echo '<div class="nav2">你可能犯了一个错误，该用户 ' . text($_POST['komu']) . ' 不在网站上。</div>';
+	if(empty($ank['id'])) {
+		/* 检查是否有这样一个昵称的用户 */
+		echo '<div class="nav2">你可能犯了一个错误，用户 ' . text($_POST['komu']) . ' 不存在</div>';
 		echo '<div class="foot"> <a href="mails.php">返回</a></div>';
 		include_once '../sys/inc/tfoot.php';
 	} elseif ((strlen2($_POST['msg']) < 3) OR (strlen2($_POST['msg']) > 1024)) {
