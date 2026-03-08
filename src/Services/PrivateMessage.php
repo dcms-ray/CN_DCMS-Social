@@ -85,7 +85,7 @@ class PrivateMessage
 	 * @param int $id 消息ID
 	 * @return bool 是否操作成功
 	 */
-	public function delete(int $id, int $user_id) {
+	public function delete(int $id) {
 		return $this->db->delete('DELETE FROM `mail` WHERE `id` = ?', [$id]);
 	}
 
