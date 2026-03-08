@@ -197,9 +197,6 @@ if (isset($_GET['delete']) && $_GET['delete'] == 'all') {
 		exit;
 	} else {
 		echo '<div class="mess">是否清空消息？</div>';
-		echo '<div class="nav1">';
-		echo $mess['msg'];
-		echo '</div>';
 		echo '<form method="post" name="delete" action="?id=' . $ank['id'] . '&amp;delete=all">';
 		echo '<input type="hidden" name="continue" value="ok">';
 		echo '<input value="确认删除" type="submit">';
