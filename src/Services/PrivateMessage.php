@@ -35,6 +35,7 @@ class PrivateMessage
 	public function get(int $id) {
 		$result = $this->db->query('SELECT * FROM `mail` WHERE id = ? LIMIT 1', [$id]);
 		return [
+			'id'          => $result['id'],
 			'sender_id'   => $result['id_user'],
 			'receiver_id' => $result['id_kont'],
 			'time'        => $result['time'],
