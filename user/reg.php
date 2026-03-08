@@ -74,7 +74,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 			            要激活您的帐户，请点击链接:<br />
 			            <a href='" . $set['siteurl'] . "/user/reg.php?id={$id_reg}&amp;activation={$activation}'>" . $set['siteurl'] . "/user/reg.php?id=" . dbinsertid() . "&amp;activation={$activation}</a><br />
 			            如果帐户在24小时内未激活，它将被删除<br />
-			            真诚的，网站管理<br />";
+			            CN_DCMS-Social 管理组<br />";
 
 			$emailResult = sendEmail($subject, $regmail, $_POST['email'], $_SESSION['reg_nick']);
 			if ($emailResult['status'] == 'success') {
@@ -173,7 +173,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1) {
 
 	if ($set['reg_select'] == 'open_mail') {
 		echo "E-mail:<br /><input type='text' name='email' /><br />";
-		echo "* 指定您的真实电子邮件地址。您将收到一个激活您的帐户的代码.<br />";
+		echo "* 使用您的真实电子邮件地址，您将收到一个包含激活帐户链接的邮件<br />";
 	}
 
 	echo "输入密码（6-32个字符）:<br /><input type='password' name='pass1' maxlength='32' /><br />";

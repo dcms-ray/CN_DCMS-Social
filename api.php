@@ -165,8 +165,8 @@ switch ($action) {
 				$regmail = "你好！ {$_POST['reg_nick']}<br />
 							要激活您的帐户，请点击链接:<br />
 							<a href='" . $set['siteurl'] . "/user/reg.php?id=$id_reg&amp;activation=$activation'>点击激活帐户</a><br />
-							如果帐户在24小时内未激活，它将被删除。<br />
-							真诚的，网站管理团队";
+							如果帐户在24小时内未激活，它将被系统自动删除<br />
+							CN_DCMS-Social 管理组";
 
 
 				// 调用封装的发送邮件函数
@@ -279,9 +279,9 @@ switch ($action) {
 						$subject = "密码恢复";
 						$regmail = "你好！ $user2[nick]<br />
 									您已激活密码恢复<br />
-									要设置新密码，请点击链接:<br />
+									需重置密码，请点击链接:<br />
 									<a href='" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
-									此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
+									此链接为一次性有效，成功重置密码或登录后即失效({$user2['nick']})<br />CN_DCMS-Social 管理组<br />";
 
 						// 调用封装的发送邮件函数
 						$emailResult = sendEmail($subject, $regmail, $user2['email'], $user2['nick']);
