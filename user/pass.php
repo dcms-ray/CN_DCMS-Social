@@ -21,7 +21,7 @@ if (isset($_POST['nick']) && isset($_POST['mail']) && $_POST['nick'] != NULL && 
 	if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "'"), 0) == 0) {
 		$err = "使用此用户名的用户未注册";
 	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "' AND `email` = '" . my_esc($_POST['mail']) . "'"), 0) == 0) {
-		$err = '无效的电子邮件地址或丢失的电子邮件信息';
+		$err = '电子邮件地址无效或发送失败';
 	} else {
 		// 生成链接Token
 		$token = bin2hex(random_bytes(32));
@@ -36,7 +36,7 @@ if (isset($_POST['nick']) && isset($_POST['mail']) && $_POST['nick'] != NULL && 
 		            您已激活密码恢复<br />
 		            要设置新密码，请点击链接:<br />
 		            <a href='" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
-		            此链接有效，直到您的用户名下的第一个授权({$user2['nick']})<br />真诚的，网站管理<br />";
+		            此链接为一次性有效，成功重置密码或登录后即失效({$user2['nick']})<br />CN_DCMS-Social 管理组<br />";
 
 		// 调用封装的发送邮件函数
 		$emailResult = sendEmail($subject, $regmail, $user2['email'], $user2['nick']);
@@ -109,8 +109,8 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 	echo "<input type=\"text\" name=\"mail\" title=\"E-mail\" value=\"\" maxlength=\"32\" size=\"16\" /><br />";
 	echo "<input type=\"submit\" value=\"下一步\" title=\"下一步\" />";
 	echo "</form>";
-	echo "设置新密码的链接将发送到您的电子邮件。<br />";
-	echo "如果您在资料中没有关于您的电子邮件的条目，密码恢复是不可能的。<br />";
+	echo "重置密码的链接将发送到您的邮箱<br />";
+	echo "如果您在资料中没有设置您的电子邮件地址，则无法恢复，请联系管理员手动重置<br />";
 
 	echo '<div class="foot">
 		尚未登记？<br/>

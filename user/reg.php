@@ -76,7 +76,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 			            要激活您的帐户，请点击链接:<br />
 			            <a href='" . get_http_type() . "://{$set['hostname']}/user/reg.php?id={$id_reg}&amp;activation={$activation}'>" . get_http_type() . "://{$set['hostname']}/user/reg.php?id=" . dbinsertid() . "&amp;activation={$activation}</a><br />
 			            如果帐户在24小时内未激活，它将被删除<br />
-			            真诚的，网站管理<br />";
+			            CN_DCMS-Social 管理组<br />";
 
 			$emailResult = sendEmail($subject, $regmail, $_POST['email'], $_SESSION['reg_nick']);
 			if ($emailResult['status'] == 'success') {
@@ -135,7 +135,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1 && dbresult(dbquery("SELE
 
 		msg('注册成功！');
 
-		echo "如果您的浏览器不支持Cookie，您可以创建一个自动登录书签<br />";
+		echo "如果您的浏览器不支持Cookie，您可以创建一个自动登录链接<br />";
 		echo "<input type='text' value='" . get_http_type() . "://{$_SERVER['SERVER_NAME']}/user/login.php?id={$user['id']}&amp;pass=" . htmlspecialchars($_POST['pass1']) . "' /><br />";
 		if ($set['reg_select'] == 'open_mail') unset($user);
 		echo "<div class='foot'>";
@@ -175,7 +175,7 @@ if (isset($_SESSION['step']) && $_SESSION['step'] == 1) {
 
 	if ($set['reg_select'] == 'open_mail') {
 		echo "E-mail:<br /><input type='text' name='email' /><br />";
-		echo "* 指定您的真实电子邮件地址。您将收到一个激活您的帐户的代码.<br />";
+		echo "* 使用您的真实电子邮件地址，您将收到一个激活您的帐户的链接<br />";
 	}
 
 	echo "输入密码（6-32个字符）:<br /><input type='password' name='pass1' maxlength='32' /><br />";
