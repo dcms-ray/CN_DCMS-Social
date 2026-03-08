@@ -20,9 +20,7 @@ namespace GuGuan123\dcms\Services;
 
 class Captcha
 {
-	private $set;
-	private $db;
-	public function __construct(array $set, \GuGuan123\dcms\Database $db) {
+	public function __construct(private array $set, private \GuGuan123\dcms\Database $db) {
 		$this->set = $set;
 		$this->db = $db;
 	}
@@ -37,7 +35,7 @@ class Captcha
 		$iv = openssl_random_pseudo_bytes(16);
 
 		// 给验证码添加过期时间，加密后进行 base64 编码，与 base64 编码过的 iv 拼装在一起作为 captcha_token
-		$token = base64_encode(openssl_encrypt($captcha_value . '.' . (time() + 600), 'aes-256-cbc', $this->set['shif'], 0, $iv)) . '.' . base64_encode($iv);
+		$token = rtrim(strtr(base64_encode(openssl_encrypt($captcha_value . '.' . (time() + 600), 'aes-256-cbc', $this->set['shif'], 0, $iv)), '+/', '-_'), '=') . '.' . rtrim(strtr(base64_encode($iv), '+/', '-_'), '=');
 
 		// 插入数据库，保存生成的 token，状态为 'unused'
 		$this->db->insert("INSERT INTO captcha_tokens (captcha_token, expires_at, status) VALUES (?, FROM_UNIXTIME(?), 'unused')", [
@@ -66,7 +64,7 @@ class Captcha
 		}
 
 		// 解密并拆分 Token
-		$decrypted_captcha_token = explode('.', openssl_decrypt(base64_decode($token_parts[0]), 'aes-256-cbc', $this->set['shif'], 0, base64_decode($token_parts[1])));
+		$decrypted_captcha_token = explode('.', openssl_decrypt(base64_decode(strtr($token_parts[0], '-_', '+/')), 'aes-256-cbc', $this->set['shif'], 0, base64_decode(strtr($token_parts[1], '-_', '+/'))));
 		if (count($decrypted_captcha_token) !== 2) {
 			return [
 				'status' => 'error',
