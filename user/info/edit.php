@@ -102,13 +102,13 @@ if (isset($_GET['set'])) {
 			}
 		}
 
-		//-------------------skype---------------//
-		if (isset($_GET['set']) && $_GET['set']=='skype') {
-			if (isset($_POST['ank_skype']) && preg_match('#^([A-z0-9 \-]*)$#ui', $_POST['ank_skype'])) {
-				$user['ank_skype'] = $_POST['ank_skype'];
-				dbquery("UPDATE `user` SET `ank_skype` = '".my_esc($user['ank_skype'])."' WHERE `id` = '$user[id]' LIMIT 1");
+		//-------------------xmpp---------------//
+		if (isset($_GET['set']) && $_GET['set']=='xmpp') {
+			if (isset($_POST['ank_xmpp']) && preg_match('/^[\w.%+-]{1,64}@[\w.-]{1,255}\.[A-Za-z]{2,}$/u', $_POST['ank_xmpp'])) {
+				$user['ank_xmpp'] = $_POST['ank_xmpp'];
+				$db->update('UPDATE user SET ank_xmpp = ? WHERE id = ? LIMIT 1', [$user['ank_xmpp'], $user['id']]);
 			} else {
-				$err[] = '无效的Skype账号';
+				$err[] = "无效的 XMPP 地址";
 			}
 		}
 
@@ -257,7 +257,7 @@ if (isset($_GET['set'])) {
 	}
 	if (isset($_GET['set']) && $_GET['set']=='gorod') echo "城市:<br /><input type='text' name='ank_city' value='$user[ank_city]' maxlength='32' /><br />";
 	if (isset($_GET['set']) && $_GET['set']=='icq') echo "QQ:<br /><input type='text' name='ank_icq' value='$user[ank_icq]' maxlength='10' /><br />";
-	if (isset($_GET['set']) && $_GET['set']=='skype') echo "Skype<br /><input type='text' name='ank_skype' value='$user[ank_skype]' maxlength='16' /><br />";
+	if (isset($_GET['set']) && $_GET['set']=='xmpp') echo "XMPP<br /><input type='text' name='ank_xmpp' value='$user[ank_xmpp]' maxlength='32' /><br />";
 	if (isset($_GET['set']) && $_GET['set']=='mail') {
 		echo "E-mail:<br />
 			<input type='text' name='email' value='$user[email]' maxlength='32' /><br />
@@ -330,9 +330,9 @@ if (isset($_GET['set'])) {
 		echo "<br />";
 	}
 	
-	echo "<a href='?set=skype'> <img src='/style/icons/str.gif' alt='*'>Skype</a> "; 
-	if ($user['ank_skype']) {
-		echo "&#62; $user[ank_skype]<br />";
+	echo "<a href='?set=xmpp'> <img src='/style/icons/str.gif' alt='*'>XMPP</a> "; 
+	if ($user['ank_xmpp']) {
+		echo "&#62; $user[ank_xmpp]<br />";
 	} else {
 		echo "<br />";
 	}

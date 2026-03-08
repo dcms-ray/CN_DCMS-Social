@@ -98,10 +98,12 @@ if (isset($_POST['save'])) {
 		dbquery("UPDATE `user` SET `ank_icq` = $ank[ank_icq] WHERE `id` = '$ank[id]' LIMIT 1");
 		if ($ank['ank_icq'] == 'null') $ank['ank_icq'] = NULL;
 	} else $err = '无效的ICQ格式';
-	if (isset($_POST['ank_skype']) && preg_match('#^([A-z0-9 \-]*)$#ui', $_POST['ank_skype'])) {
-		$ank['ank_skype'] = $_POST['ank_skype'];
-		dbquery("UPDATE `user` SET `ank_skype` = '" . my_esc($ank['ank_skype']) . "' WHERE `id` = '$ank[id]' LIMIT 1");
-	} else $err[] = "无效的Skype账号";
+	if (isset($_POST['ank_xmpp']) && preg_match('/^[\w.%+-]{1,64}@[\w.-]{1,255}\.[A-Za-z]{2,}$/u', $_POST['ank_xmpp'])) {
+		$ank['ank_xmpp'] = $_POST['ank_xmpp'];
+		$db->update('UPDATE user SET ank_xmpp = ? WHERE id = ? LIMIT 1', [$ank['ank_xmpp'], $ank['id']]);
+	} else {
+		$err[] = "无效的 XMPP 地址";
+	}
 	if (isset($_POST['ank_n_tel']) && (is_numeric($_POST['ank_n_tel']) && strlen($_POST['ank_n_tel']) >= 5 && strlen($_POST['ank_n_tel']) <= 11 || $_POST['ank_n_tel'] == NULL)) {
 		$ank['ank_n_tel'] = $_POST['ank_n_tel'];
 		dbquery("UPDATE `user` SET `ank_n_tel` = '$ank[ank_n_tel]' WHERE `id` = '$ank[id]' LIMIT 1");
@@ -200,8 +202,8 @@ echo '<select name="ank_g_r">
 	</select><br/>';
 echo "城市:<br /><input type='text' name='ank_city' value='$ank[ank_city]' maxlength='32' /><br />
 	ICQ:<br /><input type='text' name='ank_icq' value='$ank[ank_icq]' maxlength='9' /><br />
-	Skype 账号<br />
-		<input type='text' name='ank_skype' value='$ank[ank_skype]' maxlength='16' /><br />
+	XMPP 地址<br />
+		<input type='text' name='ank_xmpp' value='$ank[ank_xmpp]' maxlength='32' /><br />
 	E-mail:<br /><input type='text' name='email' value='$ank[email]' maxlength='32' /><br />
 	电话号码:<br /><input type='text' name='ank_n_tel' value='$ank[ank_n_tel]' maxlength='11' /><br />
 	关于我:<br /><input type='text' name='ank_o_sebe' value='$ank[ank_o_sebe]' maxlength='512' /><br />";

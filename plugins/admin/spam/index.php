@@ -109,12 +109,13 @@ if (user_access('adm_panel_show')) {
 			echo user::nick($anketa['id'])  . "<br />";
 		}
 
-    if ($ank == false) {
+		if ($ank == false) {
 			echo "<b>申诉:</b> [已删除]<br />";
-    } else {
+		} else {
 			echo "<b>申诉:</b> <a href='../../../user/info.php?id={$ank['id']}'>{$ank['nick']}</a>";
-      echo " " . medal($ank['id']) . " " . online($ank['id']) . " (" . vremja($post['time']) . ")<br />";
-    }
+		}
+
+		echo " " . medal($ank['id']) . " " . online($ank['id']) . " (" . vremja($post['time']) . ")<br />";
   	
 		if ($post['razdel'] == 'mail' || $post['razdel'] == 'guest' || $post['razdel'] == 'forum' || $post['razdel'] == 'stena')
 			echo "<b>通信:</b> <font color='red' style='border-bottom: 1px solid green;'>" . output_text($post['spam']) . "<br /></font>";
