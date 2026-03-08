@@ -168,29 +168,29 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 					$color = null;
 					$color2 = null;
 				}
-				echo "<img src='/style/icons/lenta.gif' alt='*' /> <a href='/user/tape/'>" . $color . "消息" . $color2 . "</a> ";
+				echo "<img src='../style/icons/lenta.gif' alt='*' /> <a href='tape/'>" . $color . "消息" . $color2 . "</a> ";
 				if ($k_l != 0) echo "<font color=\"red\">+$k_l</font>";
 				echo "</div>";
 			}
 			/*---------------------------------------*/
 			echo "<div class='main2'>";
-			echo "<img src='/style/my_menu/who_rating.png' alt='*' /> <a href='/user/info/who_rating.php?id=$ank[id]'><b>评价</b></a> (" . dbresult(dbquery("SELECT COUNT(*) FROM `user_voice2` WHERE `id_kont` = '" . $ank['id'] . "'"), 0) . ")<br />";
+			echo "<img src='../style/my_menu/who_rating.png' alt='*' /> <a href='info/who_rating.php?id=$ank[id]'><b>评价</b></a> (" . dbresult(dbquery("SELECT COUNT(*) FROM `user_voice2` WHERE `id_kont` = '" . $ank['id'] . "'"), 0) . ")<br />";
 			echo "</div>";
 			/*-----------------------------交朋友-------------------------*/
 			if (isset($user) && $user['id'] != $ank['id']) {
 				echo "<div class='main'>";
 				if ($frend_new == 0 && $frend == 0) {
-					echo "<img src='/style/icons/druzya.png' alt='*'/> <a href='/user/info.php?id=$ank[id]&amp;frends'>添加为好友</a><br />";
+					echo "<img src='../style/icons/druzya.png' alt='*'/> <a href='?id=$ank[id]&amp;frends'>添加为好友</a><br />";
 				} elseif ($frend_new == 1) {
-					echo "<img src='/style/icons/druzya.png' alt='*'/> <a href='/user/frends/create.php?otm=$ank[id]'>拒绝申请</a><br />";
+					echo "<img src='../style/icons/druzya.png' alt='*'/> <a href='frends/create.php?otm=$ank[id]'>拒绝申请</a><br />";
 				} elseif ($frend == 2) {
-					echo "<img src='/style/icons/druzya.png' alt='*'/> <a href='/user/frends/create.php?del=$ank[id]'>从朋友中删除</a><br />"; //统一 WAP 口径——Diamochang
+					echo "<img src='../style/icons/druzya.png' alt='*'/> <a href='frends/create.php?del=$ank[id]'>从朋友中删除</a><br />"; //统一 WAP 口径——Diamochang
 				}
 				echo "</div>";
 				/*-------------------------------------------------------------*/
 				/*--------------------消息 -----------------------------------*/
 				echo "<div class='main'>";
-				echo " <a href=\"/user/mail.php?id=$ank[id]\"><img src='/style/icons/pochta.gif' alt='*' /> 通信</a> ";
+				echo ' <a href="mail.php?id=' . $ank['id'] . '><img src="../style/icons/pochta.gif" alt="*"> 私信</a> ';
 				echo "</div>";
 				/*----------------------------------------------------------------*/
 				/*
@@ -199,7 +199,7 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				========================================
 				*/
 				echo "<div class='main2'>";
-				echo "<img src='/style/icons/many.gif' alt='*' /> <a href=\"/user/money/translate.php?id=$ank[id]\">赠送$sMonet[0]</a> ";
+				echo "<img src='../style/icons/many.gif' alt='*' /> <a href=\"money/translate.php?id=$ank[id]\">赠送$sMonet[0]</a> ";
 				echo "</div>";
 				/*
 				========================================
@@ -207,14 +207,14 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				========================================
 				*/
 				echo "<div class='main2'>";
-				echo "<img src='/style/icons/present.gif' alt='*' /> <a href=\"/user/gift/categories.php?id=$ank[id]\">送礼物</a><br />";
+				echo "<img src='../style/icons/present.gif' alt='*' /> <a href=\"gift/categories.php?id=$ank[id]\">送礼物</a><br />";
 				echo "</div>";
 			}
 			/*-----------------------------设置-----------------------*/
 			if (isset($user) && $ank['id'] == $user['id']) {
 				echo "<div class='main2'>";
-				echo "<img src='/style/icons/uslugi.gif' alt='*' /> <a href=\"/user/money/index.php\">附加服务</a><br /> ";
-				echo "<img src='/style/icons/settings.png' alt='*' /> <a href=\"/user/info/settings.php\">我的设置</a> | <a href=\"/user/my_aut.php\">登录历史</a>";
+				echo "<img src='../style/icons/uslugi.gif' alt='*' /> <a href=\"money/index.php\">附加服务</a><br /> ";
+				echo "<img src='../style/icons/settings.png' alt='*' /> <a href=\"info/settings.php\">我的设置</a> | <a href=\"/user/my_aut.php\">登录历史</a>";
 				echo "</div>";
 			}
 			/*-------------------------------------------------------------*/
@@ -244,8 +244,8 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				}
 				/*-----------------------*/
 				echo user::avatar($ank3['id']);
-				echo ' <a href="/user/info.php?id=' . $ank3['id'] . '">' . $ank3['nick'] . '</a>' . medal($ank3['id']) . ' ' . online($ank3['id']) . ' (' . (($ank3['pol'] == 1) ? '男' : '女') . ')<br />';
-				echo '<a href="/user/mail.php?id=' . $ank3['id'] . '"><img src="/style/icons/pochta.gif" alt="*" /> 通信</a> ';
+				echo ' <a href="?id=' . $ank3['id'] . '">' . $ank3['nick'] . '</a>' . medal($ank3['id']) . ' ' . online($ank3['id']) . ' (' . (($ank3['pol'] == 1) ? '男' : '女') . ')<br />';
+				echo '<a href="mail.php?id=' . $ank3['id'] . '"><img src="../style/icons/pochta.gif" alt="*" /> 通信</a> ';
 				echo "</div>";
 			}
 			/*---------------------the end--------------------------*/
@@ -257,7 +257,7 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 			/*---------------------------朋友-----------------------------*/
 			$k_fr = dbresult(dbquery("SELECT COUNT(*) FROM `frends` WHERE `user` = '$ank[id]' AND `i` = '1'"), 0);
 			$res = dbquery("select `frend` from `frends` WHERE `user` = '$ank[id]' AND `i` = '1'");
-			echo '<a class="top_nav" href="/user/frends/?id=' . $ank['id'] . '">朋友 (' . $k_fr . '</b>/';
+			echo '<a class="top_nav" href="frends/?id=' . $ank['id'] . '">朋友 (' . $k_fr . '</b>/';
 			$i = 0;
 			while ($k_fr = dbarray($res)) {
 				if (dbresult(dbquery("SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = '$k_fr[frend]' AND ul.ban = 0 AND ul.last_online > NOW() - INTERVAL 10 MINUTE ORDER BY ul.last_online DESC LIMIT 1;"), 0) != 0) $i++;
@@ -270,7 +270,7 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 			echo ")</a>";
 			/*--------------------------------------------------------------*/
 			/*------------------------相片册---------------------------*/
-			echo "<a class='top_nav' href='/photo/$ank[id]/'>照片 ";
+			echo "<a class='top_nav' href='../photo/$ank[id]/'>照片 ";
 			echo "(" . dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id_user` = '$ank[id]'"), 0) . ")</a>";
 			/*--------------------------------------------------------------*/
 			/*-------------------------个人档案---------------------------*/
