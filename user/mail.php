@@ -189,12 +189,23 @@ if (isset($_GET['delete']) && $_GET['delete'] != 'all') {
 	}
 }
 
-if (isset($_GET['delete']) && $_GET['delete'] == 'all' && isset($_GET['continue']) && $_GET['continue'] == 'yes') {
-	dbquery("DELETE FROM `mail` WHERE `unlink` = '$ank[id]'  AND `id_user` = '$user[id]' AND `id_kont` = '$ank[id]' OR `id_user` = '$ank[id]' AND `id_kont` = '$user[id]' AND `unlink` = '$ank[id]'  ");
-	dbquery("UPDATE `mail` SET `unlink` = '$user[id]' WHERE  `id_user` = '$user[id]' AND `id_kont` = '$ank[id]' OR `id_user` = '$ank[id]' AND `id_kont` = '$user[id]'");
-	$_SESSION['message'] = '已删除所有消息';
-	header("Location: ?id=$ank[id]");
-	exit;
+if (isset($_GET['delete']) && $_GET['delete'] == 'all') {
+	if (isset($_POST['continue']) && $_POST['continue'] == 'yes') {
+		$privateMessage->clear_all($user['id'], $ank['id']);
+		$_SESSION['message'] = '已删除所有消息';
+		header("Location: ?id=$ank[id]");
+		exit;
+	} else {
+		echo '<div class="mess">是否清空消息？</div>';
+		echo '<div class="nav1">';
+		echo $mess['msg'];
+		echo '</div>';
+		echo "<form method='post' name='delete' action='?delete=all'>";
+		echo '<input type="hidden" name="continue" value="ok">';
+		echo '<input value="确认删除" type="submit">';
+		echo '</form>';
+		require_once '../sys/inc/tfoot.php';
+	}
 }
 
 aut();

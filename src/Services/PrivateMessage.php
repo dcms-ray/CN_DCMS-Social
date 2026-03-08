@@ -96,6 +96,30 @@ class PrivateMessage
 	 * @return bool 是否操作成功
 	 */
 	public function unlink(int $id, int $user_id) {
-		return $this->db->update("UPDATE `mail` SET `unlink` = ? WHERE `id` = ? LIMIT 1", [$user_id, $id]);
+		return $this->db->update('UPDATE `mail` SET `unlink` = ? WHERE `id` = ? LIMIT 1', [$user_id, $id]);
+	}
+
+	/**
+	 * 清理某个用户的与某个联系人的所有私信消息
+	 * 
+	 * @param int $user_id 清理的用户ID
+	 * @param int $target_id 清理的联系人ID
+	 */
+	public function clear_all($user_id, $target_id) {
+		$this->db->delete('DELETE FROM `mail` WHERE `unlink` = ?  AND `id_user` = ? AND `id_kont` = ? OR `id_user` = ? AND `id_kont` = ? AND `unlink` = ?', [
+			$target_id,
+			$user_id,
+			$target_id,
+			$target_id,
+			$user_id,
+			$target_id
+		]);
+		$this->db->update('UPDATE `mail` SET `unlink` = ? WHERE  `id_user` = ? AND `id_kont` = ? OR `id_user` = ? AND `id_kont` = ?', [
+			$user_id,
+			$user_id,
+			$target_id,
+			$target_id,
+			$user_id
+		]);
 	}
 }
