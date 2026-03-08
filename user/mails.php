@@ -53,7 +53,7 @@ if(isset($_GET['send']) AND isset($_POST['send'])) {
 		}
 		if ($block == true AND $ank['id'] != 0) {
 			/* 如果一切正常的话，就发送 */
-			$db->insert('INSERT INTO mail (id_user, id_kont, `time`, msg) VALUES (?, ?, ?, ?)', [$user['id'], $ank['id'], $time, $_POST['msg']])
+			$db->insert('INSERT INTO mail (id_user, id_kont, `time`, msg) VALUES (?, ?, ?, ?)', [$user['id'], $ank['id'], $time, $_POST['msg']]);
 			header("Location: mail.php?id=$ank[id]");
 			$_SESSION['message'] = '消息发送成功';
 		}
