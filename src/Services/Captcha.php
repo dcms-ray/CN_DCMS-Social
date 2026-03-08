@@ -20,6 +20,8 @@ namespace GuGuan123\dcms\Services;
 
 class Captcha
 {
+	private $set;
+	private $db;
 	public function __construct(array $set, \GuGuan123\dcms\Database $db) {
 		$this->set = $set;
 		$this->db = $db;
