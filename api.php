@@ -306,10 +306,10 @@ switch ($action) {
 					$response['status'] = 'error';
 					$response['message'] = 'nick not found';
 				}
-			} else {
-				$response['status'] = 'error';
-				$response['message'] = 'missing parameters';
 			}
+		} else {
+			$response['status'] = 'error';
+			$response['message'] = 'missing parameters';
 		}
 		break;
 
@@ -322,6 +322,7 @@ switch ($action) {
 				'last_online' => $user['last_online']
 			];
 		}, $results)];
+		break;
 
 	case 'user-info':
 		$user_info = user::get_user(($_GET['id'] ?? ($user ?? 0)));
