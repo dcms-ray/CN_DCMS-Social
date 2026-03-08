@@ -25,7 +25,21 @@ class Captcha
 		$this->db = $db;
 	}
 
-	// 获取 Captcha URL 和 Captcha token
+	/**
+	 * 生成验证码令牌 (Captcha Token)
+	 * * 逻辑说明：
+	 * 1. 生成 5 位随机数字验证码并设定 10 分钟有效期。
+	 * 2. 使用 AES-256-CBC 对“验证码.过期时间”进行加密。
+	 * 3. 将加密后的密文与 IV（偏移量）分别进行 URL 安全的 Base64 编码并拼接。
+	 * 4. 将 Token 记录至数据库以便后续核对，初始状态为 'unused'。
+	 *
+	 * @return array{
+	 * status: string,  // 响应状态 (e.g., 'success')
+	 * token: string,   // 经过加密和 Base64 编码后的完整验证码令牌
+	 * url: string,     // 供前端调用的验证码图片完整 URL
+	 * expires: int     // 令牌失效的 Unix 时间戳
+	 * }
+	 */
 	public function createToken() {
 		// 生成5位验证码
 		$captcha_value = rand(10000, 99999);
@@ -35,7 +49,7 @@ class Captcha
 		$iv = openssl_random_pseudo_bytes(16);
 
 		// 给验证码添加过期时间，加密后进行 base64 编码，与 base64 编码过的 iv 拼装在一起作为 captcha_token
-		$token = rtrim(strtr(base64_encode(openssl_encrypt($captcha_value . '.' . (time() + 600), 'aes-256-cbc', $this->set['shif'], 0, $iv)), '+/', '-_'), '=') . '.' . rtrim(strtr(base64_encode($iv), '+/', '-_'), '=');
+		$token = rtrim(strtr(base64_encode(openssl_encrypt($captcha_value . '.' . $expiry_time, 'aes-256-cbc', $this->set['shif'], 0, $iv)), '+/', '-_'), '=') . '.' . rtrim(strtr(base64_encode($iv), '+/', '-_'), '=');
 
 		// 插入数据库，保存生成的 token，状态为 'unused'
 		$this->db->insert("INSERT INTO captcha_tokens (captcha_token, expires_at, status) VALUES (?, FROM_UNIXTIME(?), 'unused')", [
@@ -51,8 +65,15 @@ class Captcha
 		];
 	}
 
-	// 核对验证码
-	function validateToken($user_input, $captcha_token) {
+	/**
+	 * 核对验证码
+	 * 
+	 * @param string $user_input    用户输入的验证码内容
+	 * @param string $captcha_token 验证码Token
+	 * 
+	 * @return array{status: string, message: string} 返回包含状态码和提示消息的关联数组
+	 */
+	function validateToken(string $user_input, string $captcha_token) {
 		// 解析 captcha_token
 		$token_parts = explode('.', $captcha_token);
 		if (count($token_parts) !== 2) {
