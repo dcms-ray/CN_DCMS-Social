@@ -180,7 +180,7 @@ if (isset($_GET['delete']) && $_GET['delete'] != 'all') {
 		echo '<div class="mess">是否删除此消息？</div>';
 		echo '<div class="nav1">';
 		echo $mess['msg'];
-		echo '</div>'
+		echo '</div>';
 		echo "<form method='post' name='delete' action='?komm={$post['id']}'>";
 		echo '<input type="hidden" name="continue" value="ok">';
 		echo '<input value="确认删除" type="submit">';
