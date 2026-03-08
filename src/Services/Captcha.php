@@ -40,7 +40,7 @@ class Captcha
 	 * expires: int     // 令牌失效的 Unix 时间戳
 	 * }
 	 */
-	public function createToken() {
+	public function createToken(): array {
 		// 生成5位验证码
 		$captcha_value = rand(10000, 99999);
 		$expiry_time = time() + 600;  // 设置过期时间为 10 分钟后
@@ -73,7 +73,7 @@ class Captcha
 	 * 
 	 * @return array{status: string, message: string} 返回包含状态码和提示消息的关联数组
 	 */
-	function validateToken(string $user_input, string $captcha_token) {
+	function validateToken(string $user_input, string $captcha_token): array {
 		// 解析 captcha_token
 		$token_parts = explode('.', $captcha_token);
 		if (count($token_parts) !== 2) {

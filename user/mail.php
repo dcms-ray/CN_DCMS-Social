@@ -28,6 +28,7 @@ if (!$ank) {
 	exit;
 }
 
+$privateMessage = new GuGuan123\dcms\Services\PrivateMessage($set, $db);
 
 if ($user['group_access'] < 1 && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'all' AND `id_user` = '$ank[id]' AND (`time` > '$time' OR `view` = '0')"), 0) != 0) {
 	// 如果用户被封禁
@@ -37,14 +38,14 @@ if ($user['group_access'] < 1 && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WH
 	title();
 	aut();
 	echo "<div class='nav2'>";
-	echo "<b><font color=red>此用户被阻止！</font></b><br /> ";
+	echo "<b><font color=red>此用户被封禁！</font></b><br /> ";
 	echo "</div>";
 	include_once '../sys/inc/tfoot.php';
 } else {
 	// 将邮件标记为已读
 	dbquery("UPDATE `mail` SET `read` = '1' WHERE `id_kont` = '$user[id]' AND `id_user` = '$ank[id]'");
 
-	$set['title'] = '邮箱: ' . $ank['nick'];
+	$set['title'] = '私信: ' . $ank['nick'];
 	include_once '../sys/inc/thead.php';
 	title();
 }
@@ -161,23 +162,37 @@ if (isset($_POST['msg']) && $ank['id'] != 0 && !isset($_GET['spam'])) {
 	}
 }
 
-if (isset($_GET['delete'])  && $_GET['delete'] != 'add') {
-	$mess = dbassoc(dbquery("SELECT * FROM `mail` WHERE `id` = '" . intval($_GET['delete']) . "' limit 1"));
-	if ($mess['id_user'] == $user['id'] || $mess['id_kont'] == $user['id']) {
-		if ($mess['unlink'] != $user['id'] && $mess['unlink'] != 0)
-			dbquery("DELETE FROM `mail` WHERE `id` = '" . $mess['id'] . "'");
-		else
-			dbquery("UPDATE `mail` SET `unlink` = '$user[id]' WHERE `id` = '$mess[id]' LIMIT 1");
-		$_SESSION['message'] = '邮件删除';
-		header("Location: ?id=$ank[id]");
-		exit;
+if (isset($_GET['delete']) && $_GET['delete'] != 'all') {
+	$mess = $privateMessage->get(intval($_GET['delete']));
+
+	if (isset($_POST['continue']) && $_POST['continue'] == 'yes') {
+		if ($mess['sender_id'] == $user['id'] || $mess['receiver_id'] == $user['id']) {
+			if ($mess['unlink'] != $user['id'] && $mess['unlink'] != 0) {
+				$privateMessage->delete($mess['id']);
+			} else {
+				$privateMessage->unlink($mess['id'], $user['id']);
+			}
+			$_SESSION['message'] = '已删除';
+			header("Location: ?id=$ank[id]");
+			exit;
+		}
+	} else {
+		echo '<div class="mess">是否删除此消息？</div>';
+		echo '<div class="nav1">';
+		echo $mess['msg'];
+		echo '</div>'
+		echo "<form method='post' name='delete' action='?komm={$post['id']}'>";
+		echo '<input type="hidden" name="continue" value="ok">';
+		echo '<input value="确认删除" type="submit">';
+		echo '</form>';
+		require_once '../sys/inc/tfoot.php';
 	}
 }
 
-if (isset($_GET['delete']) && $_GET['delete'] == 'add') {
+if (isset($_GET['delete']) && $_GET['delete'] == 'all' && isset($_GET['continue']) && $_GET['continue'] == 'yes') {
 	dbquery("DELETE FROM `mail` WHERE `unlink` = '$ank[id]'  AND `id_user` = '$user[id]' AND `id_kont` = '$ank[id]' OR `id_user` = '$ank[id]' AND `id_kont` = '$user[id]' AND `unlink` = '$ank[id]'  ");
 	dbquery("UPDATE `mail` SET `unlink` = '$user[id]' WHERE  `id_user` = '$user[id]' AND `id_kont` = '$ank[id]' OR `id_user` = '$ank[id]' AND `id_kont` = '$user[id]'");
-	$_SESSION['message'] = '已删除的邮件';
+	$_SESSION['message'] = '已删除所有消息';
 	header("Location: ?id=$ank[id]");
 	exit;
 }
@@ -307,7 +322,7 @@ echo "</table>";
 if ($k_page > 1) str("?id=$ank[id]&amp;", $k_page, $page); // 输出页数
 
 echo "<div class='foot'>";
-echo "<img src='../style/icons/str.gif' alt='*'> <a href='?id=$ank[id]&amp;page=$page&amp;delete=add'>清除邮件</a><br />";
+echo "<img src='../style/icons/str.gif' alt='*'> <a href='?id=$ank[id]&amp;page=$page&amp;delete=all'>清空所有信息</a><br />";
 echo "</div>";
 
 include_once '../sys/inc/tfoot.php';
