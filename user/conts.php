@@ -188,7 +188,7 @@ if (isset($_POST['deleted'])) {
 }
 err();
 
-echo "<div class='nav2'><span style='float:right;'><a href='/user/mails.php'><img src='/style/icons/mails.png'> 写一封信</a></span><br/></div>";
+echo "<div class='nav2'><span style='float:right;'><a href='mails.php'><img src='../style/icons/mails.png'> 写一封信</a></span><br/></div>";
 $k_post = dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = '$type'"), 0);
 if ($k_post) {
 	$k_page = k_page($k_post, $set['p_str']);
@@ -216,7 +216,7 @@ if ($k_post) {
 		/*---------------------------*/
 		echo user::nick($ank_kont['id'], 1, 1, 0); //输出用户名
 		echo '<input type="checkbox" name="post_' . $post['id_kont'] . '" value="1" />';
-		echo ($k_new_mess != 0 ? '<img src="/style/icons/new_mess.gif" alt="*" /> ' : '<img src="/style/icons/msg.gif" alt="*" /> ') . '<a href="/user/mail.php?id=' . $ank_kont['id'] . '">' . ($post['name'] != null ? $post['name'] : '信息') . '</a> ';
+		echo ($k_new_mess != 0 ? '<img src="../style/icons/new_mess.gif" alt="*" /> ' : '<img src="../style/icons/msg.gif" alt="*" /> ') . '<a href="mail.php?id=' . $ank_kont['id'] . '">' . ($post['name'] != null ? $post['name'] : '信息') . '</a> ';
 		echo ($k_new_mess != 0 ? '<font color="red">' : null) . ($k_new_mess != 0 ? '+' . $k_new_mess : '(' . $k_mess . '/' . $k_mess2 . ')' . $k_mess_to) . ($k_new_mess != 0 ? '</font> ' : null);
 		echo '</div>';
 	}
@@ -239,10 +239,10 @@ if ($type == 'ignor') echo '<div class="mess">来自这位的消息通知不会�
 if ($type == 'favorite') echo '<div class="mess">来自这位的消息通知将着重显示</div>';
 
 echo '<div class="main">';
-echo ($type == 'common' ? '<b>' : null) . '<img style="padding:2px;" src="/style/icons/activ.gif" alt="*" /> <a href="?type=common">联系人列表</a>' . ($type == 'common' ? '</b>' : null) . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = 'common'"), 0) . ')<br />';
-echo ($type == 'favorite' ? '<b>' : null) . '<img style="padding:2px;" src="/style/icons/star_fav.gif" alt="*" /> <a href="?type=favorite">特别关心</a>' . ($type == 'favorite' ? '</b>' : null) . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = 'favorite'"), 0) . ')<br />';
-echo ($type == 'ignor' ? '<b>' : null) . '<img style="padding:2px;" src="/style/icons/spam.gif" alt="*" /> <a href="?type=ignor">黑名单</a>' . ($type == 'ignor' ? '</b>' : null) . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = 'ignor'"), 0) . ')<br />';
-echo ($type == 'deleted' ? '<b>' : null) . '<img style="padding:2px;" src="/style/icons/trash.gif" alt="*" /> <a href="?type=deleted">已删除</a>' . ($type == 'deleted' ? '</b>' : null) . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = 'deleted'"), 0) . ')<br />';
+echo ($type == 'common' ? '<b>' : null) . '<img style="padding:2px;" src="../style/icons/activ.gif" alt="*" /> <a href="?type=common">联系人列表</a>' . ($type == 'common' ? '</b>' : null) . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = 'common'"), 0) . ')<br />';
+echo ($type == 'favorite' ? '<b>' : null) . '<img style="padding:2px;" src="../style/icons/star_fav.gif" alt="*" /> <a href="?type=favorite">特别关心</a>' . ($type == 'favorite' ? '</b>' : null) . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = 'favorite'"), 0) . ')<br />';
+echo ($type == 'ignor' ? '<b>' : null) . '<img style="padding:2px;" src="../style/icons/spam.gif" alt="*" /> <a href="?type=ignor">黑名单</a>' . ($type == 'ignor' ? '</b>' : null) . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = 'ignor'"), 0) . ')<br />';
+echo ($type == 'deleted' ? '<b>' : null) . '<img style="padding:2px;" src="../style/icons/trash.gif" alt="*" /> <a href="?type=deleted">已删除</a>' . ($type == 'deleted' ? '</b>' : null) . ' (' . dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_user` = '$user[id]' AND `type` = 'deleted'"), 0) . ')<br />';
 echo '</div>';
 
 include_once '../sys/inc/tfoot.php';
