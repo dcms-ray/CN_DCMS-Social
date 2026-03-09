@@ -6,7 +6,6 @@
 */
 
 require 'classes/class.user.php';
-require 'classes/authManager.php';
 
 // 访问记录
 //dbquery("INSERT INTO `visit_today` (`ip`, `ua`, `ua_hash`, `time`) VALUES ('$ip', '" . my_esc(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '" . md5(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') . "', '$time')");
@@ -14,7 +13,7 @@ require 'classes/authManager.php';
 // 生成一个默认的随机字符串
 $passgen = passgen();
 
-$authManager = new AuthManager($set, $db, $clientDetails, $webbrowser);
+$authManager = new GuGuan123\dcms\Services\AuthManager($set, $db, $clientDetails, $webbrowser);
 
 // 检查登录状态
 $authManagerCheckStatusResult = $authManager->checkStatus();

@@ -277,37 +277,6 @@ function setget($name, $default = NULL) {
 }
 
 /**
- * 检查并返回文件的替换路径或原始路径
- *
- * @param string $source2 输入的文件路径
- * @return string 返回替换后的文件路径或原始路径
- */
-function check_replace($source2) {
-	// 获取文件的真实路径，如果不存在则使用原始输入
-	$source = realpath($source2);
-	if (!file_exists($source)) $source = $source2;
-	// 将路径中的目录分隔符统一替换为正斜杠
-	$source = str_ireplace(DIRECTORY_SEPARATOR, "/", (string)$source);
-	$h = str_ireplace(DIRECTORY_SEPARATOR, "/", H);
-	$replace = str_ireplace(DIRECTORY_SEPARATOR, "/", REPLACE);
-	// 计算替换路径
-	$replace_file = str_ireplace($h, $replace, (string)$source);
-	// 检查是否启用了替换功能
-	if (setget('replace', 1) == 1) {
-		// 如果替换文件存在，返回替换路径
-		if (file_exists($replace_file)) {
-			return $replace_file;
-		} else {
-			// 否则返回原始路径
-			return $source;
-		}
-	} else {
-		// 未启用替换功能时，返回原始路径
-		return $source;
-	}
-}
-
-/**
  * 测试文件是否为普通文件（使用 check_replace 检查路径）
  *
  * @param string $file 文件路径
@@ -523,33 +492,48 @@ if (isset($_SERVER['HTTP_REFERER']) && !preg_match('#' . preg_quote($_SERVER['HT
 }
 
 if (!isset($hard_process)) {
-	$q = dbquery("SELECT * FROM `cron` WHERE `id` = 'everyday'");
-	if (dbrows($q) == 0) dbquery("INSERT INTO `cron` (`id`, `time`) VALUES ('everyday', '" . time() . "')");
-	$everyday = dbassoc($q);
-	if (!isset($everyday['time']) || isset($everyday['time']) && $everyday['time'] < time() - 60 * 60 * 24) {
+	// 检查并获取 cron 记录
+	$everyday = $db->query("SELECT * FROM `cron` WHERE `id` = ?", ['everyday']);
+
+	if (!$everyday) {
+		$db->insert("INSERT INTO `cron` (`id`, `time`) VALUES (?, ?)", ['everyday', time()]);
+		// 重新获取一下刚才插入的对象
+		$everyday = ['time' => time()];
+	}
+
+	// 检查是否满足“每天执行一次”的条件
+	if (!isset($everyday['time']) || $everyday['time'] < (time() - 86400)) {
 		$hard_process = true;
-		if (function_exists('set_time_limit')) set_time_limit(600); // 将限制设置为 10 分钟
-		dbquery("UPDATE `cron` SET `time` = '" . time() . "' WHERE `id` = 'everyday'");
-		dbquery("DELETE FROM `guests` WHERE `date_last` < '" . (time() - 600) . "'");
-		//dbquery("DELETE FROM `chat_post` WHERE `time` < '" . (time() - 60 * 60 * 24) . "'"); // 删除旧的聊天帖子
-		dbquery("DELETE FROM `user` WHERE `activation` != null AND `date_reg` < '" . (time() - 60 * 60 * 24) . "'"); // 删除未激活的账户
+		if (function_exists('set_time_limit')) set_time_limit(600);
 
-		// 删除过期的 password reset token
-		dbquery("DELETE FROM `password_reset_tokens` WHERE `created_at` < '" . date('Y-m-d H:i:s') . "'");
+		// 更新执行时间
+		$db->update("UPDATE `cron` SET `time` = ? WHERE `id` = ?", [time(), 'everyday']);
 
-		// 删除所有一个多月前标记为删除的联系人
-		$qd = dbquery("SELECT * FROM `users_konts` WHERE `type` = 'deleted' AND `time` < " . ($time - 60 * 60 * 24 * 30));
-		while ($deleted = dbarray($qd)) {
-			dbquery("DELETE FROM `users_konts` WHERE `id_user` = '{$deleted['id_user']}' AND `id_kont` = '{$deleted['id_kont']}'");
+		// 执行清理任务（直接用 $db->executeStatement 处理无返回值的操作）
+		$db->executeStatement("DELETE FROM `guests` WHERE `date_last` < ?", [time() - 600]);
+		$db->executeStatement("DELETE FROM `user` WHERE `activation` IS NOT NULL AND `date_reg` < ?", [time() - 86400]);
+		$db->executeStatement("DELETE FROM `password_reset_tokens` WHERE `created_at` < ?", [date('Y-m-d H:i:s')]);
 
-			if (dbresult(dbquery("SELECT COUNT(*) FROM `users_konts` WHERE `id_kont` = '{$deleted['id_user']}' AND `id_user` = '{$deleted['id_kont']}'"), 0) == 0) {
-				// 如果用户未与其他人联系，则删除所有消息
-				dbquery("DELETE FROM `mail` WHERE `id_user` = '{$deleted['id_user']}' AND `id_kont` = '{$deleted['id_kont']}' OR `id_kont` = '{$deleted['id_user']}' AND `id_user` = '{$deleted['id_kont']}'");
+		// 处理过期联系人
+		$month_ago = time() - (86400 * 30);
+		$deleted_konts = $db->queryAll("SELECT * FROM `users_konts` WHERE `type` = 'deleted' AND `time` < ?", [$month_ago]);
+
+		foreach ($deleted_konts as $deleted) {
+			$db->executeStatement("DELETE FROM `users_konts` WHERE `id_user` = ? AND `id_kont` = ?", [$deleted['id_user'], $deleted['id_kont']]);
+
+			// 检查对方是否也没有联系了
+			$count = $db->queryColumn("SELECT COUNT(*) FROM `users_konts` WHERE `id_kont` = ? AND `id_user` = ?", [$deleted['id_user'], $deleted['id_kont']]);
+			if ($count == 0) {
+				$db->executeStatement("DELETE FROM `mail` WHERE (`id_user` = ? AND `id_kont` = ?) OR (`id_kont` = ? AND `id_user` = ?)", 
+					[$deleted['id_user'], $deleted['id_kont'], $deleted['id_user'], $deleted['id_kont']]);
 			}
 		}
-		$tab = dbquery('SHOW TABLES FROM ' . $set['sql_db_name']);
-		while ($table = mysqli_fetch_row($tab)) {
-			dbquery("OPTIMIZE TABLE `{$table[0]}`"); // 表的优化
+
+		// 数据库优化
+		$tables = $db->queryAll("SHOW TABLES FROM `" . $set['sql_db_name'] . "`");
+		foreach ($tables as $table) {
+			$tableName = reset($table);
+			$db->executeStatement("OPTIMIZE TABLE `$tableName`");
 		}
 	}
 }

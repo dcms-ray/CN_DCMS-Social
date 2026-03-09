@@ -1,6 +1,4 @@
 <?php
-define('H', $_SERVER['DOCUMENT_ROOT'] . '/');
-
 // 加载网站设置
 function setget() {
 	$set = array();
@@ -9,12 +7,12 @@ function setget() {
 	$set_replace = array();
 
 	// 正在加载默认设置。消除未定义变量的缺失
-	$default = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/default.ini', true);
+	$default = parse_ini_file('sys/dat/default.ini', true);
 	$set_default = $default['DEFAULT'];
 	$set_replace = $default['REPLACE'];
 
-	if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/settings.php')) {
-		$set_dynamic = require_once($_SERVER['DOCUMENT_ROOT'] . '/sys/dat/settings.php');
+	if (file_exists('sys/dat/settings.php')) {
+		$set_dynamic = require_once('sys/dat/settings.php');
 	} else {
 		http_response_code(506);
 		exit;
@@ -30,7 +28,7 @@ function decrypt_captcha_token($captcha_token) {
 	}
 
 	// 使用 openssl 解密
-	$decrypted_captcha_token = openssl_decrypt(base64_decode($token_parts[0]), 'aes-256-cbc', setget()['shif'], 0, base64_decode($token_parts[1]));
+	$decrypted_captcha_token = openssl_decrypt(base64_decode(strtr($token_parts[0], '-_', '+/')), 'aes-256-cbc', setget()['shif'], 0, base64_decode(strtr($token_parts[1], '-_', '+/')));
 	if ($decrypted_captcha_token == false) {
 		throw new Exception('captcha_token 解密失败');
 	}
@@ -65,7 +63,7 @@ class captcha
 	function __construct($str) {
 		// 检查GD库是否启用
 		if (!function_exists('gd_info')) {
-			header('Location: /style/errors/gd_err.gif');
+			header('Location: style/errors/gd_err.gif');
 			exit;
 		}
 		// 检查支持的图像格式
@@ -83,11 +81,11 @@ class captcha
 			$n = $this->str[$i]; // 获取验证码字符串的每个字符
 			// 根据支持的图像格式加载对应的数字图像
 			if ($this->png) {
-				$num[$n] = imagecreatefrompng(H . '/style/captcha/' . $n . '.png');
+				$num[$n] = imagecreatefrompng('style/captcha/' . $n . '.png');
 			} elseif ($this->gif) {
-				$num[$n] = imagecreatefromgif(H . '/style/captcha/' . $n . '.gif');
+				$num[$n] = imagecreatefromgif('style/captcha/' . $n . '.gif');
 			} elseif ($this->jpg) {
-				$num[$n] = imagecreatefromjpeg(H . '/style/captcha/' . $n . '.jpg');
+				$num[$n] = imagecreatefromjpeg('style/captcha/' . $n . '.jpg');
 			}
 			// 将数字图像复制到验证码图像上
 			imagecopy($this->img, $num[$n], $i * 15 + 10, 8, 0, 0, 15, 20);

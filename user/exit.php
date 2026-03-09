@@ -16,7 +16,7 @@ if (setget('exit', 1) == 1) {
 			$authManager->logout($user['login_id']);
 			setcookie('auth_token', '', time() - 3600, '/');
 			session_destroy();
-			header('Location: ../?' . session_id());
+			header('Location: ..');
 			exit();
 		} else {
 			header('Location: ' . $_POST['return']);
@@ -26,7 +26,7 @@ if (setget('exit', 1) == 1) {
 } else {
 	setcookie('auth_token', '', time() - 3600, '/');
 	session_destroy();
-	header('Location: ../?' . session_id());
+	header('Location: ..');
 	exit();
 }
 

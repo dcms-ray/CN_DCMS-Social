@@ -24,6 +24,8 @@ function getSet() {
 	$set_dynamic = array();
 	$set_replace = array();
 
+	global $current_page;
+
 	// 正在加载默认设置。消除未定义变量的缺失
 	$default = parse_ini_file(__DIR__ . '/../dat/default.ini', true);
 	$set_default = $default['DEFAULT'];
@@ -32,8 +34,12 @@ function getSet() {
 	// 检查 install 目录是否存在，如果存在就转跳到引擎安装界面
 	if (file_exists(__DIR__ . '/../dat/settings.php')) {
 		$set_dynamic = require_once(__DIR__ . '/../dat/settings.php');
-	} elseif (file_exists(__DIR__ . '/../../install/index.php')) {
-		header('Location: /install/');
+	} elseif (file_exists(__DIR__ . '/../../install/index.php') && isset($current_page) && $current_page == 'index') {
+		header('Location: install/');
+		exit;
+	} else {
+		http_response_code(500);
+		echo 'sys/dat/settings.php 消失了' . PHP_EOL;
 		exit;
 	}
 

@@ -70,8 +70,8 @@ if (ini_get('session.use_trans_sid') == true) {
 	echo "<span class='on'>session.use_trans_sid: OK</span><br />";
 } else {
 	echo "<span class='off'>session.use_trans_sid: OFF</span><br />";
-	$err[] = '在没有COOKIE支持的浏览器上，会话将丢失';
-	$err[] = '加到根部 .htaccess 字符串 <b>php_value session.use_trans_sid 1</b>';
+	echo '在没有COOKIE支持的浏览器上，会话将丢失<br />';
+	echo '加到根部 .htaccess 字符串 <b>php_value session.use_trans_sid 1</b><br />';
 }
 if (ini_get('magic_quotes_gpc') == 0) {
 	echo "<span class='on'>magic_quotes_gpc: 0 (OK)</span><br />";
@@ -89,7 +89,12 @@ if (ini_get('arg_separator.output') == '&amp;') {
 }
 
 // 测试URL重写是否正常工作
-if (trim(file_get_contents(get_http_type() . "://{$_SERVER['HTTP_HOST']}/sys/inc/mod_rewrite.test")) == 'mod_rewrite-ok') {
+if (empty($set['siteurl'])) {
+	$test_url = get_http_type() . '://' . $_SERVER['HTTP_HOST'] . '/sys/inc/mod_rewrite.test';
+} else {
+	$test_url = $set['siteurl'] . '/sys/inc/mod_rewrite.test';
+}
+if (str_contains(file_get_contents($test_url), 'mod_rewrite-ok')) {
 	echo "<span class='on'>mod_rewrite: OK</span><br />";
 } elseif (function_exists('apache_get_modules')) {
 	$apache_mod = apache_get_modules();
@@ -116,7 +121,12 @@ if (function_exists('mysqli_info')) {
 	echo "<span class='on'>MySQLi: OK</span><br />";
 } else {
 	echo "<span class='off'>MySQLi: OFF</span><br />";
-	$err[] = '没有MySQLi，工作是不可能的';
+}
+if (extension_loaded('pdo')) {
+	echo "<span class='on'>PDO: OK</span><br />";
+} else {
+	echo "<span class='off'>PDO: OFF</span><br />";
+    $err[] = "呜呜，没有 PDO 扩展，DCMS是无法工作的喵...";
 }
 if (function_exists('iconv')) {
 	echo "<span class='on'>Iconv: OK</span><br />";

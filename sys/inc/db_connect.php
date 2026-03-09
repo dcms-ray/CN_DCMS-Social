@@ -16,12 +16,9 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
-
-require_once __DIR__ . '/classes/database.php'; // 引入数据库操作类
-
 // 初始化全局变量
 try {
-	$db = new Database([
+	$db = new GuGuan123\dcms\Database([
 		'driver' => 'mysql',
 		'host' => $set['sql_host'],
 		'dbname' => $set['sql_db_name'],
@@ -228,7 +225,7 @@ if ($set['use_mysqli'] == 1) {
 		// 遍历并优化每个表
 		foreach ($tables as $table) {
 			$tableName = reset($table); // 获取表名（第一个键值）
-			$db->dbquery("OPTIMIZE TABLE `$tableName`");
+			$db->query("OPTIMIZE TABLE `$tableName`");
 		}
 	}
 }

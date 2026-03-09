@@ -121,9 +121,9 @@ if (isset($_GET['set'])) {
 				$user['set_show_mail'] = 0;
 				dbquery("UPDATE `user` SET `set_show_mail` = '0' WHERE `id` = '$user[id]' LIMIT 1");
 			}
-			if (isset($_POST['email']) && ($_POST['email']==null || preg_match('#^[A-z0-9-\._]+@[A-z0-9]{2,}\.[A-z]{2,4}$#ui',$_POST['email']))) {
-				$user['email']=$_POST['email'];
-				dbquery("UPDATE `user` SET `email` = '$user[email]' WHERE `id` = '$user[id]' LIMIT 1");
+			if (isset($_POST['email']) && ($_POST['email']==null || filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))) {
+				$user['email'] = $_POST['email'];
+				$db->update('UPDATE user SET email = ? WHERE id = ? LIMIT 1', [$user['email'], $user['id']]);
 			} else {
 				$err[] = '无效的电子邮件';
 			}
@@ -170,11 +170,11 @@ if (isset($_GET['set'])) {
 			$_SESSION['message'] = '更改已成功接受';
 			dbquery("UPDATE `user` SET `rating_tmp` = '".($user['rating_tmp']+1)."' WHERE `id` = '$user[id]' LIMIT 1");
 			if (isset($_GET['act']) && $_GET['act']=='ank') {
-				header("Location: /user/info/anketa.php?".session_id());
+				header("Location: anketa.php");
 			} elseif (isset($_GET['act']) && $_GET['act']=='ank_web') {
-				header("Location: /user/info.php".session_id());
+				header("Location: ../info.php");
 			} else {
-				header("Location: /user/info/edit.php?".session_id());
+				header("Location: edit.php");
 			}
 			exit;
 		}
@@ -275,25 +275,25 @@ if (isset($_GET['set'])) {
 	echo "基本信息";
 	echo "</div>";
 	echo "<div class='nav1'>";
-	echo "<a href='?set=nick'><img src='/style/icons/str.gif' alt='*'><b>昵称</b> &#62; $user[nick]<br /></a>";
+	echo "<a href='?set=nick'><img src='../../style/icons/str.gif' alt='*'><b>昵称</b> &#62; $user[nick]<br /></a>";
 
-	echo "<a href='?set=name'> <img src='/style/icons/str.gif' alt='*'> 姓名</a>";
+	echo "<a href='?set=name'> <img src='../../style/icons/str.gif' alt='*'> 姓名</a>";
 	if ($user['ank_name']!=NULL) {
 		echo " &#62; $user[ank_name]<br />";
 	} else {
 		echo "<br />";
 	}
 
-	echo "<a href='?set=pol'> <img src='/style/icons/str.gif' alt='*'>性别</a> &#62; ".(($user['pol']==1)?'男':'女')."<br />";
+	echo "<a href='?set=pol'> <img src='../../style/icons/str.gif' alt='*'>性别</a> &#62; ".(($user['pol']==1)?'男':'女')."<br />";
 
-	echo "<a href='?set=gorod'> <img src='/style/icons/str.gif' alt='*'>城市</a>";
+	echo "<a href='?set=gorod'> <img src='../../style/icons/str.gif' alt='*'>城市</a>";
 	if ($user['ank_city']!=NULL) {
 		echo " &#62; $user[ank_city]<br />";
 	} else {
 		echo "<br />";
 	}
 
-	echo "<a href='?set=date'> <img src='/style/icons/str.gif' alt='*'>出生日期</a> ";
+	echo "<a href='?set=date'> <img src='../../style/icons/str.gif' alt='*'>出生日期</a> ";
 	if ($user['ank_d_r']!=NULL && $user['ank_m_r']!=NULL && $user['ank_g_r']!=NULL) {
 		echo " &#62;$user[ank_g_r]/$user[ank_m_r]/$user[ank_d_r]<br />";
 	} elseif($user['ank_d_r']!=NULL && $user['ank_m_r']!=NULL) {
@@ -302,35 +302,35 @@ if (isset($_GET['set'])) {
 		echo "<br />";
 	}
 
-	echo "<a href='?set=osebe'> <img src='/style/icons/str.gif' alt='*'>关于我</a>";
+	echo "<a href='?set=osebe'> <img src='../../style/icons/str.gif' alt='*'>关于我</a>";
 	if ($user['ank_o_sebe']) {
 		echo " > ".htmlspecialchars($user['ank_o_sebe'])."<br />";
 	} else {
 		echo "<br />";
 	}
 
-	echo "<a href='?set=mobile'> <img src='/style/icons/str.gif' alt='*'>电话号码</a> ";
+	echo "<a href='?set=mobile'> <img src='../../style/icons/str.gif' alt='*'>电话号码</a> ";
 	if ($user['ank_n_tel']) {
 		echo "&#62; $user[ank_n_tel]<br />";
 	} else {
 		echo "<br />";
 	}
 
-	echo "<a href='?set=icq'> <img src='/style/icons/str.gif' alt='*'>QQ</a> ";
+	echo "<a href='?set=icq'> <img src='../../style/icons/str.gif' alt='*'>QQ</a> ";
 	if ($user['ank_icq']) {
 		echo "&#62; $user[ank_icq]<br />";
 	} else {
 		echo "<br />";
 	}
 
-	echo "<a href='?set=mail'> <img src='/style/icons/str.gif' alt='*'>E-Mail</a> ";
+	echo "<a href='?set=mail'> <img src='../../style/icons/str.gif' alt='*'>E-Mail</a> ";
 	if ($user['email']) {
 		echo "&#62; $user[email]<br />";
 	} else {
 		echo "<br />";
 	}
 	
-	echo "<a href='?set=xmpp'> <img src='/style/icons/str.gif' alt='*'>XMPP</a> "; 
+	echo "<a href='?set=xmpp'> <img src='../../style/icons/str.gif' alt='*'>XMPP</a> "; 
 	if ($user['ank_xmpp']) {
 		echo "&#62; $user[ank_xmpp]<br />";
 	} else {
@@ -339,7 +339,7 @@ if (isset($_GET['set'])) {
 	echo "</div>";
 }
 
-echo "<div class='foot'><img src='/style/icons/str.gif' alt='*'> <a href='anketa.php'>查看资料</a><br />";
-if (isset($_SESSION['refer']) && $_SESSION['refer']!=NULL && otkuda($_SESSION['refer'])) echo "<img src='/style/icons/str2.gif' alt='*'> <a href='$_SESSION[refer]'> 上一页</a><br />";
+echo "<div class='foot'><img src='../../style/icons/str.gif' alt='*'> <a href='anketa.php'>查看资料</a><br />";
+if (isset($_SESSION['refer']) && $_SESSION['refer']!=NULL && otkuda($_SESSION['refer'])) echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='$_SESSION[refer]'> 上一页</a><br />";
 echo '</div>';
 require_once '../../sys/inc/tfoot.php';

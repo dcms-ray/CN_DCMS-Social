@@ -1,4 +1,5 @@
 <?php
+$current_page = 'index';
 require_once 'sys/inc/start.php';
 require_once 'sys/inc/compress.php';
 require_once 'sys/inc/sess.php';

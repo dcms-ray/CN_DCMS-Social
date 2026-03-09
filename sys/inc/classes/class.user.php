@@ -36,6 +36,7 @@ class user
 		* $on  == 1		显示 Nick 旁边的在线图标和用户组图标
 		* $medal == 1	在线输出图标旁边的奖牌
 		*/
+		global $set;
 		static $nicks = [];
 		if (empty($nicks[$user])) {
 			$ank = dbassoc(dbquery('SELECT `id`, `group_access`, `pol`, `nick`, `rating` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
@@ -61,7 +62,7 @@ class user
 			$ank = array('id' => '0', 'nick' => '[已删除]', 'pol' => '1', 'rating' => '0', 'browser' => 'wap');
 		}
 		if ($url == true) {
-			$nick = ' <a href="/user/info.php?id=' . $user . '">' . text($ank['nick']) . '</a> ';
+			$nick = ' <a href="' . $set['siteurl'] . '/user/info.php?id=' . $user . '">' . text($ank['nick']) . '</a> ';
 		} else {
 			$nick = text($ank['nick']);
 		}
@@ -70,25 +71,25 @@ class user
 		if ($on == 1) {
 			$is_ban = dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `id_user` = '$user' AND (`time` > 'time()' OR `navsegda` = '1')"), 0);
 			if ($is_ban != 0) {
-				$icon = ' <img src="/style/user/ban.png" alt="*" class="icon" id="icon_group" /> ';
+				$icon = ' <img src="' . $set['siteurl'] . '/style/user/ban.png" alt="*" class="icon" id="icon_group" /> ';
 			} else {
 				if (isset($ank['group_access']) && ($ank['group_access'] > 7 && ($ank['group_access'] < 10 || $ank['group_access'] > 14))) {
 					if ($ank['pol'] == 1) {
-						$icon = '<img src="/style/user/1.png" alt="*" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set['siteurl'] . '/style/user/1.png" alt="*" class="icon" id="icon_group" /> ';
 					} else {
-						$icon = '<img src="/style/user/2.png" alt="" class="icon" id="icon_group"/> ';
+						$icon = '<img src="' . $set['siteurl'] . '/style/user/2.png" alt="" class="icon" id="icon_group"/> ';
 					}
 				} elseif (isset($ank['group_access']) && (($ank['group_access'] > 1 && $ank['group_access'] <= 7) || ($ank['group_access'] > 10 && $ank['group_access'] <= 14))) {
 					if ($ank['pol'] == 1) {
-						$icon = '<img src="/style/user/3.png" alt="*" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set['siteurl'] . '/style/user/3.png" alt="*" class="icon" id="icon_group" /> ';
 					} else {
-						$icon = '<img src="/style/user/4.png" alt="*" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set['siteurl'] . '/style/user/4.png" alt="*" class="icon" id="icon_group" /> ';
 					}
 				} else {
 					if (isset($ank['pol']) && $ank['pol'] == 1) {
-						$icon = '<img src="/style/user/5.png" alt="" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set['siteurl'] . '/style/user/5.png" alt="" class="icon" id="icon_group" /> ';
 					} else {
-						$icon = '<img src="/style/user/6.png" alt="" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set['siteurl'] . '/style/user/6.png" alt="" class="icon" id="icon_group" /> ';
 					}
 				}
 			}
@@ -97,9 +98,9 @@ class user
 		// 在线图标输出
 		if ($user != 0 && !empty($ank['date_last']) && $ank['date_last'] > time() - 600 && $on == 1) {
 			if ($ank['browser'] == 'wap') {
-				$online = ' <img src="/style/icons/online.gif" alt="WAP" /> ';
+				$online = ' <img src="' . $set['siteurl'] . '/style/icons/online.gif" alt="WAP" /> ';
 			} else {
-				$online = ' <img src="/style/icons/online_web.gif" alt="WEB" /> ';
+				$online = ' <img src="' . $set['siteurl'] . '/style/icons/online_web.gif" alt="WEB" /> ';
 			}
 		}
 
@@ -121,7 +122,7 @@ class user
 			} elseif ($R >= 60) {
 				$img = 7;
 			}
-			$icon_medal = ' <img src="/style/medal/' . $img . '.png" alt="*" /> ';
+			$icon_medal = ' <img src="' . $set['siteurl'] . '/style/medal/' . $img . '.png" alt="*" /> ';
 		}
 		return $icon . $nick . $icon_medal . $online;
 	}
@@ -151,9 +152,9 @@ class user
 				$avatar = $avatars[$user];
 			}
 			if (isset($avatar['id']) && test_file(H . 'files/gallery/50/' . $avatar['id'] . '.jpg')) {
-				$AVATAR = ' <img class="avatar" src="/photo/photo50/' . $avatar['id'] . '.jpg" alt="Avatar" /> ';
+				$AVATAR = ' <img class="avatar" src="' . $set['siteurl'] . '/photo/photo50/' . $avatar['id'] . '.jpg" alt="Avatar" /> ';
 			} else {
-				$AVATAR = '<img class="avatar" src="/style/user/avatar.gif" height= "50" width="50" alt="No Avatar" />';
+				$AVATAR = '<img class="avatar" src="' . $set['siteurl'] . '/style/user/avatar.gif" height= "50" width="50" alt="No Avatar" />';
 			}
 		}
 		return $AVATAR;

@@ -34,7 +34,7 @@ if (isset($_POST['nick']) && isset($_POST['pass'])) {    // 检查用户是否�
 
 // 检查用户是否登录失败
 if (!isset($user)) {
-	header('Location: /user/aut.php');
+	header('Location: aut.php');
 	exit;
 }
 
@@ -75,7 +75,7 @@ if (isset($user) && $user['rating_tmp'] > 1000) {
 	dbquery("update `user` set `rating_tmp` = '{$col}' where `id` = '{$user['id']}' limit 1");
 }
 if (isset($_GET['return'])) {
-	header('Location: '.urldecode($_GET['return']));
+	header('Location: ' . urldecode($_GET['return']));
 } else {
-	header('Location: /user/umenu.php');
+	header('Location: umenu.php');
 }

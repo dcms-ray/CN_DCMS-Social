@@ -21,10 +21,10 @@ function sendEmail($subject, $body, $recipientEmail, $recipientName) {
 				$mail->SMTPAuth = ($set['smtp_auth'] == '1' ? true : false);				// 启用 SMTP 验证
 				$mail->Username = $set['smtp_username'];									// SMTP 用户名
 				$mail->Password = $set['smtp_password'];									// SMTP 密码
-				if ($set['smtp_secure'] == 'tls') {
-					$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS; // 使用 TLS 加密
-				} elseif ($set['smtp_secure'] == 'ssl') {
-					$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SSL;      // 使用 SSL 加密
+				if ($set['smtp_secure'] == 'starttls') {
+					$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS; // 使用显式 TLS 加密
+				} elseif ($set['smtp_secure'] == 'tls') {
+					$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;    // 使用隐式 TLS 加密
 				} else {
 					$mail->SMTPSecure = NULL;                                               // 不加密，使用纯文本传输
 				}

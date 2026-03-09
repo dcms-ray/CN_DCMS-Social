@@ -463,7 +463,7 @@ $page = page($k_page);
 $start = $set['p_str'] * $page - $set['p_str'];
 
 echo '<div class="foot">';
-echo "<b>评论</b>: (" . dbresult(dbquery("SELECT COUNT(`id`)FROM `notes_komm` WHERE `id_notes`='" . $notes['id'] . "'"), 0) . ")";
+echo "<b>评论</b>: ({$k_post})";
 echo '</div>';
 
 if ($k_post == 0) {
@@ -484,7 +484,8 @@ if ($k_post == 0) {
 	$q = dbquery("SELECT * FROM `notes_komm` WHERE `id_notes` = '" . intval($_GET['id']) . "' ORDER BY `time` $sort LIMIT $start, $set[p_str]");
 	echo "<table class='post'>";
 	while ($post = dbassoc($q)) {
-		$ank = dbassoc(dbquery("SELECT * FROM `user` WHERE `id` = $post[id_user] LIMIT 1"));
+		// 意义不明的查询
+		//$ank = dbassoc(dbquery("SELECT * FROM `user` WHERE `id` = $post[id_user] LIMIT 1"));
 
 		if ($num == 0) {
 			echo '<div class="nav1">';

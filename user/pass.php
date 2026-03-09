@@ -18,10 +18,13 @@ title();
 dbquery("DELETE FROM `password_reset_tokens` WHERE `created_at` < '" . date('Y-m-d H:i:s') . "'");
 
 if (isset($_POST['nick']) && isset($_POST['mail']) && $_POST['nick'] != NULL && $_POST['mail'] != NULL) {
-	if (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "'"), 0) == 0) {
+	// 检查验证码
+	if (!isset($_SESSION['captcha']) || !isset($_POST['chislo']) || $_SESSION['captcha'] != $_POST['chislo']) {
+		$err[] = '验证码错误或无效';
+	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "'"), 0) == 0) {
 		$err = "使用此用户名的用户未注册";
 	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `nick` = '" . my_esc($_POST['nick']) . "' AND `email` = '" . my_esc($_POST['mail']) . "'"), 0) == 0) {
-		$err = '电子邮件地址无效或发送失败';
+		$err = '电子邮件地址不正确';
 	} else {
 		// 生成链接Token
 		$token = bin2hex(random_bytes(32));
@@ -35,7 +38,7 @@ if (isset($_POST['nick']) && isset($_POST['mail']) && $_POST['nick'] != NULL && 
 		$regmail = "你好！ {$user2['nick']}<br />
 		            您已激活密码恢复<br />
 		            要设置新密码，请点击链接:<br />
-		            <a href='" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . get_http_type() . "://{$set['hostname']}/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
+		            <a href='" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}'>" . $set['siteurl'] . "/user/pass.php?id={$user2['id']}&amp;token={$token}</a><br />
 		            此链接为一次性有效，成功重置密码或登录后即失效({$user2['nick']})<br />CN_DCMS-Social 管理组<br />";
 
 		// 调用封装的发送邮件函数
@@ -84,7 +87,7 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 		} else {
 			err();
 			aut();
-			echo "<form action='/user/pass.php?id={$_GET['id']}&amp;token=" . esc($_GET['token'], 1) . "&amp;{$passgen}' method=\"post\">";
+			echo "<form action='?id={$_GET['id']}&amp;token=" . esc($_GET['token'], 1) . "&amp;{$passgen}' method=\"post\">";
 			echo "用户名:<br />";
 			echo "<input type=\"text\" disabled='disabled' value='{$user2['nick']}' maxlength=\"32\" size=\"16\" /><br />";
 			echo "新密码:<br /><input type='password' name='pass1' value='' /><br />";
@@ -107,18 +110,19 @@ if (isset($_GET['token']) && isset($_GET['id'])) {
 	echo "<input type=\"text\" name=\"nick\" title=\"用户名\" value=\"\" maxlength=\"32\" size=\"16\" /><br />";
 	echo "E-mail:<br />";
 	echo "<input type=\"text\" name=\"mail\" title=\"E-mail\" value=\"\" maxlength=\"32\" size=\"16\" /><br />";
+	echo "<img src='../captcha.php' width='100' height='30' alt='验证码图像' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
 	echo "<input type=\"submit\" value=\"下一步\" title=\"下一步\" />";
 	echo "</form>";
-	echo "重置密码的链接将发送到您的邮箱<br />";
-	echo "如果您在资料中没有设置您的电子邮件地址，则无法恢复，请联系管理员手动重置<br />";
+	echo '重置密码的链接将发送到您的邮箱<br />';
+	echo '如果您在资料中没有设置您的电子邮件地址，则无法恢复，请联系管理员手动重置<br />';
 
 	echo '<div class="foot">
 		尚未登记？<br/>
-		<a href="/user/reg.php">注册账号</a><br/>
+		<a href="reg.php">注册账号</a><br/>
 		</div>
 		<div class="foot">
 		已经注册？ <br/>
-		<a href="/user/aut.php">登录账号</a><br/>
+		<a href="aut.php">登录账号</a><br/>
 		</div>';
 }
 

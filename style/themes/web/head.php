@@ -7,35 +7,35 @@ header("Content-type: text/html");
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title><?php echo htmlspecialchars($set['title']); ?></title>
-		<link rel="shortcut icon" href="/favicon.ico" />
-		<link rel="stylesheet" href="/style/themes/<?php echo $set['set_them']; ?>/style.css" type="text/css" />
-		<link rel="stylesheet" href="/style/themes/<?php echo $set['set_them']; ?>/tables.css" type="text/css" />
+		<link rel="shortcut icon" href="<?php echo $set['siteurl']; ?>/favicon.ico" />
+		<link rel="stylesheet" href="<?php echo $set['siteurl']; ?>/style/themes/<?php echo $set['set_them']; ?>/style.css" type="text/css" />
+		<link rel="stylesheet" href="<?php echo $set['siteurl']; ?>/style/themes/<?php echo $set['set_them']; ?>/tables.css" type="text/css" />
 
 		<!-- Модальное окно -->
-		<link rel="stylesheet" href="/assets/css/style.css" type="text/css"/>
+		<link rel="stylesheet" href="<?php echo $set['siteurl']; ?>/assets/css/style.css" type="text/css"/>
 
 		<!-- 多余的jQuery
 		<script type="text/javascript" src="<?php echo get_http_type(); ?>://code.jquery.com/jquery-1.2.1.js"></script>
 		-->
 
-		<script src="/assets/js/jquery/jquery-1.8.3.js"></script>
-		<script type="text/javascript" src="/assets/js/facebox.js"></script>
+		<script src="<?php echo $set['siteurl']; ?>/assets/js/jquery/jquery-1.8.3.js"></script>
+		<script type="text/javascript" src="<?php echo $set['siteurl']; ?>/assets/js/facebox.js"></script>
 		<script type="text/javascript">
 			jQuery(document).ready(function($) {
 				$('a[rel*=facebox]').facebox({
-					loading_image: '/assets/img/loading.gif',
-					close_image: '/assets/img/closelabel.gif'
+					loading_image: '<?php echo $set['siteurl']; ?>/assets/img/loading.gif',
+					close_image: '<?php echo $set['siteurl']; ?>/assets/img/closelabel.gif'
 				})
 			})
 		</script>
 
-		<script type="text/javascript" src="/assets/js/ajax.js"></script>
-		<script type="text/javascript" src="/assets/js/form-submit.js"></script>
-		<script src="/style/themes/<?php echo $set['set_them']; ?>/js.js" type="text/javascript" language="JavaScript" charset="utf-8"></script>
+		<script type="text/javascript" src="<?php echo $set['siteurl']; ?>/assets/js/ajax.js"></script>
+		<script type="text/javascript" src="<?php echo $set['siteurl']; ?>/assets/js/form-submit.js"></script>
+		<script src="<?php echo $set['siteurl']; ?>/style/themes/<?php echo $set['set_them']; ?>/js.js" type="text/javascript" language="JavaScript" charset="utf-8"></script>
 
 		<!-- 对话框 -->
-		<script src="/assets/js/dialog.js"></script>
-		<link type="text/css" href="/assets/css/dialog.css" rel="stylesheet" />
+		<script src="<?php echo $set['siteurl']; ?>/assets/js/dialog.js"></script>
+		<link type="text/css" href="<?php echo $set['siteurl']; ?>/assets/css/dialog.css" rel="stylesheet" />
 		<script>
 			function showContent2(link) {
 
@@ -83,7 +83,7 @@ header("Content-type: text/html");
 			<table class="nav">
 				<tr>
 					<td class="logo">
-						<a href="/index.php" title="到主页"><img src="/style/themes/<?php echo $set['set_them']; ?>/logo.png" alt="Logotype" /></a>
+						<a href="<?php echo $set['siteurl']; ?>" title="到主页"><img src="<?php echo $set['siteurl']; ?>/style/themes/<?php echo $set['set_them']; ?>/logo.png" alt="Logotype" /></a>
 					</td>
 					<td class="head_menu">
 						<?php include H . 'style/themes/' . $set['set_them'] . '/navigation.php'; ?>
