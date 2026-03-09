@@ -37,8 +37,8 @@ aut();
 
 ?>
 <form  method="post">
-	你确定退出登录吗?
-	<input type="hidden" name="return" value="<?php echo $_SERVER['HTTP_REFERER']; ?>">
+你确定退出登录吗?
+	<input type="hidden" name="return" value="<?php echo $_SERVER['HTTP_REFERER']; ?>"><br />
 	<input type="submit" name="confirm_yes" value="是的,我确定">
 	<input type="submit" name="confirm_no" value="不是,我手滑了">
 </form>
