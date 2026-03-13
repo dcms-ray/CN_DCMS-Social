@@ -17,7 +17,7 @@ http://dcms-social.ru
 
 $file_id = dbassoc(dbquery("SELECT * FROM `downnik_files` WHERE `id`='" . intval($_GET['id_file']) . "' LIMIT 1"));
 if (empty($file_id['id_user']) or $file_id['id_user'] != $ank['id']) {
-	header("Location: /?" . session_id());
+	header('Location: ../../../..');
 	exit;
 }
 $dir_id = dbassoc(dbquery("SELECT * FROM `downnik_dir` WHERE `id` = '{$file_id['id_dir']}' LIMIT 1"));
