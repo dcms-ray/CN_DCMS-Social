@@ -96,9 +96,13 @@ class AuthManager
 		return ['status' => true];
 	}
 
-	public function login($nick, $password, $expiration = 3600): array {
+	public function login($id, $password, $expiration = 3600, $mode = 'nick'): array {
 		// 使用参数化查询验证用户名和密码
-		$user = $this->db->query("SELECT `id`, `pass` FROM `user` WHERE `nick` = :nick LIMIT 1", ['nick' => $nick]);
+		if ($mode == 'nick') {
+			$user = $this->db->query("SELECT `id`, `pass` FROM `user` WHERE `nick` = :nick LIMIT 1", ['nick' => $id]);
+		} elseif ($mode == 'id') {
+			$user = $this->db->query("SELECT `id`, `pass` FROM `user` WHERE `id` = ? LIMIT 1", [$id]);
+		}
 		// 比较密码
 		if ($user && password_verify($password, $user['pass'])) {
 			// 登录成功

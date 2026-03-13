@@ -48,7 +48,7 @@ switch ($action) {
 			} else {
 				$expiration = time() + 3600 * 24;
 			}
-			$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['password'], $expiration);
+			$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['password'], $expiration, 'nick');
 			if ($authManagerLoginResult['status']) {
 				// 登录成功
 

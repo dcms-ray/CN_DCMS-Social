@@ -11,14 +11,18 @@ $show_all = true;
 include_once '../sys/inc/user.php';
 only_unreg();
 
-if (isset($_POST['nick']) && isset($_POST['pass'])) {    // 检查用户是否已经提交登录表单
+if ((isset($_POST['nick']) && isset($_POST['pass'])) || (isset($_GET['id']) && isset($_GET['pass']))) {
 	// 选择了“记住我”
-	if (isset($_POST['aut_save']) && $_POST['aut_save']) {
+	if ((isset($_POST['aut_save']) && $_POST['aut_save']) || (isset($_GET['aut_save']) && $_GET['aut_save'])) {
 		$expiration = time() + 60 * 60 * 24 * 365;
 	} else {
 		$expiration = time() + 3600 * 24;
 	}
-	$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['pass'], $expiration);
+	if (isset($_POST['nick']) && isset($_POST['pass'])) {
+		$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['pass'], $expiration, 'nick');
+	} else {
+		$authManagerLoginResult = $authManager->login($_GET['id'], $_GET['pass'], $expiration, 'id');
+	}
 	if ($authManagerLoginResult['status']) {
 		$_SESSION['id_user'] = $authManagerLoginResult['data']['user_id'];
 		$_SESSION['login_id'] = $authManagerLoginResult['data']['login_id'];
