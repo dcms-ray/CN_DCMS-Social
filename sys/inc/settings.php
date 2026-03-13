@@ -52,9 +52,6 @@ if ($set['show_err_php']) {
 	ini_set('display_errors', true); // 启用错误显示
 }
 $set['web'] = false;
-if (empty($set['hostname'])) {
-	$set['hostname'] = filter_var($_SERVER['HTTP_HOST'], FILTER_SANITIZE_URL);
-}
 
 // 解析 User-Agent 检查设备类型是否为 PC
 if (!empty($_SERVER["HTTP_USER_AGENT"]) && !(new Detection\MobileDetect())->isMobile()) {
