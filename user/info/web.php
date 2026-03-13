@@ -8,7 +8,7 @@ $not_user = dbresult(dbquery("SELECT COUNT(*) FROM `user` WHERE `id` = '$ank[id]
 if (isset($user) && $user['id'] != $ank['id']) {
 	if (isset($_GET['fok'])) {
 		echo '<center>';
-		echo "<div class='foot'><form action='/user/info.php?id=" . $ank['id'] . "' method=\"post\">";
+		echo "<div class='foot'><form action='?id=" . $ank['id'] . "' method=\"post\">";
 		echo "<input class=\"submit\" type=\"submit\" value=\"关闭\" />";
 		echo "</form></div>";
 		echo '</center>';
@@ -19,7 +19,7 @@ if (isset($user) && isset($_GET['frends'])  && $frend_new == 0 && $frend == 0) {
 		echo '<center>';
 		echo "<div class='err'>该用户需要确认添加你为好友。</div><div class='foot'><form action='/user/frends/create.php?add=" . $ank['id'] . "' method=\"post\">";
 		echo "<input class=\"submit\" type=\"submit\" value=\"申请\" />";
-		echo " <a href='/user/info.php?id=$ank[id]'>取消</a><br />";
+		echo " <a href='?id=$ank[id]'>取消</a><br />";
 		echo "</form></div>";
 		echo '</center>';
 	}
@@ -151,13 +151,13 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				讨论
 				========================================
 				*/
-				echo "<img src='/style/icons/chat.gif' alt='*' /> ";
+				echo "<img src='../style/icons/chat.gif' alt='*' /> ";
 				$new_g = dbresult(dbquery("SELECT COUNT(*) FROM `discussions` WHERE `id_user` = '$user[id]' AND `count` > '0'"), 0);
 				if ($new_g != 0) {
-					echo "<a href='/user/discussions/index.php'><font color='red'>讨论情况</font></a> ";
+					echo "<a href='discussions/index.php'><font color='red'>讨论情况</font></a> ";
 					echo "<font color=\"red\">+$new_g</font> ";
 				} else {
-					echo "<a href='/user/discussions/index.php'>讨论情况</a> ";
+					echo "<a href='discussions/index.php'>讨论情况</a> ";
 				}
 				echo "<br />";
 				$k_l = dbresult(dbquery("SELECT COUNT(*) FROM `tape` WHERE `id_user` = '$user[id]'  AND  `read` = '0'"), 0);
@@ -278,21 +278,21 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				dbquery("INSERT INTO `user_files` (`id_user`, `name`,  `osn`) values('$ank[id]', '文件', '1')");
 			}
 			$dir_osn = dbassoc(dbquery("SELECT * FROM `user_files` WHERE `id_user` = '$ank[id]' AND `osn` = '1' LIMIT 1"));
-			if (isset($dir_osn['id'])) echo "<a class='top_nav' href='/user/personalfiles/$ank[id]/$dir_osn[id]/'>文件";
+			if (isset($dir_osn['id'])) echo "<a class='top_nav' href='personalfiles/$ank[id]/$dir_osn[id]/'>文件";
 			echo "(" . dbresult(dbquery("SELECT COUNT(*) FROM `user_files` WHERE `id_user` = '$ank[id]' AND `osn` > '1'"), 0) . "/" . dbresult(dbquery("SELECT COUNT(*) FROM `downnik_files` WHERE `id_user` = '$ank[id]'"), 0) . ")";
 			echo "</a>";
 			/*----------------------------------------------------------------*/
-			echo "<a class='top_nav' href='/user/info/them_p.php?id=" . $ank['id'] . "'>专题和评论</a> ";
+			echo "<a class='top_nav' href='info/them_p.php?id=" . $ank['id'] . "'>专题和评论</a> ";
 			/*-------------------------音乐---------------------------------*/
 			$k_music = dbresult(dbquery("SELECT COUNT(*) FROM `user_music` WHERE `id_user` = '$ank[id]'"), 0);
-			echo "<a class='top_nav' href='/user/music/index.php?id=$ank[id]'>音乐 ";
+			echo "<a class='top_nav' href='music/index.php?id=$ank[id]'>音乐 ";
 			echo "(" . $k_music . ")";
 			echo "</a>";
 			/*----------------------------------------------------------------*/
 			/*---------------------------日记------------------------------*/
 			echo "<div>";
 			$kol_dnev = dbresult(dbquery("SELECT COUNT(*) FROM `notes` WHERE `id_user` = '" . $ank['id'] . "'"), 0);
-			echo "<a class='top_nav' href='/plugins/notes/user.php?id=$ank[id]'>日记 ($kol_dnev)";
+			echo "<a class='top_nav' href='../plugins/notes/user.php?id=$ank[id]'>日记 ($kol_dnev)";
 			echo "</a>";
 			/*----------------------------------------------------------------*/
 			/*
@@ -301,7 +301,7 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 			========================================
 			*/
 			$zakladki = dbresult(dbquery("SELECT COUNT(id) FROM `bookmarks` WHERE `id_user` = '" . $ank['id'] . "'"), 0);
-			echo "<a class='top_nav' href='/user/bookmark/index.php?id=$ank[id]'>书签($zakladki)";
+			echo "<a class='top_nav' href='bookmark/index.php?id=$ank[id]'>书签($zakladki)";
 			echo "</a><br />";
 			echo '</table>';
 			/*
@@ -312,7 +312,7 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 			echo user::nick($ank['id'], 1, 0, 0);
 			if (isset($ank['date_last'])) echo " <span style='float:right;color:#666;'>进来了" . ($ank['pol'] == 0 ? 'a' : null) . " " . vremja($ank['date_last']) . "</span> ";
 			if ((user_access('user_ban_set') || user_access('user_ban_set_h') || user_access('user_ban_unset')) && $ank['id'] != $user['id'])
-				echo "<a href='/adm_panel/ban.php?id=$ank[id]'><font color=red>[禁止]</font></a>";
+				echo "<a href='../adm_panel/ban.php?id=$ank[id]'><font color=red>[禁止]</font></a>";
 			echo "</div></div>";
 			//-------------我的状态------------//
 			if (isset($status['id']) || (isset($user) && $ank['id'] == $user['id'])) {
@@ -327,26 +327,26 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				if (isset($status['id'])) echo output_text($status['msg']) . ' <font style="font-size:10px; color:gray;">' . vremja($status['time']) . '</font>';
 				echo "</div>";
 				if (isset($status['id'])) {
-					echo " <a href='/user/status/komm.php?id=$status[id]'><img src='/style/icons/bbl4.png' alt=''/> " . dbresult(dbquery("SELECT COUNT(*) FROM `status_komm` WHERE `id_status` = '$status[id]'"), 0) . " </a> ";
+					echo " <a href='status/komm.php?id=$status[id]'><img src='/style/icons/bbl4.png' alt=''/> " . dbresult(dbquery("SELECT COUNT(*) FROM `status_komm` WHERE `id_status` = '$status[id]'"), 0) . " </a> ";
 					$l = dbresult(dbquery("SELECT COUNT(*) FROM `status_like` WHERE `id_status` = '$status[id]'"), 0);
 					if (isset($user) && $user['id'] != $ank['id'] && dbresult(dbquery("SELECT COUNT(*) FROM `status_like` WHERE `id_status` = '$status[id]' AND `id_user` = '$user[id]' LIMIT 1"), 0) == 0) {
-						echo " <a href='/user/info.php?id=$ank[id]&amp;like'><img src='/style/icons/like.gif' alt='*'/> 赞!</a> • ";
+						echo " <a href='?id=$ank[id]&amp;like'><img src='/style/icons/like.gif' alt='*'/> 赞!</a> • ";
 						$like = $l;
 					} else if (isset($user) && $user['id'] != $ank['id']) {
-						echo " <img src='/style/icons/like.gif' alt=''/> 你和 ";
+						echo " <img src='../style/icons/like.gif' alt=''/> 你和 ";
 						$like = $l - 1;
 					} else {
-						echo " <img src='/style/icons/like.gif' alt=''/> ";
+						echo " <img src='../style/icons/like.gif' alt=''/> ";
 						$like = $l;
 					}
-					echo "<a href='/user/status/like.php?id=$status[id]'> $like 人. </a>";
+					echo "<a href='status/like.php?id=$status[id]'> $like 人. </a>";
 					echo '</div>';
 				}
 				/* 总状态数 */
 				$st = dbresult(dbquery("SELECT COUNT(*) FROM `status` WHERE `id_user` = '$ank[id]'"), 0);
 				if ($st > 0) {
 					echo "<div class='main2'>"; // 使用我们自己的Diva
-					echo " &rarr; <a href='/user/status/index.php?id=$ank[id]'>所有状态</a> (" . $st . ")";
+					echo " &rarr; <a href='status/index.php?id=$ank[id]'>所有状态</a> (" . $st . ")";
 					echo "</div>";
 				}
 			}
