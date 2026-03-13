@@ -1,7 +1,7 @@
 <?php
 // 如果没有设置用户且没有通过GET方式传递用户ID，则重定向到/photo/页面
 if (!isset($user) && !isset($_GET['id_user'])) {
-	header("Location: /photo/?" . session_id());
+	header("Location: {$set['siteurl']}/photo/");
 	exit;
 }
 
@@ -13,7 +13,7 @@ if (isset($_GET['id_user'])) $ank['id'] = intval($_GET['id_user']);
 $ank = user::get_user($ank['id']);
 // 如果获取用户信息失败，则重定向到/photo/页面
 if (!$ank) {
-	header("Location: /photo/?" . session_id());
+	header('Location: ..');
 	exit;
 }
 
@@ -35,10 +35,10 @@ err();
 // 包含创建相册表单的代码
 include 'inc/gallery_form.php';
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <b>相册</b></div>';
+echo '<img src="../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <b>相册</b></div>';
 
 // 如果当前登录用户是相册主人，则显示创建新相册的链接
-if (isset($user) && $ank['id'] == $user['id']) echo '<div class="mess"><a href="/photo/' . $ank['id'] . '/?act=create"><img src="/style/icons/apply14.png"> 新相册</a></div>';
+if (isset($user) && $ank['id'] == $user['id']) echo '<div class="mess"><a href="?act=create"><img src="../../style/icons/apply14.png"> 新相册</a></div>';
 
 // 包含隐私设置的代码
 include H . 'sys/add/user.privace.php';
@@ -65,12 +65,12 @@ while ($post = dbassoc($q)) {
 	$num++;
 	// 获取相册中照片的数量
 	$count = dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id_gallery` = '$post[id]'"), 0);
-	echo '<img src="/style/themes/' . $set['set_them'] . '/loads/14/' . ($post['pass'] != null || $post['privat'] != 0 ? 'lock.gif' : 'dir.png') . '" alt="*" /> ';
-	echo '<a href="/photo/' . $ank['id'] . '/' . $post['id'] . '/">' . text($post['name']) . '</a> (' . $count . ' 照片) ';
+	echo '<img src="../../style/themes/' . $set['set_them'] . '/loads/14/' . ($post['pass'] != null || $post['privat'] != 0 ? 'lock.gif' : 'dir.png') . '" alt="*" /> ';
+	echo '<a href="' . $post['id'] . '/">' . text($post['name']) . '</a> (' . $count . ' 照片) ';
 	// 如果当前登录用户有权限或相册主人，则显示编辑和删除链接
 	if (isset($user) && (user_access('photo_alb_del') || $user['id'] == $ank['id'])) {
-		echo '[<a href="/photo/' . $ank['id'] . '/' . $post['id'] . '/?edit=rename"><img src="/style/icons/edit.gif" alt="*" /> 编辑</a>] ';
-		echo '[<a href="/photo/' . $ank['id'] . '/' . $post['id'] . '/?act=delete"><img src="/style/icons/delete.gif" alt="*" /> 删除</a>]';
+		echo '[<a href="' . $post['id'] . '/?edit=rename"><img src="../../style/icons/edit.gif" alt="*" /> 编辑</a>] ';
+		echo '[<a href="' . $post['id'] . '/?act=delete"><img src="../../style/icons/delete.gif" alt="*" /> 删除</a>]';
 	}
 	echo '<br />';
 	// 如果相册没有描述，则显示提示信息；否则显示描述
@@ -85,7 +85,7 @@ echo '</table>';
 // 如果有多页，则显示分页链接
 if ($k_page > 1) str('?', $k_page, $page);
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <b>相册</b>';
+echo '<img src="../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <b>相册</b>';
 echo '</div>';
 include_once '../sys/inc/tfoot.php';
 exit;
