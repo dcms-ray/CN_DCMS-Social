@@ -258,11 +258,11 @@ if (!isset($block_photo)) {
 	if ((isset($user) && ($user['abuld'] == 1 || $photo['id_user'] == $user['id'])) || $photo['metka'] == 0) {	// 标记为18+
 		echo '<div class="nav2">';
 		if ($webbrowser == 'web' && $w > 128) {
-			echo "<a href='/photo/photo0/{$photo['id']}.{$photo['ras']}' title='查看图片'><img style='max-width:90%' src='/photo/photo640/{$photo['id']}.jpg'/></a>";
-			if ($rat > 0) echo "<div style='display:inline;margin-left:-45px;vertical-align:top;'><img style='padding-top:15px;' src='/style/icons/5_plus.png'/></div>";
+			echo "<a href='../../../photo0/{$photo['id']}.{$photo['ras']}' title='查看图片'><img style='max-width:90%' src='../../../photo640/{$photo['id']}.jpg'/></a>";
+			if ($rat > 0) echo "<div style='display:inline;margin-left:-45px;vertical-align:top;'><img style='padding-top:15px;' src='../../../../style/icons/5_plus.png'/></div>";
 		} else {
-			echo "<a href='/photo/photo0/{$photo['id']}.{$photo['ras']}' title='查看图片'><img src='/photo/photo128/{$photo['id']}.jpg'/></a>";
-			if ($rat > 0) echo "<div style='display:inline;margin-left:-25px;vertical-align:top;'><img style='padding-top:10px;' src='/style/icons/6.png'/></div>";
+			echo "<a href='../../../photo0/{$photo['id']}.{$photo['ras']}' title='查看图片'><img src='../../../photo128/{$photo['id']}.jpg'/></a>";
+			if ($rat > 0) echo "<div style='display:inline;margin-left:-25px;vertical-align:top;'><img style='padding-top:10px;' src='../../../../style/icons/6.png'/></div>";
 		}
 		echo '</div>';
 		/*
@@ -273,27 +273,27 @@ if (!isset($block_photo)) {
 		if (isset($user) && $user['id'] != $ank['id']) {
 			echo '<div class="nav2">';
 			if ($user['id'] != $ank['id'] &&  dbresult(dbquery("SELECT COUNT(*) FROM `gallery_rating` WHERE `id_user` = '$user[id]' AND `id_photo` = '$photo[id]'"), 0) == 0) {
-				echo "<a href=\"?rating=6\" title=\"5+\"><img src='/style/icons/6.png' alt=''/></a>";
-				echo "<a href=\"?rating=5\" title=\"5\"><img src='/style/icons/5.png' alt=''/></a>";
-				echo "<a href=\"?rating=4\" title=\"4\"><img src='/style/icons/4.png' alt=''/></a>";
-				echo "<a href=\"?rating=3\" title=\"3\"><img src='/style/icons/3.png' alt=''/></a>";
-				echo "<a href=\"?rating=2\" title=\"2\"><img src='/style/icons/2.png' alt=''/></a>";
-				echo "<a href=\"?rating=1\" title=\"1\"><img src='/style/icons/1.png' alt=''/></a>";
+				echo "<a href=\"?rating=6\" title=\"5+\"><img src='../../../../style/icons/6.png' alt=''/></a>";
+				echo "<a href=\"?rating=5\" title=\"5\"><img src='../../../../style/icons/5.png' alt=''/></a>";
+				echo "<a href=\"?rating=4\" title=\"4\"><img src='../../../../style/icons/4.png' alt=''/></a>";
+				echo "<a href=\"?rating=3\" title=\"3\"><img src='../../../../style/icons/3.png' alt=''/></a>";
+				echo "<a href=\"?rating=2\" title=\"2\"><img src='../../../../style/icons/2.png' alt=''/></a>";
+				echo "<a href=\"?rating=1\" title=\"1\"><img src='../../../../style/icons/1.png' alt=''/></a>";
 			} else {
 				$rate = dbassoc(dbquery("SELECT * FROM `gallery_rating` WHERE `id_photo` = $photo[id] AND `id_user` = '$user[id]' LIMIT 1"));
 				if (isset($user) && $user['id'] != $ank['id'])
-					echo '你的评价 <img src="/style/icons/' . $rate['like'] . '.png" alt=""/></a>';
+					echo '你的评价 <img src="../../../../style/icons/' . $rate['like'] . '.png" alt=""/></a>';
 			}
 			echo '</div>';
 		}
 	} elseif (!isset($user)) {
 		echo '<div class="mess">';
-		echo '<img src="/style/icons/small_adult.gif" alt="*"><br /> 此图像包含与性有关的内容/性行为的刻画/性器官的接触与接合等/使人联想起性行为的事物。只有年龄达到18岁以上的用户才能查看此类图像。 <br />';
-		echo '<a href="/user/aut.php">登录</a> | <a href="/user/reg.php">注册</a>';
+		echo '<img src="../../../../style/icons/small_adult.gif" alt="*"><br /> 此图像包含与性有关的内容/性行为的刻画/性器官的接触与接合等/使人联想起性行为的事物。只有年龄达到18岁以上的用户才能查看此类图像。 <br />';
+		echo '<a href="../../../../user/aut.php">登录</a> | <a href="../../../../user/reg.php">注册</a>';
 		echo '</div>';
 	} else {
 		echo '<div class="mess">';
-		echo '<img src="/style/icons/small_adult.gif" alt="*"><br /> 
+		echo '<img src="../../../../style/icons/small_adult.gif" alt="*"><br /> 
 		      此图像包含与性有关的内容/性行为的刻画/性器官的接触与接合等/使人联想起性行为的事物。只有年龄达到18岁以上的用户才能查看此类图像。 
 		      如果你的年龄达到18岁及以上，那么你可以 <a href="?sess_abuld=1">继续浏览</a>.';
 		echo '</div>';
@@ -302,17 +302,17 @@ if (!isset($block_photo)) {
 	$listr = dbassoc(dbquery("SELECT * FROM `gallery_photo` WHERE `id_gallery` = '$gallery[id]' AND `id` < '$photo[id]' ORDER BY `id` DESC LIMIT 1"));
 	$list = dbassoc(dbquery("SELECT * FROM `gallery_photo` WHERE `id_gallery` = '$gallery[id]' AND `id` > '$photo[id]' ORDER BY `id`  ASC LIMIT 1"));
 	echo '<div class="c2" style="text-align: center;">';
-	if (isset($list['id']))	echo '<span class="page">' . ($list['id'] ? "<a href='/photo/$ank[id]/$gallery[id]/$list[id]/'>&laquo; 上一页</a>" : "&laquo; 上一页") . '</span>';
+	if (isset($list['id']))	echo '<span class="page">' . ($list['id'] ? "<a href='../$list[id]/'>&laquo; 上一页</a>" : "&laquo; 上一页") . '</span>';
 	$k_1 = dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id` > '$photo[id]' AND `id_gallery` = '$gallery[id]'"), 0) + 1;
 	$k_2 = dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id_gallery` = '$gallery[id]'"), 0);
 	echo ' (第' . $k_1 . '页 共' . $k_2 . '页) ';
-	if (isset($listr['id']))	echo '<span class="page">' . ($listr['id'] ? "<a href='/photo/$ank[id]/$gallery[id]/$listr[id]/'>下一页 &raquo;</a>" : "下一页 &raquo;") . '</span>';
+	if (isset($listr['id']))	echo '<span class="page">' . ($listr['id'] ? "<a href='../$listr[id]/'>下一页 &raquo;</a>" : "下一页 &raquo;") . '</span>';
 	echo '</div>';
 	/*----------------------alex-borisi---------------*/
 	if ((isset($user) && ($user['abuld'] == 1 || $photo['id_user'] == $user['id'])) || $photo['metka'] == 0) {
 		if (isset($user)) {
 			echo '<div class="nav1">';
-			echo '<img src="/style/icons/fav.gif" alt="*" /> ';
+			echo '<img src="../../../../style/icons/fav.gif" alt="*" /> ';
 			if (dbresult(dbquery("SELECT COUNT(*) FROM `bookmarks` WHERE `id_user` = '" . $user['id'] . "' AND `id_object` = '" . $photo['id'] . "' AND `type`='fot' LIMIT 1"), 0) == 0)
 				echo '<a href="?fav=1&amp;page=' . $pageEnd . '">添加到书签</a><br />';
 			else
@@ -324,8 +324,8 @@ if (!isset($block_photo)) {
 		echo '类型: <b>' . $photo['ras'] . '</b>, ' . $w . 'x' . $h . ' <br />';
 		if ($photo['opis'] != null)
 			echo output_text($photo['opis']) . '<br />';
-		echo '<img src="/style/icons/d.gif" alt="*"> ';
-		echo '<a href="/photo/download/' . $photo['id'] . '.' . $photo['ras'] . '" title="下载原图">';
+		echo '<img src="../../../../style/icons/d.gif" alt="*"> ';
+		echo '<a href="../../../download/' . $photo['id'] . '.' . $photo['ras'] . '" title="下载原图">';
 		echo '下载 (' . size_file(filesize(H . 'files/gallery/photo/' . $photo['id'] . '.' . $photo['ras'])) . ')';
 		echo '</a><br />';
 		echo '</div>';
@@ -395,8 +395,8 @@ if (!isset($block_photo)) {
 
 
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'], 1, 0, 0) . ' | <a href="/photo/' . $ank['id'] . '/">相册</a> | ';
-echo '<a href="/photo/' . $ank['id'] . '/' . $gallery['id'] . '/">' . text($gallery['name']) . '</a> | ';
+echo '<img src="../../../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'], 1, 0, 0) . ' | <a href="../..">相册</a> | ';
+echo '<a href="..">' . text($gallery['name']) . '</a> | ';
 echo '<b>' . text($photo['name']) . '</b>';
 if ($photo['metka'] == 1) echo ' <font color=red>(18+)</font>';
 echo '</div>';
