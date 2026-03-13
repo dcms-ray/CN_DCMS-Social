@@ -29,7 +29,7 @@ if (!$ank) {
 /* 禁止用户 */
 // 如果用户被禁止访问照片，则重定向到用户禁止页面并退出。
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'photo' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
-	header('Location: {$set['siteurl']}/user/ban.php?' . session_id());
+	header('Location: ' . $set['siteurl'] . '/user/ban.php');
 	exit;
 }
 
