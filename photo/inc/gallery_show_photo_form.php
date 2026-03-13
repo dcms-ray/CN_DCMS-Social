@@ -22,7 +22,7 @@ if (isset($_GET['act']) && $_GET['act'] == 'delete'): ?>
 <? endif;
 
 echo '<div class="foot">';
-if ($ank['id'] == $user['id']) echo '<img src="' . $set['siteurl'] . '/style/icons/pht2.png" alt="*"> <a href="?act=avatar">设置为头像</a><br />';
+if ($ank['id'] == $user['id']) { echo '<img src="' . $set['siteurl'] . '/style/icons/pht2.png" alt="*"> <a href="?act=avatar">设置为头像</a><br />'; }
 ?>
 <img src="<?php echo $set['siteurl']; ?>/style/icons/pen2.png" alt="*"> <a href="?act=rename">重命名</a><br />
 <img src="<?php echo $set['siteurl']; ?>/style/icons/crs2.png" alt="*"> <a href="?act=delete">删除</a><br />
