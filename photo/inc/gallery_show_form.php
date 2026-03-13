@@ -2,35 +2,35 @@
 // 编辑相册
 if (isset($user) && ($user['level'] > $ank['level'] || $user['id'] == $ank['id']) && isset($_GET['edit']) && $_GET['edit'] == 'rename'): ?>
 <div class="foot">
-	<img src="/style/icons/str2.gif" alt="*"> <?=user::nick($ank['id'],1,0,0)?> | 
-	<a href="/photo/<?=$ank['id']?>/">相册</a> | 
-	<a href="/photo/<?=$ank['id']?>/<?=$gallery['id']?>/"><?=text($gallery['name'])?></a> | 
+	<img src="<?php echo $set['siteurl']; ?>/style/icons/str2.gif" alt="*"> <?php echo user::nick($ank['id'], 1, 0, 0); ?> | 
+	<a href="<?php echo $set['siteurl']; ?>/photo/<?php echo $ank['id']; ?>/">相册</a> | 
+	<a href="<?php echo $set['siteurl']; ?>/photo/<?php echo $ank['id']; ?>/<?php echo $gallery['id']; ?>/"><?php echo text($gallery['name']); ?></a> | 
 	<b>编辑</b>
 </div>
 <form action="?edit=rename&amp;ok" method="post">
 	<div class="nav2">相册名称：<br />
-	<input type="text" name="name" value="<?=text($gallery['name'])?>" /><br />
-	简介：<?=$tPanel?>
+	<input type="text" name="name" value="<?php echo text($gallery['name']); ?>" /><br />
+	简介：<?php echo $tPanel; ?>
 	<textarea name="opis"></textarea><br />
 	密码：<br />
-	<input type="text" name="pass" value="<?=text($gallery['pass'])?>" /></div>
+	<input type="text" name="pass" value="<?php echo text($gallery['pass']); ?>" /></div>
 	<div class="nav1">
 	谁可以查看？<br />
-	<input name="privat" type="radio" <?=($gallery['privat'] == 0 ? ' checked="checked"' : null)?> value="0" />所有人 
-	<input name="privat" type="radio" <?=($gallery['privat'] == 1 ? ' checked="checked"' : null)?>value="1" />我的好友
-	<input name="privat" type="radio" <?=($gallery['privat'] == 2 ? ' checked="checked"' : null)?>value="2" />只有我</div>
+	<input name="privat" type="radio" <?php echo ($gallery['privat'] == 0 ? ' checked="checked"' : null); ?> value="0" />所有人 
+	<input name="privat" type="radio" <?php echo ($gallery['privat'] == 1 ? ' checked="checked"' : null); ?>value="1" />我的好友
+	<input name="privat" type="radio" <?php echo ($gallery['privat'] == 2 ? ' checked="checked"' : null); ?>value="2" />只有我</div>
 	<div class="nav2">
 	谁可以评论？<br />
-	<input name="privat_komm" type="radio" <?=($gallery['privat_komm'] == 0 ? ' checked="checked"' : null)?> value="0" />所有人 
-	<input name="privat_komm" type="radio" <?=($gallery['privat_komm'] == 1 ? ' checked="checked"' : null)?> value="1" />我的好友 
-	<input name="privat_komm" type="radio" <?=($gallery['privat_komm'] == 2 ? ' checked="checked"' : null)?> value="2" />只有我</div>
+	<input name="privat_komm" type="radio" <?php echo ($gallery['privat_komm'] == 0 ? ' checked="checked"' : null); ?> value="0" />所有人 
+	<input name="privat_komm" type="radio" <?php echo ($gallery['privat_komm'] == 1 ? ' checked="checked"' : null); ?> value="1" />我的好友 
+	<input name="privat_komm" type="radio" <?php echo ($gallery['privat_komm'] == 2 ? ' checked="checked"' : null); ?> value="2" />只有我</div>
 	<input class="submit" type="submit" value="保存" />
 </form>
 
 <div class="foot">
-	<img src="/style/icons/str2.gif" alt="*"> <?=user::nick($ank['id'],1,0,0)?> | 
-	<a href="/photo/<?=$ank['id']?>/">相册</a> | 
-	<a href="/photo/<?=$ank['id']?>/<?=$gallery['id']?>/"><?=text($gallery['name'])?></a> | 
+	<img src="<?php echo $set['siteurl']; ?>/style/icons/str2.gif" alt="*"> <?php echo user::nick($ank['id'], 1, 0, 0); ?> | 
+	<a href="<?php echo $set['siteurl']; ?>/photo/<?php echo $ank['id']; ?>/">相册</a> | 
+	<a href="<?php echo $set['siteurl']; ?>/photo/<?php echo $ank['id']; ?>/<?php echo $gallery['id']; ?>/"><?php echo text($gallery['name']); ?></a> | 
 	<b>编辑</b>
 </div>
 <?php
@@ -41,10 +41,10 @@ endif;
 // 删除相册
 if ((user_access('photo_alb_del') || isset($user) && $user['id'] == $ank['id']) && isset($_GET['act']) && $_GET['act'] == 'delete'): ?>
 	<div class='mess'>
-		您确实要删除相册 <b><?=text($gallery['name'])?></b>, 和所有照片？<br />
+		您确实要删除相册 <b><?php echo text($gallery['name']); ?></b>, 和所有照片？<br />
 		<center>
-			<a href="?act=delete&amp;ok"><img src="/style/icons/ok.gif" alt="*"> 删除</a>
-			<a href="?"><img src="/style/icons/delete.gif" alt="*"> 取消</a> 
+			<a href="?act=delete&amp;ok"><img src="<?php echo $set['siteurl']; ?>/style/icons/ok.gif" alt="*"> 删除</a>
+			<a href="?"><img src="<?php echo $set['siteurl']; ?>/style/icons/delete.gif" alt="*"> 取消</a> 
 		</center>
 	</div>
 <?php endif;
@@ -53,9 +53,9 @@ if ((user_access('photo_alb_del') || isset($user) && $user['id'] == $ank['id']) 
 // 上传照片
 if (isset($user) && $user['id'] == $ank['id'] && isset($_GET['act']) && $_GET['act'] == 'upload'): ?>
 <div class="foot">
-	<img src="/style/icons/str2.gif" alt="*"> <?=user::nick($ank['id'],1,0,0)?> | 
-	<a href="/photo/<?=$ank['id']?>/">相册</a> | 
-	<a href="/photo/<?=$ank['id']?>/<?=$gallery['id']?>/"><?=text($gallery['name'])?></a> | 
+	<img src="<?php echo $set['siteurl']; ?>/style/icons/str2.gif" alt="*"> <?php echo user::nick($ank['id'], 1, 0, 0); ?> | 
+	<a href="<?php echo $set['siteurl']; ?>/photo/<?=$ank['id']?>/">相册</a> | 
+	<a href="<?php echo $set['siteurl']; ?>/photo/<?=$ank['id']?>/<?php echo $gallery['id']; ?>/"><?php echo text($gallery['name']); ?></a> | 
 	<b>上传照片</b>
 </div>
 <form class="nav2" id="photo_form" enctype="multipart/form-data" action="?act=upload&amp;ok" method="post">
@@ -80,9 +80,9 @@ if (isset($user) && $user['id'] == $ank['id'] && isset($_GET['act']) && $_GET['a
 </div>
 
 <div class="foot">
-	<img src="/style/icons/str2.gif" alt="*"> <?=user::nick($ank['id'],1,0,0)?> | 
-	<a href="/photo/<?=$ank['id']?>/">相册</a> | 
-	<a href="/photo/<?=$ank['id']?>/<?=$gallery['id']?>/"><?=text($gallery['name'])?></a> | 
+	<img src="<?php echo $set['siteurl']; ?>/style/icons/str2.gif" alt="*"> <?php echo user::nick($ank['id'], 1, 0, 0); ?> | 
+	<a href="<?php echo $set['siteurl']; ?>/photo/<?php echo $ank['id']; ?>/">相册</a> | 
+	<a href="<?php echo $set['siteurl']; ?>/photo/<?php echo $ank['id']; ?>/<?php echo $gallery['id']; ?>/"><?php echo text($gallery['name']); ?></a> | 
 	<b>上传照片</b>
 </div>
 <?php

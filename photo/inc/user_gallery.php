@@ -88,4 +88,3 @@ echo '<div class="foot">';
 echo '<img src="../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <b>相册</b>';
 echo '</div>';
 include_once '../sys/inc/tfoot.php';
-exit;
