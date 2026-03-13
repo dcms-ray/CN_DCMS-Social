@@ -6,7 +6,7 @@
 
 // 如果没有设置用户且没有通过GET请求传递用户ID，则重定向到照片页面并退出。
 if (!isset($user) && !isset($_GET['id_user'])) {
-	header("Location: /photo/?" . session_id());
+	header("Location: {$set['siteurl']}/photo/");
 	exit;
 }
 // 如果设置了用户，则将用户ID赋值给ank数组。
@@ -22,14 +22,14 @@ if (dbrows(dbquery("SELECT id FROM `user` WHERE id = {$ank['id']} LIMIT 1")) > 0
 $ank = user::get_user($ank['id']);
 // 如果获取用户信息失败，则重定向到照片页面并退出。
 if (!$ank) {
-	header("Location: /photo/?" . session_id());
+	header("Location: {$set['siteurl']}/photo/");
 	exit;
 }
 
 /* 禁止用户 */
 // 如果用户被禁止访问照片，则重定向到用户禁止页面并退出。
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'photo' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
-	header('Location: /user/ban.php?' . session_id());
+	header('Location: {$set['siteurl']}/user/ban.php?' . session_id());
 	exit;
 }
 
@@ -37,7 +37,7 @@ if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` 
 $gallery['id'] = intval($_GET['id_gallery']);
 // 如果画廊不存在，则重定向到用户照片页面并退出。
 if (dbresult(dbquery("SELECT COUNT(*) FROM `gallery` WHERE `id` = '$gallery[id]' AND `id_user` = '$ank[id]' LIMIT 1"), 0) == 0) {
-	header("Location: /photo/$ank[id]/?" . session_id());
+	header("Location: {$set['siteurl']}/photo/$ank[id]/?" . session_id());
 	exit;
 }
 // 获取画廊信息。
@@ -45,7 +45,7 @@ $gallery = dbassoc(dbquery("SELECT * FROM `gallery` WHERE `id` = '$gallery[id]' 
 $photo['id'] = intval($_GET['id_photo']);
 // 如果照片不存在，则重定向到画廊页面并退出。
 if (dbresult(dbquery("SELECT COUNT(*) FROM `gallery_photo` WHERE `id` = '$photo[id]' LIMIT 1"), 0) == 0) {
-	header("Location: /photo/$ank[id]/$gallery[id]/?" . session_id());
+	header("Location: {$set['siteurl']}/photo/$ank[id]/$gallery[id]/?" . session_id());
 	exit;
 }
 // 获取照片信息。
@@ -63,7 +63,7 @@ if (isset($_GET['fav']) && $_GET['fav'] == 1) {
 	if (dbresult(dbquery("SELECT COUNT(`id`) FROM `bookmarks` WHERE `id_user` = '" . $user['id'] . "' AND `id_object` = '" . $photo['id'] . "' AND `type`='photo' LIMIT 1"), 0) == 0) {
 		dbquery("INSERT INTO `bookmarks` (`type`,`id_object`, `id_user`, `time`) VALUES ('photo','$photo[id]', '$user[id]', '$time')");
 		$_SESSION['message'] = '添加到书签的照片';
-		header("Location: /photo/$ank[id]/$gallery[id]/$photo[id]/?page=" . intval($_GET['page']));
+		header("Location: ?page=" . intval($_GET['page']));
 		exit;
 	}
 }
@@ -74,7 +74,7 @@ if (isset($_GET['fav']) && $_GET['fav'] == 0) {
 	if (dbresult(dbquery("SELECT COUNT(`id`) FROM `bookmarks` WHERE `id_user` = '" . $user['id'] . "' AND `id_object` = '" . $photo['id'] . "' `type`='photo' LIMIT 1"), 0) == 1) {
 		dbquery("DELETE FROM `bookmarks` WHERE `id_user` = '$user[id]' AND  `id_object` = '$photo[id]' AND `type`='photo'");
 		$_SESSION['message'] = '从书签中删除的照片';
-		header("Location: /photo/$ank[id]/$gallery[id]/$photo[id]/?page=" . intval($_GET['page']));
+		header("Location: ?page=" . intval($_GET['page']));
 		exit;
 	}
 }
@@ -108,7 +108,7 @@ if (isset($user) && $user['id'] != $ank['id'] && dbresult(dbquery("SELECT COUNT(
 		$c = dbresult(dbquery("SELECT COUNT(*) FROM `user_set` WHERE `id_user` = '$user[id]' AND `ocenka` > '$time'"), 0);
 		if ($c == 0 && $_GET['rating'] == 6) {
 			$_SESSION['message'] = '您需要激活服务';
-			header("Location: ../user/money/plus5.php");
+			header("Location: ../../../../user/money/plus5.php");
 			exit;
 		}
 		dbquery("INSERT INTO `gallery_rating` (`id_user`, `id_photo`, `like`, `time`, `avtor`) values('$user[id]', '$photo[id]', '" . intval($_GET['rating']) . "', '$time', $photo[id_user])");
@@ -191,7 +191,7 @@ if (isset($_POST['msg']) && isset($user)) {
 // 删除照片
 if (isset($user) && isset($_GET['delete']) && (user_access('photo_komm_del') || $ank['id'] == $user['id'] || $user['id'] == dbarray(dbquery("SELECT `id_user` FROM `gallery_komm` WHERE `id` = '" . intval($_GET['delete']) . "'"))['id_user']) && dbresult(dbquery("SELECT COUNT(*) FROM `gallery_komm` WHERE `id`='" . intval($_GET['delete']) . "' AND `id_photo`='$photo[id]' LIMIT 1"), 0) != 0) {
 	dbquery("DELETE FROM `gallery_komm` WHERE `id`='" . intval($_GET['delete']) . "' LIMIT 1");
-	admin_log('相册', '照片', "删除照片上的评论 [url=/user/info.php?id={$ank['id']}]" . user::nick($ank['id'], 1, 0, 0) . "[/url]");
+	admin_log('相册', '照片', "删除照片上的评论 [url={$set['siteurl']}/user/info.php?id={$ank['id']}]" . user::nick($ank['id'], 1, 0, 0) . "[/url]");
 	$_SESSION['message'] = '评论成功删除';
 	header("Location: ?page=" . intval($_GET['page']));
 	exit;
@@ -206,8 +206,8 @@ aut();
 
 
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'], 1, 0, 0) . ' | <a href="/photo/' . $ank['id'] . '/">相册</a> | ';
-echo '<a href="/photo/' . $ank['id'] . '/' . $gallery['id'] . '/">' . text($gallery['name']) . '</a> | ';
+echo '<img src="../../../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'], 1, 0, 0) . ' | <a href="/photo/' . $ank['id'] . '/">相册</a> | ';
+echo '<a href="..">' . text($gallery['name']) . '</a> | ';
 echo '<b>' . text($photo['name']) . '</b>';
 if ($photo['metka'] == 1) echo ' <font color=red>(18+)</font>';
 echo '</div>';
@@ -243,7 +243,7 @@ if ((empty($user) || $user['id'] != $ank['id']) && $gallery['pass'] != NULL) {
 		echo '<form action="?" method="POST">密码:<br /><input type="pass" name="password" value="" /><br />		
 		<input type="submit" value="登录"/></form>';
 		echo '<div class="foot">';
-		echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'], 1, 0, 0) . ' | <a href="/photo/' . $ank['id'] . '/">相册</a> | <b>' . text($gallery['name']) . '</b>';
+		echo '<img src="../../../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'], 1, 0, 0) . ' | <a href="/photo/' . $ank['id'] . '/">相册</a> | <b>' . text($gallery['name']) . '</b>';
 		echo '</div>';
 		include_once '../sys/inc/tfoot.php';
 		exit;
