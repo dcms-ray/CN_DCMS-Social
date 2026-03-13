@@ -384,10 +384,11 @@ if (!isset($block_photo)) {
 	if ($k_page > 1) str('?', $k_page, $page); // 输出页数
 	if (isset($user)) {
 		echo '<form method="post" name="message" action="?page=' . $pageEnd . '&amp;' . REPLY . '">';
-		if (test_file(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php'))
+		if (test_file(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php')) {
 			include_once check_replace(H . 'style/themes/' . $set['set_them'] . '/altername_post_form.php');
-		else
+		} else {
 			echo $tPanel . '<textarea name="msg">' . $insert . '</textarea><br />';
+		}
 		echo '<input value="发送" type="submit" />';
 		echo '</form>';
 	}
