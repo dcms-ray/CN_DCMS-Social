@@ -20,7 +20,7 @@ if (!$ank) {
 
 // 如果用户被Ban
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'photo' AND `id_user` = '{$user['id']}' AND (`time` > '{$time}' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
-	header('Location: /user/ban.php?' . session_id());
+	header('Location: ' . $set['siteurl'] . '/user/ban.php');
 	exit;
 }
 
@@ -148,7 +148,7 @@ if (!isset($block_photo)) {
 
 		if ($post['metka'] == 1) echo ' <font color=red>(18+)</font>';
 
-		echo '<br /><img src="/photo/photo128/' . $post['id'] . '.' . $post['ras'] . '" alt="Photo Screen" /></a><br />';
+		echo '<br /><img src="../../photo128/' . $post['id'] . '.' . $post['ras'] . '" alt="Photo Screen" /></a><br />';
 
 		if ($post['opis'] == null) {
 			echo '无描述<br />';
