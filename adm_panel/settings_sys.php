@@ -20,7 +20,7 @@ if (isset($_POST['save'])) {
 	try {
 		if (empty($_POST['siteurl'])) {
 			$temp_set['siteurl'] = NULL;
-		} elseif (filter_var($_POST['siteurl'], FILTER_VALIDATE_URL))) {
+		} elseif (filter_var($_POST['siteurl'], FILTER_VALIDATE_URL)) {
 			$temp_set['siteurl'] = esc($_POST['siteurl']);
 		} else {
 			throw new Exception('无效的URL');
