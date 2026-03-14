@@ -16,13 +16,13 @@ if ((user_access('photo_alb_del') || isset($user) && $user['id'] == $ank['id']) 
 		admin_log('图片集锦', '相片册', "删除相册 " . text($gallery['name']) . " (照片: " . dbrows($q) . ")");
 	dbquery("DELETE FROM `gallery` WHERE `id` = '$gallery[id]' LIMIT 1");
 	$_SESSION['message'] = '已成功删除相册';
-	header("Location: /photo/$ank[id]/");
+	header("Location: {$set['siteurl']}/photo/{$ank['id']}/");
 	exit;
 }
 
 // 上传照片
 if (isset($user) && $user['id'] == $ank['id'] && isset($_FILES['file'])) {	// 检查上传权限
-	if ($imgc = @imagecreatefromstring(file_get_contents($_FILES['file']['tmp_name']))) {	// 检查图片是否有效
+	if ($imgc = imagecreatefromstring(file_get_contents($_FILES['file']['tmp_name']))) {	// 检查图片是否有效
 		// 检查图片标题
 		$name = $_POST['name'];
 		if ($name == null) $name = esc(stripcslashes(htmlspecialchars($_FILES['file']['name'])));
@@ -177,11 +177,11 @@ if (isset($user) && $user['id'] == $ank['id'] && isset($_FILES['file'])) {	// �
 			@unlink(H . "files/gallery/50/{$id_photo}.tmp.jpg");
 			if (isset($_GET['avatar'])) {
 				$_SESSION['message'] = '已成功将照片设置为头像';
-				header("Location: /user/info.php");
+				header("Location: {$set['siteurl']}/user/info.php");
 				exit;
 			}
 			$_SESSION['message'] = '照片已成功上传';
-			header("Location: /photo/{$ank['id']}/{$gallery['id']}/{$id_photo}/");
+			header("Location: {$set['siteurl']}/photo/{$ank['id']}/{$gallery['id']}/{$id_photo}/");
 			exit;
 		}
 	} else {
@@ -207,7 +207,7 @@ if (isset($_GET['edit']) && $_GET['edit'] == 'rename' && isset($_GET['ok']) && (
 			admin_log('图片集锦', '照片', "重命名用户相册 '[url=/user/info.php?id={$ank['id']}]" . user::nick($ank['id'], 1, 0, 0) . "[/url]'");
 		dbquery("UPDATE `gallery` SET `name` = '$name', `privat` = '$privat', `privat_komm` = '$privat_komm', `pass` = '$pass', `opis` = '$msg' WHERE `id` = '$gallery[id]' LIMIT 1");
 		$_SESSION['message'] = '已成功接受更改';
-		header("Location: /photo/{$ank['id']}/?");
+		header("Location: {$set['siteurl']}/photo/{$ank['id']}/?");
 		exit;
 	}
 }

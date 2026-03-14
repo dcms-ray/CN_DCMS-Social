@@ -1,7 +1,7 @@
 <?php
 // 如果没有设置用户且没有通过GET请求传递用户ID，则重定向到首页并退出
 if (!isset($user) && !isset($_GET['id_user'])) {
-	header("Location: /photo/?" . session_id());
+	header("Location: {$set['siteurl']}/photo/");
 	exit;
 }
 // 如果设置了用户，则将用户ID赋值给ank数组
@@ -14,13 +14,13 @@ $ank = user::get_user($ank['id']);
 
 // 如果没有获取到用户信息，则重定向到首页并退出
 if (!$ank) {
-	header('Location: /photo/?' . session_id());
+	header("Location: {$set['siteurl']}/photo/");
 	exit;
 }
 
 // 如果用户被Ban
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'photo' AND `id_user` = '{$user['id']}' AND (`time` > '{$time}' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
-	header('Location: /user/ban.php?' . session_id());
+	header('Location: ' . $set['siteurl'] . '/user/ban.php');
 	exit;
 }
 
@@ -29,7 +29,7 @@ $gallery['id'] = intval($_GET['id_gallery']);
 
 // 如果相册不存在或者不属于当前用户，则重定向到用户相册页面并退出
 if (dbresult(dbquery("SELECT COUNT(*) FROM `gallery` WHERE `id` = '$gallery[id]' AND `id_user` = '$ank[id]' LIMIT 1"), 0) == 0) {
-	header('Location: /photo/' . $ank['id'] . '/?' . session_id());
+	header("Location: {$set['siteurl']}/photo/{$ank['id']}/");
 	exit;
 }
 
@@ -52,7 +52,7 @@ include 'inc/gallery_show_form.php';
 
 // 显示页脚信息
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <a href="/photo/' . $ank['id'] . '/">相册</a> | <b>' . text($gallery['name']) . '</b></div>';
+echo '<img src="../../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <a href="../../' . $ank['id'] . '/">相册</a> | <b>' . text($gallery['name']) . '</b></div>';
 
 // 包含隐私设置文件
 include H . 'sys/add/user.privace.php';
@@ -114,7 +114,7 @@ if ((!isset($user) || $user['id'] != $ank['id']) && $gallery['pass'] != NULL) {
 		<input type="submit" value="登录"/></form>';
 
 		echo '<div class="foot">';
-		echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <a href="/photo/' . $ank['id'] . '/">相册</a> | <b>' . text($gallery['name']) . '</b>';
+		echo '<img src="../../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <a href="../../' . $ank['id'] . '/">相册</a> | <b>' . text($gallery['name']) . '</b>';
 		echo '</div>';
 
 		include_once '../sys/inc/tfoot.php';
@@ -143,20 +143,21 @@ if (!isset($block_photo)) {
 		echo '<div class="' . ($num % 2 ? "nav1" : "nav2") . '">';
 		$num++;
 
-		echo '<img src="/style/themes/' . $set['set_them'] . '/loads/14/jpg.png" alt="*"/>';
-		echo '<a href="/photo/' . $ank['id'] . '/' . $gallery['id'] . '/' . $post['id'] . '/">' . text($post['name']);
+		echo '<img src="../../../style/themes/' . $set['set_them'] . '/loads/14/jpg.png" alt="*"/>';
+		echo '<a href="../../' . $ank['id'] . '/' . $gallery['id'] . '/' . $post['id'] . '/">' . text($post['name']);
 
 		if ($post['metka'] == 1) echo ' <font color=red>(18+)</font>';
 
-		echo '<br /><img src="/photo/photo128/' . $post['id'] . '.' . $post['ras'] . '" alt="Photo Screen" /></a><br />';
+		echo '<br /><img src="../../photo128/' . $post['id'] . '.' . $post['ras'] . '" alt="Photo Screen" /></a><br />';
 
-		if ($post['opis'] == null)
+		if ($post['opis'] == null) {
 			echo '无描述<br />';
-		else
+		} else {
 			echo '<div class="text">' . output_text($post['opis']) . '</div>';
+		}
 
-		echo '<img src="/style/icons/uv.png"> (' . dbresult(dbquery("SELECT COUNT(*) FROM `gallery_komm` WHERE `id_photo` = '$post[id]'"), 0) . ')';
-		echo '<img src="/style/icons/add_fav.gif"> (' . dbresult(dbquery("SELECT COUNT(`id`)FROM `bookmarks` WHERE `id_object`='" . $post['id'] . "' AND `type`='photo'"), 0) . ')';
+		echo '<img src="../../../style/icons/uv.png"> (' . dbresult(dbquery("SELECT COUNT(*) FROM `gallery_komm` WHERE `id_photo` = '$post[id]'"), 0) . ')';
+		echo '<img src="../../../style/icons/add_fav.gif"> (' . dbresult(dbquery("SELECT COUNT(`id`)FROM `bookmarks` WHERE `id_object`='" . $post['id'] . "' AND `type`='photo'"), 0) . ')';
 
 		echo '</div>';
 	}
@@ -168,12 +169,12 @@ if (!isset($block_photo)) {
 }
 if (isset($user) && (user_access('photo_alb_del') || $ank['id'] == $user['id'])) {
 	echo '<div class="mess">';
-	echo '<img src="/style/icons/apply14.png" width="16"> <a href="?act=upload">上传照片</a><br/>';
-	echo '<img src="/style/icons/edit.gif" width="16"> <a href="/photo/' . $ank['id'] . '/' . $gallery['id'] . '/?edit=rename">编辑相册</a><br/>';
-	echo '<img src="/style/icons/delete.gif" width="16"> <a href="/photo/' . $ank['id'] . '/' . $gallery['id'] . '/?act=delete"">删除相册</a></div>';
+	echo '<img src="../../../style/icons/apply14.png" width="16"> <a href="?act=upload">上传照片</a><br/>';
+	echo '<img src="../../../style/icons/edit.gif" width="16"> <a href="../../' . $ank['id'] . '/' . $gallery['id'] . '/?edit=rename">编辑相册</a><br/>';
+	echo '<img src="../../../style/icons/delete.gif" width="16"> <a href="../../' . $ank['id'] . '/' . $gallery['id'] . '/?act=delete"">删除相册</a></div>';
 }
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <a href="/photo/' . $ank['id'] . '/">相册</a> | <b>' . text($gallery['name']) . '</b>';
+echo '<img src="../../../style/icons/str2.gif" alt="*"> ' . user::nick($ank['id'],1,0,0) . ' | <a href="../../' . $ank['id'] . '/">相册</a> | <b>' . text($gallery['name']) . '</b>';
 echo '</div>';
 
 include_once '../sys/inc/tfoot.php';

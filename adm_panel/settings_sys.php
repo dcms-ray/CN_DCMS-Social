@@ -18,12 +18,12 @@ title();
 
 if (isset($_POST['save'])) {
 	try {
-		if (empty($_POST['hostname'])) {
-			$temp_set['hostname'] = NULL;
-		} elseif (filter_var($_POST['hostname'], FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
-			$temp_set['hostname'] = esc($_POST['hostname']);
+		if (empty($_POST['siteurl'])) {
+			$temp_set['siteurl'] = NULL;
+		} elseif (filter_var($_POST['siteurl'], FILTER_VALIDATE_URL))) {
+			$temp_set['siteurl'] = esc($_POST['siteurl']);
 		} else {
-			throw new Exception('无效的域名');
+			throw new Exception('无效的URL');
 		}
 		// Shaman
 		$temp_set['title'] = esc(stripcslashes(htmlspecialchars($_POST['title'])), 1);
@@ -81,7 +81,7 @@ err();
 aut();
 
 echo "<form method=\"post\" action=\"?\">";
-echo "网站域名:<br /><input name=\"hostname\" value=\"" . ($set_dinamic['hostname'] ?? NULL) . "\" type=\"text\" /><br />";
+echo "网站URL:<br /><input name=\"siteurl\" value=\"" . ($set_dinamic['siteurl'] ?? NULL) . "\" type=\"text\" /><br />";
 echo "网站名称:<br /><input name=\"title\" value=\"{$temp_set['title']}\" type=\"text\" /><br />";
 echo "每页显示:<br /><input name=\"p_str\" value=\"{$temp_set['p_str']}\" type=\"text\" /><br />";
 echo "主页:<br /><input name=\"main\" value=\"" . setget('main', "") . "\" type=\"text\" /><br />";

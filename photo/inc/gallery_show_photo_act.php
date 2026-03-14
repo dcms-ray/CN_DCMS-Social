@@ -58,7 +58,7 @@ if (
 
 	// 设置成功消息并跳转
 	$_SESSION['message'] = '照片已成功删除';
-	header("Location: /photo/$ank[id]/$gallery[id]/");
+	header("Location: {$set['siteurl']}/photo/{$ank['id']}/{$gallery['id']}/");
 	exit;
 }
 

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 =======================================
 DCMS-Social 用户个人文件
@@ -42,5 +42,4 @@ if (isset($_GET['delete'])) {
 	echo '[<a href="?page=' . intval($_GET['page']) . '&amp;id_file=' . $file_id['id'] . '"><img src="/style/icons/delete.gif" alt="*"> 取消</a>]';
 	echo '</div>';
 	include_once '../../sys/inc/tfoot.php';
-	exit;
 }
