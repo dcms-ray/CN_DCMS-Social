@@ -65,24 +65,21 @@ $passgen = passgen();
 
 // 保存系统设置
 function save_settings($set) {
-	// 从数组中移除特定键
+	// 从数组中移除不需要保存的临时键
 	unset($set['web']);
 	
-	// 构建配置文件内容
-	$configContent = "<?php\nreturn " . var_export($set, true) . ";\n";
+	// 构建配置文件内容（格式需与 GuGuan123\dcms\Services\Settings 类保持一致）
+	$configContent = "<?php\n/**\n * DCMS System Settings (Generated during Installation)\n * Generated at: " . date('Y-m-d H:i:s') . "\n */\nreturn " . var_export($set, true) . ";\n";
 
 	// 定义配置文件路径
 	$filePath = H . 'sys/dat/settings.php';
 
-	// 尝试打开文件写入内容
-	if ($fopen = fopen($filePath, 'w')) {
-		fputs($fopen, $configContent);
-		fclose($fopen);
-		chmod($filePath, 0777);
+	// 尝试写入内容
+	if (file_put_contents($filePath, $configContent) !== false) {
+		@chmod($filePath, 0777);
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 }
 
 // 递归删除文件夹

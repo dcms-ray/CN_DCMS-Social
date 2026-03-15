@@ -16,45 +16,44 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
-
-// 加载网站设置
+/**
+ * 加载网站设置 (兼容性函数)
+ * @return array
+ */
 function getSet() {
-	$set = array();
-	$set_default = array();
-	$set_dynamic = array();
-	$set_replace = array();
-
 	global $current_page;
+	$settingsService = \GuGuan123\dcms\Services\Settings::getInstance();
 
-	// 正在加载默认设置。消除未定义变量的缺失
-	$default = parse_ini_file(__DIR__ . '/../dat/default.ini', true);
-	$set_default = $default['DEFAULT'];
-	$set_replace = $default['REPLACE'];
-
-	// 检查 install 目录是否存在，如果存在就转跳到引擎安装界面
-	if (file_exists(__DIR__ . '/../dat/settings.php')) {
-		$set_dynamic = require_once(__DIR__ . '/../dat/settings.php');
-	} elseif (file_exists(__DIR__ . '/../../install/index.php') && isset($current_page) && $current_page == 'index') {
-		header('Location: install/');
-		exit;
-	} else {
-		http_response_code(500);
-		echo 'sys/dat/settings.php 消失了' . PHP_EOL;
-		exit;
+	// 检查是否已安装
+	if (!$settingsService->isInstalled()) {
+		if (file_exists(H . 'install/index.php') && isset($current_page) && $current_page == 'index') {
+			header('Location: install/');
+			exit;
+		} else {
+			http_response_code(500);
+			echo 'sys/dat/settings.php 消失了' . PHP_EOL;
+			exit;
+		}
 	}
 
-	return array_merge($set_default, $set_dynamic, $set_replace);
+	return $settingsService->getAll();
 }
 
+// 初始化设置
+$settingsService = \GuGuan123\dcms\Services\Settings::getInstance();
 $set = getSet();
-if ($set['show_err_php']) {
-	error_reporting(E_ALL); // 启用错误显示
-	ini_set('display_errors', true); // 启用错误显示
+
+// 错误显示处理
+if ($settingsService->get('show_err_php')) {
+	error_reporting(E_ALL);
+	ini_set('display_errors', true);
 }
+
+// 临时设置
 $set['web'] = false;
 
 // 解析 User-Agent 检查设备类型是否为 PC
-if (!empty($_SERVER["HTTP_USER_AGENT"]) && !(new Detection\MobileDetect())->isMobile()) {
+if (!empty($_SERVER["HTTP_USER_AGENT"]) && !(new \Detection\MobileDetect())->isMobile()) {
 	$webbrowser = true;
 } else {
 	$webbrowser = false;

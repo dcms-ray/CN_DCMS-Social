@@ -164,24 +164,15 @@ function msg($msg) {
 
 // 保存系统设置
 function save_settings($set) {
-	// 从数组中移除特定键
-	unset($set['web']);
-	
-	// 构建配置文件内容
-	$configContent = "<?php\nreturn " . var_export($set, true) . ";\n";
+	$settingsService = \GuGuan123\dcms\Services\Settings::getInstance();
 
-	// 定义配置文件路径
-	$filePath = H . 'sys/dat/settings.php';
-
-	// 尝试打开文件写入内容
-	if ($fopen = fopen($filePath, 'w')) {
-		fputs($fopen, $configContent);
-		fclose($fopen);
-		chmod($filePath, 0777);
-		return true;
-	} else {
-		return false;
+	// 更新服务中的设置
+	foreach ($set as $key => $value) {
+		$settingsService->set($key, $value);
 	}
+
+	// 保存到文件
+	return $settingsService->save();
 }
 
 /**

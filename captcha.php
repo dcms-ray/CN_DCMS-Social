@@ -1,24 +1,5 @@
 <?php
-// 加载网站设置
-function setget() {
-	$set = array();
-	$set_default = array();
-	$set_dynamic = array();
-	$set_replace = array();
-
-	// 正在加载默认设置。消除未定义变量的缺失
-	$default = parse_ini_file('sys/dat/default.ini', true);
-	$set_default = $default['DEFAULT'];
-	$set_replace = $default['REPLACE'];
-
-	if (file_exists('sys/dat/settings.php')) {
-		$set_dynamic = require_once('sys/dat/settings.php');
-	} else {
-		http_response_code(506);
-		exit;
-	}
-	return array_merge($set_default, $set_dynamic, $set_replace);
-}
+require_once __DIR__ . '/vendor/autoload.php';
 
 function decrypt_captcha_token($captcha_token) {
 	// 解析 captcha_token
@@ -28,7 +9,7 @@ function decrypt_captcha_token($captcha_token) {
 	}
 
 	// 使用 openssl 解密
-	$decrypted_captcha_token = openssl_decrypt(base64_decode(strtr($token_parts[0], '-_', '+/')), 'aes-256-cbc', setget()['shif'], 0, base64_decode(strtr($token_parts[1], '-_', '+/')));
+	$decrypted_captcha_token = openssl_decrypt(base64_decode(strtr($token_parts[0], '-_', '+/')), 'aes-256-cbc', \GuGuan123\dcms\Services\Settings::getInstance()->getAll()['shif'], 0, base64_decode(strtr($token_parts[1], '-_', '+/')));
 	if ($decrypted_captcha_token == false) {
 		throw new Exception('captcha_token 解密失败');
 	}
@@ -181,9 +162,11 @@ class captcha
 
 if (isset($_GET['captcha_token'])) {
 	try {
-		$captcha_code = decrypt_captcha_token($_GET['captcha_token']);
+		$Captcha = new \GuGuan123\dcms\Services\Captcha($set, $db);
+		$captcha_code = $Captcha->decrypt_token($_GET['captcha_token']);
 	} catch(Exception $e) {
-		echo $e->getMessage();
+		http_response_code(500);
+		die($e->getMessage());
 	}
 } else {
 	session_name('SESS');

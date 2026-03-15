@@ -66,6 +66,30 @@ class Captcha
 	}
 
 	/**
+	 * 解析 captcha token
+	 * 
+	 * @param string $captcha_token 验证码Token
+	 * @return string 解密后的验证码
+	 */
+	public function decrypt_token($captcha_token) {
+		// 解析 captcha_token
+		$token_parts = explode('.', $captcha_token);
+		if (count($token_parts) !== 2) throw new \Exception('captcha_token format error');
+
+		// 使用 openssl 解密
+		$decrypted_captcha_token = openssl_decrypt(base64_decode(strtr($token_parts[0], '-_', '+/')), 'aes-256-cbc', \GuGuan123\dcms\Services\Settings::getInstance()->getAll()['shif'], 0, base64_decode(strtr($token_parts[1], '-_', '+/')));
+		if ($decrypted_captcha_token == false) throw new \Exception('captcha_token decryption failed');
+
+		$decrypted_captcha_token_parts = explode('.', $decrypted_captcha_token);
+		if (count($decrypted_captcha_token_parts) !== 2) throw new \Exception('captcha_token format error');
+
+		if ($decrypted_captcha_token_parts[1] < time()) throw new \Exception('captcha_token expired at ' . $decrypted_captcha_token_parts[1]);
+
+		// 返回解密后的验证码
+		return $decrypted_captcha_token_parts[0];
+	}
+
+	/**
 	 * 核对验证码
 	 * 
 	 * @param string $user_input    用户输入的验证码内容
@@ -73,29 +97,15 @@ class Captcha
 	 * 
 	 * @return array{status: string, message: string} 返回包含状态码和提示消息的关联数组
 	 */
-	function validateToken(string $user_input, string $captcha_token): array {
-		// 解析 captcha_token
-		$token_parts = explode('.', $captcha_token);
-		if (count($token_parts) !== 2) {
-			// captcha_token 格式错误
-			return [
+	public function validateToken(string $user_input, string $captcha_token): array {
+		try {
+			// 解密 captcha_token
+			$decrypted_captcha_token = $this->decrypt_token($captcha_token);
+		} catch(\Exception $e) {
+			return array(
 				'status' => 'error',
-				'message' => 'captcha_token format error'
-			];
-		}
-
-		// 解密并拆分 Token
-		$decrypted_captcha_token = explode('.', openssl_decrypt(base64_decode(strtr($token_parts[0], '-_', '+/')), 'aes-256-cbc', $this->set['shif'], 0, base64_decode(strtr($token_parts[1], '-_', '+/'))));
-		if (count($decrypted_captcha_token) !== 2) {
-			return [
-				'status' => 'error',
-				'message' => 'captcha_token format error'
-			];
-		} elseif ($decrypted_captcha_token[1] < time()) {
-			return [
-				'status' => 'error',
-				'message' => 'captcha_token expired'
-			];
+				'message' =>  $e->getMessage()
+			);
 		}
 		// 查询数据库，检查 token 是否存在且未使用
 		$token_record = $this->db->query("SELECT * FROM captcha_tokens WHERE captcha_token = ? AND status = 'unused'", [$captcha_token]);
@@ -105,7 +115,7 @@ class Captcha
 			return ['status' => 'error', 'message' => 'captcha_token invalid or used'];
 		}
 		// 验证解密后的验证码是否正确（与用户输入的验证码比较）
-		if ($decrypted_captcha_token[0] === $user_input) {
+		if ($decrypted_captcha_token === $user_input) {
 			// 验证通过，更新 token 状态为 'used'
 			$this->db->update("UPDATE captcha_tokens SET status = 'used' WHERE captcha_token = ?", [$captcha_token]);
 			return [
