@@ -48,4 +48,4 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`money` int(11) DEFAULT '0',
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `nick` (`nick`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1;
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1;
