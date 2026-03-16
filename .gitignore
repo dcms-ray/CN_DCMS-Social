@@ -1,4 +1,15 @@
-# git屏蔽代码
-
 /sys/dat/settings.php
 /sys/tmp/*
+/files/down/data/*.dat
+/files/down/screens/14/*.gif
+/files/down/screens/48/*.gif
+/files/down/screens/128/*.gif
+/files/down/screens/320/*.gif
+/files/forum/*.frf
+/files/gallery/photo/*.*
+/files/gallery/48/*.*
+/files/gallery/50/*.*
+/files/gallery/128/*.*
+/files/gallery/640/*.*
+/files/gift/*.*
+/files/smiles/*.*
