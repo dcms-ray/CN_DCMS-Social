@@ -1,21 +1,21 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 /* 用户封禁 */ 
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'forum' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0)!=0) {
 	header('Location: /ban.php?'.session_id());
 	exit;
 }
 //网页标题
-$set['title']='论坛-新主题';
-include_once '../sys/inc/thead.php';
+$set['title']='论坛-新帖子';
+require_once '../sys/inc/thead.php';
 title();
 aut(); // 授权表
 
@@ -41,7 +41,7 @@ $q = dbquery("SELECT * FROM `forum_t`$adm_add2 ORDER BY `time` DESC LIMIT $start
 // 如果列表为空
 if ($k_post == 0) {
 	echo '<div class="mess">';
-	echo '您的主题不在论坛中';
+	echo '您的帖子不在论坛中';
 	echo '</div>';
 }
 while ($them = dbassoc($q)) {
@@ -58,15 +58,15 @@ while ($them = dbassoc($q)) {
 		echo '<div class="nav2">';
 		$num = 0;
 	}
-	// 主题图标
+	// 帖子图标
 	echo '<img src="/style/themes/' . $set['set_them'] . '/forum/14/them_' . $them['up'] . $them['close'] . '.png" alt="" /> ';
-	// 主题链接
+	// 帖子链接
 	echo '<a href="/forum/' . $forum['id'] . '/' . $razdel['id'] . '/' . $them['id'] . '/">' . text($them['name']) . '</a> 
 	<a href="/forum/' . $forum['id'] . '/' . $razdel['id'] . '/' . $them['id'] . '/?page=' . $pageEnd . '">
 	(' . dbresult(dbquery("SELECT COUNT(*) FROM `forum_p` WHERE `id_forum` = '$forum[id]' AND `id_razdel` = '$razdel[id]' AND `id_them` = '$them[id]'"),0) . ')</a><br/>';
 	// 子论坛和部分
 	echo '<a href="/forum/' . $forum['id'] . '/">' . text($forum['name']) . '</a> &gt; <a href="/forum/' . $forum['id'] . '/' . $razdel['id'] . '/">' . text($razdel['name']) . '</a><br />';
-	// 主题作者
+	// 帖子作者
 	$ank = dbassoc(dbquery("SELECT * FROM `user` WHERE `id` = $them[id_user] LIMIT 1"));
 	echo '作者: ' . user::nick($ank['id'],1,1,0) . ' (' . vremja($them['time_create']) . ')<br />';
 	// 最新文章
@@ -85,4 +85,4 @@ if ($k_page>1) str("?",$k_page,$page);
 echo '<div class="foot">';
 echo '<img src="/style/icons/str2.gif" /> <a href="/forum/">论坛</a> | <b>新回复</b>';
 echo '</div>';
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';

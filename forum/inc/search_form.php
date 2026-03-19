@@ -1,9 +1,9 @@
 <form method='get' action='search.php'>
-文本:<br />
+关键词:<br />
 <input type='text' name='search' value='<?php echo htmlentities(($_GET['search'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>'/><br />
-搜寻地点:<br />
+搜索范围:<br />
 <select name='in'>
-<option value='all'>所有位置</option>
+<option value='all'>全论坛</option>
 <?php
 $q = dbquery("SELECT `id`,`name` FROM `forum_f`" . ((!isset($user) || $user['level']==0) ? " WHERE `adm` = '0'" : null) . " ORDER BY `pos` ASC");
 while ($forums = dbassoc($q)) {

@@ -1,20 +1,20 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 
 if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'forum' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
 	header('Location: /user/ban.php?' . session_id());
 	exit;
 }
 $set['title'] = '谁在论坛上？'; //网页标题
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 title();
 aut();
 
@@ -36,7 +36,7 @@ $start = $set['p_str'] * $page - $set['p_str'];
 
 echo "<table class='post'>";
 if ($k_post == 0) {
-	echo '<tr><td class="p_t">没有人。</td></tr>';
+	echo '<tr><td class="p_t">无人在线</td></tr>';
 } else {
 	$q = dbquery("SELECT DISTINCT ul.id_user, ul.last_online, ul.url
 	              FROM `user_log` ul
@@ -59,4 +59,4 @@ if ($k_page > 1) str("?", $k_page, $page); // 输出页数
 echo "<div class='foot'>
 	  &laquo;<a href='/forum/'>回到论坛</a><br />
 	  </div>";
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';

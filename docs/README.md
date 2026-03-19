@@ -77,7 +77,7 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 - [x] 暗色模式
 - [x] "网站领袖" 新译名
 - [x] 完善“是否允许游客访问《网站资料与帮助》页面”功能，优化 plugins/rules/index.php:13 与 plugins/rules/post.php:13 的代码实现方式
-- [ ] 修复RSS订阅功能
+- [x] 修复RSS订阅功能
 - [ ] 修复更新页面
 - [ ] 提供给客户端的API
 - [X] PHP 8 支持
@@ -100,7 +100,6 @@ DCMS 原是俄罗斯的社交网站和 CMS，后由 [eKing](https://github.com/e
 - [x] 用更安全的方式保持登录和存储Cookie
 - [ ] 通过短轮询实现在线聊天
 - [x] 完善登录历史
-- [ ] 注册答题
 - [x] 完善注册电子邮箱验证
 - [x] 每日签到
 - [ ] 系统礼物发放

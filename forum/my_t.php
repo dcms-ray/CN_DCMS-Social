@@ -1,13 +1,13 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 /* Бан пользователя */ 
 if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'forum' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0)!=0)
 {
@@ -15,12 +15,12 @@ if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'forum' AND `i
 	exit;
 }
 //网页标题
-$set['title']='论坛-我的主题';
-include_once '../sys/inc/thead.php';
+$set['title']='论坛-我的帖子';
+require_once '../sys/inc/thead.php';
 title();
 aut(); 
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" /> <a href="/forum/">论坛</a> | <b>我的主题</b>';
+echo '<img src="/style/icons/str2.gif" /> <a href="/forum/">论坛</a> | <b>我的帖子</b>';
 echo '</div>';
 $k_post = dbresult(dbquery("SELECT COUNT(*) FROM `forum_t`  WHERE `id_user` = '$user[id]'"),0);
 $k_page = k_page($k_post,$set['p_str']);
@@ -32,7 +32,7 @@ $q = dbquery("SELECT * FROM `forum_t` WHERE `id_user` = '$user[id]' ORDER BY `ti
 if ($k_post == 0) 
 {
 	echo '<div class="mess">';
-	echo '您的主题不在论坛中';
+	echo '您的帖子不在论坛中';
 	echo '</div>';
 }
 while ($them = dbarray($q))
@@ -73,6 +73,6 @@ echo '</table>';
 if ($k_page>1)str("?",$k_page,$page); 
 // Меню возврата
 echo '<div class="foot">';
-echo '<img src="/style/icons/str2.gif" /> <a href="/forum/">论坛</a> | <b>我的主题</b>';
+echo '<img src="/style/icons/str2.gif" /> <a href="/forum/">论坛</a> | <b>我的帖子</b>';
 echo '</div>';
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';

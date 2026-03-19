@@ -1,15 +1,15 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
-$set['title']='论坛-前20个文件'; //网页标题
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
+$set['title']='论坛-所有文件';
+require_once '../sys/inc/thead.php';
 
 title();
 aut();
@@ -17,19 +17,26 @@ aut();
 if ($set['web']) {
     if (dbresult(dbquery("SELECT COUNT(*) FROM `forum_files`"), 0) > 0) {
         ?>
-        <table width='100%' border='1' align='center'>
+        <style>
+        table {
+            width: 100%;
+            border-collapse: separate;
+            margin: 20px auto;
+        }
+        </style>
+        <table>
         <tr class='forum_file_table_title'>
             <td width='14'></td>
             <td>档案</td>
             <td>类型</td>
             <td width='50'>大小</td>
-            <td width='50'>已下载</td>
+            <td width='50'>下载次数</td>
             <td width='50'>评级</td>
             <td width='50'></td>
         </tr>
         <?
         $q_f = dbquery("SELECT COUNT(`forum_files_rating`.`rating`) AS `c_rating`, SUM(`forum_files_rating`.`rating`) AS `rating`, `forum_files`.* FROM `forum_files` LEFT JOIN `forum_files_rating` ON
-        `forum_files`.`id` = `forum_files_rating`.`id_file` GROUP BY `forum_files`.`id` ORDER BY `rating` DESC LIMIT 20");
+        `forum_files`.`id` = `forum_files_rating`.`id_file` GROUP BY `forum_files`.`id` ORDER BY `rating`");
         while ($file = dbassoc($q_f)) {
             echo "<tr class='forum_file_table_file'>";
             echo "<td>";
@@ -56,7 +63,7 @@ if ($set['web']) {
     }
 } else {
     $q_f = dbquery("SELECT COUNT(`forum_files_rating`.`rating`) AS `c_rating`, SUM(`forum_files_rating`.`rating`) AS `rating`, `forum_files`.* FROM `forum_files` LEFT JOIN `forum_files_rating` ON
-    `forum_files`.`id` = `forum_files_rating`.`id_file` GROUP BY `forum_files`.`id` ORDER BY `rating` DESC LIMIT 20");
+    `forum_files`.`id` = `forum_files_rating`.`id_file` GROUP BY `forum_files`.`id` ORDER BY `rating` ");
     while ($file = dbassoc($q_f)) {
         if (is_file(H.'style/themes/'.$set['set_them'].'/loads/14/'.$file['ras'].'.png')) {
             echo "<img src='/style/themes/$set[set_them]/loads/14/$file[ras].png' alt='$file[ras]' />";
@@ -78,4 +85,4 @@ if ($set['web']) {
 echo "<div class=\"foot\">";
 echo "&laquo;<a href=\"/forum/\">论坛</a><br />";
 echo "</div>";
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';

@@ -1,13 +1,13 @@
 <?php
-include_once '../sys/inc/start.php';
-//include_once '../sys/inc/compress.php'; // 如果取消注释，文件将无法正确摇摆
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+//require_once '../sys/inc/compress.php'; // 如果取消注释，文件将无法正确摇摆
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 
 // 检查文件ID是否有效且文件存在
 if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `forum_files` WHERE `id` = '" . intval($_GET['id']) . "'"), 0) == 1) {

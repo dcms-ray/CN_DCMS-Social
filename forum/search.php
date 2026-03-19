@@ -1,13 +1,13 @@
 <?php
-include_once '../sys/inc/start.php';
-include_once '../sys/inc/compress.php';
-include_once '../sys/inc/sess.php';
-include_once '../sys/inc/home.php';
-include_once '../sys/inc/settings.php';
-include_once '../sys/inc/db_connect.php';
-include_once '../sys/inc/ipua.php';
-include_once '../sys/inc/fnc.php';
-include_once '../sys/inc/user.php';
+require_once '../sys/inc/start.php';
+require_once '../sys/inc/compress.php';
+require_once '../sys/inc/sess.php';
+require_once '../sys/inc/home.php';
+require_once '../sys/inc/settings.php';
+require_once '../sys/inc/db_connect.php';
+require_once '../sys/inc/ipua.php';
+require_once '../sys/inc/fnc.php';
+require_once '../sys/inc/user.php';
 /* 用户封禁 */
 if (isset($user) && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'forum' AND `id_user` = '{$user['id']}' AND (`time` > '{$time}' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
 	header('Location: /user/ban.php?' . session_id());
@@ -19,7 +19,7 @@ if (isset($_GET['search'])) include 'inc/search_act.php';
 
 //网页标题
 $set['title'] = '论坛-搜索';
-include_once '../sys/inc/thead.php';
+require_once '../sys/inc/thead.php';
 title();
 aut(); // 批准格式 
 err();
@@ -50,15 +50,15 @@ if (isset($_GET['search'])) {
 					echo '<div class="nav2">';
 					$num = 0;
 				}
-				// 主题图标 
+				// 帖子图标 
 				echo '<img src="/style/themes/' . $set['set_them'] . '/forum/14/them_' . $them['up'] . $them['close'] . '.png" alt="" />';
-				// 主题链接
+				// 帖子链接
 				echo '<a href="/forum/' . $forum['id'] . '/' . $razdel['id'] . '/' . $them['id'] . '/">' . text($them['name']) . '</a> 
 					<a href="/forum/' . $forum['id'] . '/' . $razdel['id'] . '/' . $them['id'] . '/?page=' . $pageEnd . '"> 
 					(' . dbresult(dbquery("SELECT COUNT(*) FROM `forum_p` WHERE `id_forum` = '$forum[id]' AND `id_razdel` = '$razdel[id]' AND `id_them` = '$them[id]'"), 0) . ')</a><br/>';
 				// 子论坛及栏目
 				echo '<a href="/forum/' . $forum['id'] . '/">' . text($forum['name']) . '</a> > <a href="/forum/' . $forum['id'] . '/' . $razdel['id'] . '/">' . text($razdel['name']) . '</a>';
-				// 主题作者
+				// 帖子作者
 				$ank = user::get_user($them['id_user']);
 				echo '作者: ' . user::nick($ank['id'], 1, 1, 0) . ' (' . vremja($them['time_create']) . ')';
 				// 末帖
@@ -77,7 +77,7 @@ if (isset($_GET['search'])) {
 		echo '</table>';
 		if ($k_page > 1) str('?', $k_page, $page); // 输出页数 
 	} elseif (!isset($err)) {
-		msg(htmlentities($searched['text'], ENT_QUOTES, 'UTF-8') . '" 什么也没找到');
+		msg(htmlentities($searched['text'], ENT_QUOTES, 'UTF-8') . '什么也没搜索到');
 	}
 }
 
@@ -85,4 +85,4 @@ if (isset($_GET['search'])) {
 echo '<div class="foot">';
 echo '<img src="/style/icons/str2.gif" /> <a href="/forum/">论坛</a> | <b>论坛搜索</b>';
 echo '</div>';
-include_once '../sys/inc/tfoot.php';
+require_once '../sys/inc/tfoot.php';
