@@ -169,7 +169,6 @@ if (isset($_GET['captcha_token'])) {
 		die($e->getMessage());
 	}
 } else {
-	session_name('SESS');
 	session_start();
 	// 随机生成5位数字
 	$captcha_code = (string)rand(10000, 99999);
