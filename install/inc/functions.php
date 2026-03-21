@@ -75,7 +75,7 @@ function save_settings($set) {
 	$filePath = __DIR__ . '/../../sys/dat/settings.php';
 
 	// 尝试写入内容
-	if (file_put_contents($filePath, $configContent) !== false) {
+	if (file_put_contents($filePath, $configContent)) {
 		@chmod($filePath, 0777);
 		return true;
 	}

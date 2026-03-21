@@ -28,7 +28,7 @@ if (isset($_SESSION['adm_reg_ok']) && $_SESSION['adm_reg_ok'] == true) {
 			header("Location: /index.php?" . session_id());
 			exit;
 		} else {
-			$msg['无法保存系统设置'];
+			$msg[] = '无法保存系统设置';
 		}
 	}
 } elseif (isset($_POST['reg'])) {
