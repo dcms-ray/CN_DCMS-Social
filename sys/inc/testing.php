@@ -92,7 +92,7 @@ if (ini_get('arg_separator.output') == '&amp;') {
 if (empty($set['siteurl'])) {
 	$test_url = get_http_type() . '://' . $_SERVER['HTTP_HOST'] . '/sys/inc/mod_rewrite.test';
 } else {
-	$test_url = $set['siteurl'] . '/sys/inc/mod_rewrite.test';
+	$test_url = $set['siteurl'] . 'sys/inc/mod_rewrite.test';
 }
 if (str_contains(file_get_contents($test_url), 'mod_rewrite-ok')) {
 	echo "<span class='on'>mod_rewrite: OK</span><br />";
