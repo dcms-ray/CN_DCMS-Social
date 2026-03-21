@@ -76,7 +76,7 @@ function save_settings($set) {
 
 	// 尝试写入内容
 	if (file_put_contents($filePath, $configContent)) {
-		@chmod($filePath, 0777);
+		chmod($filePath, 0777);
 		return true;
 	}
 	return false;
