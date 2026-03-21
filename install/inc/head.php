@@ -10,7 +10,7 @@ header("Content-type: application/xhtml+xml;charset=UTF-8");
 </head>
 <body>
 	<div class="body">
-	<div class="logo"><img src="../style/themes/default/logo.png"  alt="Logotype" /><br />
+	<div class="logo"><img src="../style/themes/wap/logo.png"  alt="Logotype" /><br />
 	DCMS Social - 社交网络引擎</div>
 	<div class="title">
 <?php
