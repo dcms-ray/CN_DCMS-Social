@@ -28,7 +28,7 @@ if (isset($_SESSION['adm_reg_ok']) && $_SESSION['adm_reg_ok'] == true) {
 			header("Location: /index.php?" . session_id());
 			exit;
 		} else {
-			$msg['无法保存系统设置'];
+			$msg[] = '无法保存系统设置';
 		}
 	}
 } elseif (isset($_POST['reg'])) {
@@ -103,7 +103,7 @@ if (isset($_SESSION['adm_reg_ok']) && $_SESSION['adm_reg_ok'] == true) {
 		}
 	}
 	echo "<hr />";
-	echo '<form method="get" action="' .  $set['siteurl'] . '">';
+	echo '<form method="get" action="?step=5">';
 	echo "<input name='gen' value='$passgen' type='hidden' />";
 	echo "<input name=\"step\" value=\"" . ($_SESSION['install_step'] + 1) . "\" type=\"hidden\" />";
 	echo "<input value='完成安装' type=\"submit\" />";

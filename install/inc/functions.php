@@ -72,11 +72,11 @@ function save_settings($set) {
 	$configContent = "<?php\n/**\n * DCMS System Settings (Generated during Installation)\n * Generated at: " . date('Y-m-d H:i:s') . "\n */\nreturn " . var_export($set, true) . ";\n";
 
 	// 定义配置文件路径
-	$filePath = H . 'sys/dat/settings.php';
+	$filePath = __DIR__ . '/../../sys/dat/settings.php';
 
 	// 尝试写入内容
-	if (file_put_contents($filePath, $configContent) !== false) {
-		@chmod($filePath, 0777);
+	if (file_put_contents($filePath, $configContent)) {
+		chmod($filePath, 0777);
 		return true;
 	}
 	return false;
