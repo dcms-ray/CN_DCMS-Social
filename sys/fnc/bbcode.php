@@ -7,23 +7,26 @@ function bbcodehightlight($arr) {
 function bbcodeplayvideo($data){
 	$url = $data[1];
 	$iframeUrl = '';
-	if (preg_match('#\.youku\.com/.*/id_([a-zA-Z0-9=]+)#', $url, $arr)) {			//优酷
-		$iframeUrl = 'https://player.youku.com/embed/' . $arr[1];
-	} else if (preg_match('#kg.*\.qq\.com/.*\bs=([a-zA-Z0-9=]+)#', $url, $arr)) {	// 全民K歌
-		$iframeUrl = 'https://kg.qq.com/node/play?s=' . $arr[1];
-	} else if (preg_match('#\.qq\.com/.*/([a-zA-Z0-9=]+)#', $url, $arr)) {			//腾讯视频
-		$iframeUrl = 'https://v.qq.com/txp/iframe/player.html?vid=' . $arr[1];
-	} else if (preg_match('#\b(?:bilibili\.com|b23\.tv)\b.*\bav(\d+)(?:.*\bp=(\d+))?#', $url, $arr)) {		//哔哩哔哩 av号
-		$iframeUrl = "https://player.bilibili.com/player.html?aid={$arr[1]}&page={$arr[2]}";
-	} else if (preg_match('#\b(?:bilibili\.com|b23\.tv)\b.*\b(BV[\w]+)(?:.*\bp=(\d+))?#', $url, $arr)) {	//哔哩哔哩 BV号
-		$iframeUrl = "https://player.bilibili.com/player.html?bvid={$arr[1]}&page={$arr[2]}";
+	if (preg_match('#\.youku\.com/.*/id_([a-zA-Z0-9=]+)#', $url, $arr)) {            //优酷
+			$iframeUrl = 'https://player.youku.com/embed/' . $arr[1];
+	} else if (preg_match('#kg.*\.qq\.com/.*\bs=([a-zA-Z0-9=]+)#', $url, $arr)) {    // 全民K歌
+			$iframeUrl = 'https://kg.qq.com/node/play?s=' . $arr[1];
+	} else if (preg_match('#\.qq\.com/.*/([a-zA-Z0-9=]+)#', $url, $arr)) {            //腾讯视频
+			$iframeUrl = 'https://v.qq.com/txp/iframe/player.html?vid=' . $arr[1];
+	} else if (preg_match('#\b(?:bilibili\.com|b23\.tv)\b.*\bav(\d+)(?:.*\bp=(\d+))?#', $url, $arr)) {        //哔哩哔哩 av号
+			$page = isset($arr[2]) ? $arr[2] : '1';
+			$iframeUrl = "https://player.bilibili.com/player.html?aid={$arr[1]}&page={$page}";
+	} else if (preg_match('#\b(?:bilibili\.com|b23\.tv)\b.*\b(BV[\w]+)(?:.*\bp=(\d+))?#', $url, $arr)) {    //哔哩哔哩 BV号
+			$page = isset($arr[2]) ? $arr[2] : '1';
+			$iframeUrl = "https://player.bilibili.com/player.html?bvid={$arr[1]}&page={$page}";
 	}
 	if (empty($iframeUrl)) {
-		return "视频解析错误";
+			return "视频解析错误";
 	} else {
-		return '<a target="_blank" href="' . $url . '">视频链接</a><br/><iframe src="' . $iframeUrl . '" seamless allowfullscreen sandbox="allow-scripts allow-forms allow-same-origin allow-popups"><a href="' . $url . '">' . $url . '</a></iframe>';
+			return '<a target="_blank" href="' . $url . '">视频链接</a><br/><iframe src="' . $iframeUrl . '" seamless allowfullscreen sandbox="allow-scripts allow-forms allow-same-origin allow-popups"><a href="' . $url . '">' . $url . '</a></iframe>';
 	}
 }
+
 
 # 处理 [img] 标签的内容
 function img_preg($arr) {
