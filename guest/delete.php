@@ -48,7 +48,7 @@ if (isset($_GET['id']) && dbresult(dbquery("SELECT COUNT(*) FROM `guest` WHERE `
 		echo '<input value="确认删除" type="submit" />';
 		echo '</form>';
 		echo '<div class="foot">';
-		echo "<img src='../../style/icons/str2.gif' alt='*'> <a href='index.php?page={$page}'>留言板</a>";
+		echo "<img src='../style/icons/str2.gif' alt='*'> <a href='index.php?page={$page}'>留言板</a>";
 		echo "</div>";
 		require_once '../sys/inc/tfoot.php';
 	}
