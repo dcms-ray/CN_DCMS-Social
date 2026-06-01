@@ -1,4 +1,9 @@
 <?php
+/**
+ * 个人主页的“动态”预览
+ * 这个文件只有 user/info.php 用
+ */
+
 $set['p_str'] = 5;
 if (isset($_GET['likepost'])) {
     $stena = dbassoc(dbquery("SELECT * FROM `stena` WHERE `id` = '" . intval($_GET['likepost']) . "' LIMIT 1"));
@@ -23,10 +28,10 @@ if ($k_post == 0) {
     if (isset($user)) {
         echo "<div id='comments' class='menus'>";
         echo "<div class='webmenu'>";
-        echo "<a href='/user/info.php?id=$ank[id]&amp;page=$page&amp;sort=1' class='" . ($user['sort'] == 1 ? 'activ' : '') . "'>在下面</a>";
+        echo "<a href='?id=$ank[id]&amp;page=$page&amp;sort=1' class='" . ($user['sort'] == 1 ? 'activ' : '') . "'>在下面</a>";
         echo "</div>";
         echo "<div class='webmenu'>";
-        echo "<a href='/user/info.php?id=$ank[id]&amp;page=$page&amp;sort=0' class='" . ($user['sort'] == 0 ? 'activ' : '') . "'>在顶部</a>";
+        echo "<a href='?id=$ank[id]&amp;page=$page&amp;sort=0' class='" . ($user['sort'] == 0 ? 'activ' : '') . "'>在顶部</a>";
         echo "</div>";
         echo "</div>";
     }
@@ -52,16 +57,16 @@ while ($post = dbassoc($q)) {
         // echo "" . group($ank_stena['id']) . "";
     }
     echo user::nick($ank_stena['id'],1,1,0) . "";
-    if (isset($user)) echo " <a href='/user/info.php?id=$ank[id]&amp;response=$ank_stena[id]'>[@]</a>";
+    if (isset($user)) echo " <a href='?id=$ank[id]&amp;response=$ank_stena[id]'>[@]</a>";
     echo " (" . vremja($post['time']) . ")<br />";
     echo stena($ank_stena['id'], $post['id']) . ' <br/>';
     echo output_text($post['msg']) . "<br />";
     if (isset($user)) {
         $l = dbresult(dbquery("SELECT COUNT(*) FROM `stena_like` WHERE `id_stena` = '$post[id]'"), 0);
-        echo '<a href="/user/comm.php?id=' . $post['id'] . '"><img src="/style/icons/uv.png"> (' . dbresult(dbquery("SELECT COUNT(*) FROM `stena_komm` WHERE `id_stena` = '$post[id]'"), 0) . ') </a><span style="float:right;"> <a href="?id=' . $ank['id'] . '&amp;likepost=' . $post['id'] . '&amp;page=' . $page . '" >&hearts; ' . $l . '</a> ';
-        if (isset($user) && $ank_stena['id'] != $user['id']) echo "<a href=\"/user/info.php?id=$ank[id]&amp;page=$page&amp;spam=$post[id]\"><img src='/style/icons/blicon.gif' alt='*'>举报</a>";
+        echo '<a href="comm.php?id=' . $post['id'] . '"><img src="../style/icons/uv.png"> (' . dbresult(dbquery("SELECT COUNT(*) FROM `stena_komm` WHERE `id_stena` = '$post[id]'"), 0) . ') </a><span style="float:right;"> <a href="?id=' . $ank['id'] . '&amp;likepost=' . $post['id'] . '&amp;page=' . $page . '" >&hearts; ' . $l . '</a> ';
+        if (isset($user) && $ank_stena['id'] != $user['id']) echo "<a href=\"?id=$ank[id]&amp;page=$page&amp;spam=$post[id]\"><img src='../style/icons/blicon.gif' alt='*'>举报</a>";
         if (user_access('guest_delete') || $ank['id'] == $user['id']) {
-            echo "<a href='?id=$ank[id]&amp;delete_post=$post[id]'><img src='/style/icons/delete.gif' alt='删除' />删除</a>";
+            echo "<a href='?id=$ank[id]&amp;delete_post=$post[id]'><img src='../style/icons/delete.gif' alt='删除' />删除</a>";
         }
         echo "   </span>";
     }
