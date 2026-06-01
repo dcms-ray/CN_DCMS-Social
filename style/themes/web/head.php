@@ -19,6 +19,7 @@ header("Content-type: text/html");
 		-->
 
 		<script src="<?php echo $set['siteurl']; ?>/assets/js/jquery/jquery-1.8.3.js"></script>
+		<script type="text/javascript"> window.faceboxConfig = { siteurl: '<?php echo $set['siteurl']; ?>' }; </script>
 		<script type="text/javascript" src="<?php echo $set['siteurl']; ?>/assets/js/facebox.js"></script>
 		<script type="text/javascript">
 			jQuery(document).ready(function($) {

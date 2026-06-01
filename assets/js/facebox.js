@@ -79,8 +79,8 @@
 		settings: {
 			opacity      : 0,
 			overlay      : true,
-			loadingImage : '/assets/img/loading.gif',
-			closeImage   : '/assets/img/closelabel.gif',
+			loadingImage : window.faceboxConfig.siteurl + '/assets/img/loading.gif',
+			closeImage   : window.faceboxConfig.siteurl + '/assets/img/closelabel.gif',
 			imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
 			faceboxHtml  : '\
 		<div id="facebox" style="display:none;"> \
@@ -88,7 +88,9 @@
 				<table> \
 					<tbody> \
 						<tr> \
-							<td class="tl"/><td class="b"/><td class="tr"/> \
+							<td class="tl"/> \
+							<td class="b"/> \
+							<td class="tr"/> \
 						</tr> \
 						<tr> \
 							<td class="b"/> \
@@ -97,14 +99,16 @@
 								</div> \
 								<div class="footer"> \
 									<a href="#" class="close"> \
-										<img src="/assets/img/closelabel.gif" title="close" class="close_image" /> \
+										<img src="' + window.faceboxConfig.siteurl + '/assets/img/closelabel.gif" title="close" class="close_image" /> \
 									</a> \
 								</div> \
 							</td> \
 							<td class="b"/> \
 						</tr> \
 						<tr> \
-							<td class="bl"/><td class="b"/><td class="br"/> \
+							<td class="bl"/> \
+							<td class="b"/> \
+							<td class="br"/> \
 						</tr> \
 					</tbody> \
 				</table> \
@@ -119,7 +123,7 @@
 
 			$('#facebox .content').empty()
 			$('#facebox .body').children().hide().end().
-				append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/></div>')
+				append('<div class="loading"><img src="' + $.facebox.settings.loadingImage + '"/></div>')
 
 			$('#facebox').css({
 				top:	getPageScroll()[1] + (getPageHeight() / 10),
