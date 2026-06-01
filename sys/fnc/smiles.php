@@ -1,6 +1,6 @@
 <?php
 function smiles($msg) {
-	global $user;
+	global $user, $set;
 	$q = dbquery("SELECT `id`, `smile` FROM `smile`");
 	while($post = dbarray($q)) {
 		$sm = explode("|", $post['smile']);
