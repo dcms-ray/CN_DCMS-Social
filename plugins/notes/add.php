@@ -141,7 +141,7 @@ echo '<input title="仅自己可评论" name="private_komm" type="radio" value="
       </div>';
 
 if ($user['rating'] < 6 || $user['group_access'] < 6) {
-	echo "验证码:<img src='../../captcha.php?SESS=$sess' width='100' height='30' alt='核证号码' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
+	echo "验证码:<img src='../../captcha.php' width='100' height='30' alt='核证号码' /><br /><input name='chislo' size='5' maxlength='5' value='' type='text' /><br/>";
 }
 echo '<input value="创建" type="submit" />';
 echo '</form>';

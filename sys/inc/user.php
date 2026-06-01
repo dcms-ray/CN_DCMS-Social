@@ -300,8 +300,8 @@ if (isset($_GET['response'])) {
 */
 
 $tPanel = "<div id='comments' class='tpanel'>
-<div class='tmenu'><a href='/plugins/smiles/'>表情符号</a></div>
-<div class='tmenu'><a href='/plugins/rules/bb-code.php'>标签</a></div>
+<div class='tmenu'><a href='{$set['siteurl']}/plugins/smiles/'>表情符号</a></div>
+<div class='tmenu'><a href='{$set['siteurl']}/plugins/rules/bb-code.php'>标签</a></div>
 </div>";
 
 /*
