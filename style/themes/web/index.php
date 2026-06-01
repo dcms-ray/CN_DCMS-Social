@@ -43,7 +43,7 @@ if ($k_post > 0) {
 $k_post = dbresult(dbquery("SELECT COUNT(*) FROM `news`"), 0);
 $q = dbquery("SELECT * FROM `news` ORDER BY `id` DESC LIMIT 2");
 echo "<a href='news/'><div class='my'>";
-echo "<img src='/style/icons/news.png' alt='*' /> 新闻 ";
+echo "<img src='style/icons/news.png' alt='*' /> 新闻 ";
 include H . 'news/count.php';
 echo "</div></a>";
 if ($k_post > 0) {

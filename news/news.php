@@ -44,13 +44,18 @@ if (isset($_POST['msg']) && isset($user)) {
 	$mat = antimat($msg);
 	if ($mat) $err[] = '在消息的文本中发现了一个非法字符: ' . $mat;
 	if (strlen2($msg) > 1024) {
-		$err = '信息太长了';
+		$err[] = '信息太长了';
 	} elseif (strlen2($msg) < 2) {
-		$err = '短消息';
+		$err[] = '短消息';
 	} elseif (dbresult(dbquery("SELECT COUNT(*) FROM `news_komm` WHERE `id_news` = '" . intval($_GET['id']) . "' AND `id_user` = '$user[id]' AND `msg` = '" . my_esc($msg) . "' LIMIT 1"), 0) != 0) {
-		$err = '你的留言重复了上一条';
+		$err[] = '你的留言重复了上一条';
 	} elseif (!isset($err)) {
-		dbquery("INSERT INTO `news_komm` (`id_user`, `time`, `msg`, `id_news`) values('$user[id]', '$time', '" . my_esc($msg) . "', '" . intval($_GET['id']) . "')");
+		$db->insert('INSERT INTO `news_komm` (`id_user`, `time`, `msg`, `id_news`) values(?, ?, ?, ?)', [
+			$user['id'],
+			time(),
+			my_esc($msg),
+			intval($_GET['id'])
+		]);
 		// 活动积分的累积
 		include_once '../sys/add/user.active.php';
 		/*
@@ -61,7 +66,13 @@ if (isset($_POST['msg']) && isset($user)) {
 		if (isset($ank_reply['id'])) {
 			$notifiacation = dbassoc(dbquery("SELECT * FROM `notification_set` WHERE `id_user` = '" . $ank_reply['id'] . "' LIMIT 1"));
 			if ($notifiacation['komm'] == 1 && $ank_reply['id'] != $user['id'])
-				dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$ank_reply[id]', '$news[id]', 'news_komm', '$time')");
+				$db->insert('INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES (?, ?, ?, ?, ?)', [
+					$user['id'],
+					$ank_reply['id'],
+					$news['id'],
+					'news_komm',
+					time()
+				]);
 		}
 		$_SESSION['message'] = '发送成功';
 		header('Location: ?id=' . intval($_GET['id']) . '&page=' . intval($_GET['page']));
