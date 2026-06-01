@@ -23,7 +23,7 @@ if (!isset($_SESSION['category']) || dbresult(dbquery("SELECT COUNT(*) FROM `smi
 $q = dbquery("SELECT * FROM `smile` WHERE `dir`='".intval($_SESSION['category'])."' ORDER BY id DESC ");
 echo '<div class="layer">';
 while($post = dbarray($q)) {
-	echo '<a href="javascript:emoticon(\''.$post['smile'].'\')"><img src="../../files/smiles/' . $post['id'] . '.gif" title="' . text($post['smile']) . '" /></a>';
+	echo '<a href="javascript:emoticon(\'' . $post['smile'] . '\')"><img src="' . $set['siteurl'] . '/files/smiles/' . $post['id'] . '.gif" title="' . text($post['smile']) . '" /></a>';
 }
 echo '</div>';
 
