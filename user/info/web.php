@@ -527,8 +527,8 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 			echo ' <a onclick="anketa.submit()" name="myForm"><div class="form_info">查看更多</div></a>';
 			echo '</div></form>';
 			echo "<script type='text/javascript'>	
-			      var anketa = new DHTMLSuite.form({ formRef:'myForm',action:'/style/post-form/anketa.php?id=$ank[id]',responseEl:'formResponse'});	
-			      var anketaClose = new DHTMLSuite.form({ formRef:'myForm',action:'/style/post-form/anketa.php',responseEl:'formResponse'});
+			      var anketa = new DHTMLSuite.form({ formRef:'myForm',action:'../style/post-form/anketa.php?id=$ank[id]',responseEl:'formResponse'});	
+			      var anketaClose = new DHTMLSuite.form({ formRef:'myForm',action:'../style/post-form/anketa.php',responseEl:'formResponse'});
 			      </script>";
 			/*
 			========================================
@@ -539,7 +539,7 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 			$width = ($webbrowser == 'web' ? '60' : '45'); // Размер подарков при выводе в браузер
 			if ($k_p > 0) {
 				echo '<div class="foot">';
-				echo '&rarr; <a href="/user/gift/index.php?id=' . $ank['id'] . '">所有的礼物</a> (' . $k_p . ')';
+				echo '&rarr; <a href="gift/index.php?id=' . $ank['id'] . '">所有的礼物</a> (' . $k_p . ')';
 				echo '</div>';
 				$q = dbquery("SELECT id,id_gift,status FROM `gifts_user` WHERE `id_user` = '$ank[id]' AND `status` = '1' ORDER BY `id` DESC LIMIT 7");
 				echo '<div class="nav2">';
@@ -558,10 +558,10 @@ if ($ank['group_access'] > 1) echo "<div class='err'>$ank[group_name]</div>";
 				echo "<div class='accordion-group'>
 				      <div class='accordion-heading'>";
 				if ($user['wall'] == 1) {
-					echo '<a class="accordion-toggle decoration-none collapsed" href="/user/info.php?id=' . $ank['id'] . '&amp;wall=0"><img src="/style/icons/stena.gif" alt="*" /> 动态</a>';
+					echo '<a class="accordion-toggle decoration-none collapsed" href="?id=' . $ank['id'] . '&amp;wall=0"><img src="../style/icons/stena.gif" alt="*" /> 动态</a>';
 					include_once H . 'user/stena/index.php';
 				} else {
-					echo '<a class="accordion-toggle decoration-none collapsed" href="/user/info.php?id=' . $ank['id'] . '&amp;wall=1"><img src="/style/icons/stena.gif" alt="*" /> 动态</a>';
+					echo '<a class="accordion-toggle decoration-none collapsed" href="?id=' . $ank['id'] . '&amp;wall=1"><img src="../style/icons/stena.gif" alt="*" /> 动态</a>';
 				}
 				echo '</div></div>';
 			}
