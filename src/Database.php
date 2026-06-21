@@ -129,7 +129,7 @@ class Database {
 	 * 
 	 * @param string $sql SQL查询语句
 	 * @param array $params 绑定参数数组
-	 * @param int $fetchMode 获取模式，默认PDO::FETCH_ASSOC
+	 * @param int $column_number 获取模式，默认PDO::FETCH_ASSOC
 	 * @return array|null 返回查询结果数组，如果没有结果返回null
 	 */
 	public function queryColumn($sql, $params = [], $column_number = 0) {
