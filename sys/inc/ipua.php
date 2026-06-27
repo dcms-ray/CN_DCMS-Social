@@ -16,13 +16,5 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
-/**
- * 使用方式
- * 
- * 获取 IP 和 User-Agent
- * $ip = $clientDetails['ip'];
- * $ua = $clientDetails['ua'];
- */
-$clientDetails = (new GuGuan123\dcms\Utils\ClientDetails($set ?? null, $db ?? null))->getClientDetails();
-$ua = $clientDetails['ua'];
-$ip = $clientDetails['ip'];
+$ua = (new GuGuan123\dcms\Core\ClientDetails($set ?? null, $db ?? null))->getUserAgent();
+$ip = (new GuGuan123\dcms\Core\ClientDetails($set ?? null, $db ?? null))->getClientIp();

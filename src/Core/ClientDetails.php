@@ -16,7 +16,7 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
-namespace GuGuan123\dcms\Utils;
+namespace GuGuan123\dcms\Core;
 
 /**
  * 获取客户端 IP 和 User-Agent
@@ -38,8 +38,7 @@ class ClientDetails
 	 */
 	public function getClientDetails() {
 		// 从数据库获取 CDN IP 范围
-		$cdnIpRanges = array_map(fn($item) => \IPLib\Factory::parseRangeString($item['ip_range']), ($this->db ? $this->db->queryAll("SELECT `ip_range` FROM `cdn_ips`") : []) ?: []);
-		$ip = $this->getClientIp($cdnIpRanges);
+		$ip = $this->getClientIp();
 		$ua = $this->getUserAgent();
 
 		return [
@@ -66,16 +65,17 @@ class ClientDetails
 
 	/**
 	 * 获取客户端 IP 地址
-	 * @param array $cdnIpRanges
 	 * @return string
 	 */
-	protected function getClientIp($cdnIpRanges) {
+	public function getClientIp() {
+		// 从数据库获取 CDN IP 范围
+		$cdnIpRanges = array_map(fn($item) => \IPLib\Factory::parseRangeString($item['ip_range']), ($this->db ? $this->db->queryAll("SELECT `ip_range` FROM `cdn_ips`") : []) ?: []);
 		return match ($this->set['get_ip_from_header'] ?? 'disabled') {
-			'Forwarded'               => $this->getForwardedIp($cdnIpRanges),
-			'X-Forwarded-For'   => $this->getXForwardedForIp($cdnIpRanges),
-			'X-Real-IP'                   => $this->getXRealIp($cdnIpRanges),
+			'Forwarded'        => $this->getForwardedIp($cdnIpRanges),
+			'X-Forwarded-For'  => $this->getXForwardedForIp($cdnIpRanges),
+			'X-Real-IP'        => $this->getXRealIp($cdnIpRanges),
 			'CF-Connecting-IP' => $this->getCfConnectingIp($cdnIpRanges),
-			'True-Client-IP'         => $this->getTrueClientIp($cdnIpRanges),
+			'True-Client-IP'   => $this->getTrueClientIp($cdnIpRanges),
 			default => $_SERVER['REMOTE_ADDR'],
 		};
 	}
@@ -150,7 +150,7 @@ class ClientDetails
 	 * 获取 User-Agent
 	 * @return string
 	 */
-	protected function getUserAgent() {
+	public function getUserAgent() {
 		$ua = 'N/A';
 		if (isset($_SERVER['HTTP_USER_AGENT'])) {
 			$ua = $_SERVER['HTTP_USER_AGENT'];

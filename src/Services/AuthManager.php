@@ -22,14 +22,16 @@ class AuthManager
 {
 	private array $set;
 	private \GuGuan123\dcms\Database $db;
-	private array $clientDetails;
+	private string $ip;
+	private string $ua;
 	private bool $webbrowser;
 	private const JWT_ALGORITHM = 'HS256';
 
-	public function __construct(array $set, \GuGuan123\dcms\Database $db, array $clientDetails, bool $webbrowser) {
+	public function __construct(array $set, \GuGuan123\dcms\Database $db, string $ip, string $ua, bool $webbrowser) {
 		$this->set = $set;
 		$this->db = $db;
-		$this->clientDetails = $clientDetails;
+		$this->ip = $ip;
+		$this->ua = $ua;
 		$this->webbrowser = $webbrowser;
 	}
 
@@ -59,8 +61,8 @@ class AuthManager
 
 	/**
 	 * 处理用户登录后的后续操作
-	 * @param int $user_id
-	 * @param int $login_id
+	 * @param int $user_id 用户ID
+	 * @param int $login_id 登录日志ID
 	 * @return array
 	 */
 	public function processAuthenticatedUser(int $user_id, int $login_id): array {
@@ -87,8 +89,8 @@ class AuthManager
 		$this->db->update('UPDATE user_log SET last_online = :last_online, url = :url, ip = :ip, ua = :ua, browser = :browser WHERE id = :login_id LIMIT 1', [
 			':last_online' => date('Y-m-d H:i:s'),
 			':url' => $_SERVER['SCRIPT_NAME'],
-			':ip' => $this->clientDetails['ip'],
-			':ua' => $this->clientDetails['ua'],
+			':ip' => $this->ip,
+			':ua' => $this->ua,
 			':browser' => $this->webbrowser == true ? "web" : "wap",
 			':login_id' => $login_id
 		]);
@@ -96,27 +98,27 @@ class AuthManager
 		return ['status' => true];
 	}
 
-	public function login($id, $password, $expiration = 3600, $mode = 'nick'): array {
-		// 使用参数化查询验证用户名和密码
+	public function login(string|int $id, string $password, int $expiration = 3600, string $mode = 'nick'): array {
+		// 查询验证用户名和密码
 		if ($mode == 'nick') {
 			$user = $this->db->query("SELECT `id`, `pass` FROM `user` WHERE `nick` = :nick LIMIT 1", ['nick' => $id]);
 		} elseif ($mode == 'id') {
 			$user = $this->db->query("SELECT `id`, `pass` FROM `user` WHERE `id` = ? LIMIT 1", [$id]);
+		} else {
+			return ['status' => false, 'message' => 'Invalid mode'];
 		}
+
 		// 比较密码
 		if ($user && password_verify($password, $user['pass'])) {
-			// 登录成功
-
-			// 记录登录日志
-			$logQuery = "INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) VALUES (:id_user, :date, :expire_date, :last_online, :ua, :ip, '1')";
-			// 设置默认值：如果没有指定 `last_online`，就用 `date`
-			$log_id = $this->db->insert($logQuery, [
+			// 登录成功 记录登录日志
+			$log_id = $this->db->insert('INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) VALUES (:id_user, :date, :expire_date, :last_online, :ua, :ip, :method)', [
 				'id_user' => $user['id'],
 				'date' => date('Y-m-d H:i:s'),						// 当前时间
 				'expire_date' => date('Y-m-d H:i:s', $expiration),	// 转换过期时间戳为 MySQL 时间格式
-				'last_online' => date('Y-m-d H:i:s'),				// 如果没有指定 last_online，就设置为 date 字段的当前时间
-				'ua' => $this->clientDetails['ua'],						// 从客户端获取 User-Agent
-				'ip' => $this->clientDetails['ip']						// 从客户端获取 IP 地址
+				'last_online' => date('Y-m-d H:i:s'),				// 最后在线时间
+				'ua' => $this->ua,						// 从客户端获取 User-Agent
+				'ip' => $this->ip,						// 从客户端获取 IP 地址
+				'method' => '1'
 			]);
 
 			$payload = array(
@@ -124,7 +126,7 @@ class AuthManager
 				"exp" => $expiration,
 				"jwt_id" => $log_id,
 				"user_id" => $user['id'],
-				"username" => $nick
+				"username" => $user['nick']
 			);
 
 			// 生成 Token
@@ -147,7 +149,7 @@ class AuthManager
 		}
 	}
 
-	public function logout($login_id) {
+	public function logout(int $login_id) {
 		return $this->db->update('UPDATE `user_log` SET `ban` = ? WHERE `id` = ?;', ['1', $login_id]);
 	}
 
@@ -157,10 +159,6 @@ class AuthManager
 
 	private function isCookieTokenValid(): bool {
 		return isset($_COOKIE['auth_token']);
-	}
-
-	private function isBearerTokenValid(): bool {
-		return !empty($_SERVER['HTTP_AUTHORIZATION']) && strpos($_SERVER['HTTP_AUTHORIZATION'], 'Bearer ') === 0;
 	}
 
 	private function processSessionLogin(): array {
@@ -185,7 +183,7 @@ class AuthManager
 		return ['status' => false, 'message' => 'Cookie error: ' . $userInfo['message']];
 	}
 
-	private function processBearerTokenLogin($authHeader): array {
+	private function processBearerTokenLogin(string $authHeader): array {
 		if ($authHeader && preg_match('/Bearer\s+(.+)/', $authHeader, $matches)) {
 			$jwt = $matches[1];
 			$userInfo = $this->jwtGetUserInfo($jwt);
