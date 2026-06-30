@@ -24,17 +24,17 @@ class Router
 	private $routes = [];
 
 	// 注册 GET 路由
-	public function get($path, $handler) {
+	public function get(string $path, string $handler) {
 		$this->routes['GET'][$path] = $handler;
 	}
 
 	// 注册 POST 路由
-	public function post($path, $handler) {
+	public function post(string $path, string $handler) {
 		$this->routes['POST'][$path] = $handler;
 	}
 
 	// 开始匹配并执行
-	public function dispatch($currentMethod, $currentUri) {
+	public function dispatch(string $currentMethod, string $currentUri) {
 		// 检查这个请求方法和路径是否已注册
 		if (isset($this->routes[$currentMethod][$currentUri])) {
 			$handler = $this->routes[$currentMethod][$currentUri]; // 拿到 "TopicController@show"
