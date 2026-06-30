@@ -17,7 +17,7 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
-namespace GuGuan123\dcms;
+namespace GuGuan123\dcms\Core;
 
 /**
  * Database 类用于简化与数据库的交互。
@@ -50,8 +50,11 @@ namespace GuGuan123\dcms;
  * echo $deleted ? 'Delete successful' : 'Delete failed';
  */
 class Database {
-	/** @var \PDO PDO实例 */
-	private $pdo;
+    /** @var \PDO PDO实例 */
+    private $pdo;
+
+	/** @var self|null 用来保存全局唯一实例的内部变量 */
+	private static $instance = null;
 
 	/**
 	 * 构造函数
@@ -67,18 +70,25 @@ class Database {
 	 *                      - timezone: 时区设置（可选）
 	 * @throws \Exception 如果数据库连接失败，抛出异常
 	 */
-	public function __construct(array $config) {
-		try {
-			$dsn = sprintf("%s:host=%s;dbname=%s", $config['driver'] ?? 'mysql', $config['host'], $config['dbname']);
-			$this->pdo = new \PDO($dsn, $config['username'], $config['password']);
-			$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-			if (isset($config['timezone'])) {
-				$this->pdo->exec("SET time_zone = '" . $config['timezone'] . "';");
-			}
-		} catch (\PDOException $e) {
-			throw new \Exception("Database connection failed: " . $e->getMessage());
+    public function __construct(array $config) {
+        try {
+            $dsn = sprintf("%s:host=%s;dbname=%s", $config['driver'] ?? 'mysql', $config['host'], $config['dbname']);
+            $this->pdo = new \PDO($dsn, $config['username'], $config['password']);
+            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+            if (isset($config['timezone'])) {
+                $this->pdo->exec("SET time_zone = '" . $config['timezone'] . "';");
+            }
+        } catch (\PDOException $e) {
+            throw new \Exception("Database connection failed: " . $e->getMessage());
+        }
+	}
+
+	public static function getInstance(array $config = []): self {
+		if (self::$instance === null) {
+			self::$instance = new self($config);
 		}
+		return self::$instance;
 	}
 
 	/**
@@ -89,15 +99,15 @@ class Database {
 	 * @return \PDOStatement 返回PDOStatement对象
 	 * @throws \Exception 如果执行失败，抛出异常
 	 */
-	public function executeStatement($sql, $params = []) {
-		try {
-			$stmt = $this->pdo->prepare($sql);
-			$stmt->execute($params);
-			return $stmt;
-		} catch (\PDOException $e) {
-			throw new \Exception("Statement execution failed: " . $e->getMessage());
-		}
-	}
+    public function executeStatement($sql, $params = []) {
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (\PDOException $e) {
+            throw new \Exception("Statement execution failed: " . $e->getMessage());
+        }
+    }
 
 	/**
 	 * 执行查询并返回单条记录
@@ -107,10 +117,10 @@ class Database {
 	 * @param int $fetchMode 获取模式，默认PDO::FETCH_ASSOC
 	 * @return array|null 返回查询结果数组，如果没有结果返回null
 	 */
-	public function query($sql, $params = [], $fetchMode = \PDO::FETCH_ASSOC) {
-		$result = $this->executeStatement($sql, $params)->fetch($fetchMode);
-		return $result === false ? null : $result;
-	}
+    public function query($sql, $params = [], $fetchMode = \PDO::FETCH_ASSOC) {
+        $result = $this->executeStatement($sql, $params)->fetch($fetchMode);
+        return $result === false ? null : $result;
+    }
 
 	/**
 	 * 执行查询并返回所有记录
@@ -120,9 +130,9 @@ class Database {
 	 * @param int $fetchMode 获取模式，默认PDO::FETCH_ASSOC
 	 * @return array 返回查询结果数组
 	 */
-	public function queryAll($sql, $params = [], $fetchMode = \PDO::FETCH_ASSOC) {
-		return $this->executeStatement($sql, $params)->fetchAll($fetchMode);
-	}
+    public function queryAll($sql, $params = [], $fetchMode = \PDO::FETCH_ASSOC) {
+        return $this->executeStatement($sql, $params)->fetchAll($fetchMode);
+    }
 
 	/**
 	 * 执行查询并返回单条记录
@@ -132,10 +142,10 @@ class Database {
 	 * @param int $column_number 获取模式，默认PDO::FETCH_ASSOC
 	 * @return array|null 返回查询结果数组，如果没有结果返回null
 	 */
-	public function queryColumn($sql, $params = [], $column_number = 0) {
-		$result = $this->executeStatement($sql, $params)->fetchColumn($column_number);
-		return $result === false ? null : $result;
-	}
+    public function queryColumn($sql, $params = [], $column_number = 0) {
+        $result = $this->executeStatement($sql, $params)->fetchColumn($column_number);
+        return $result === false ? null : $result;
+    }
 
 	/**
 	 * 执行插入操作并返回最后插入的ID
@@ -144,10 +154,10 @@ class Database {
 	 * @param array $params 绑定参数数组
 	 * @return string 返回最后插入的ID
 	 */
-	public function insert($sql, $params = []) {
-		$this->executeStatement($sql, $params);
-		return $this->pdo->lastInsertId();
-	}
+    public function insert($sql, $params = []) {
+        $this->executeStatement($sql, $params);
+        return $this->pdo->lastInsertId();
+    }
 
 	/**
 	 * 执行更新操作
@@ -156,9 +166,9 @@ class Database {
 	 * @param array $params 绑定参数数组
 	 * @return bool 如果更新成功返回true，否则返回false
 	 */
-	public function update($sql, $params = []) {
-		return $this->executeStatement($sql, $params)->rowCount() > 0;
-	}
+    public function update($sql, $params = []) {
+        return $this->executeStatement($sql, $params)->rowCount() > 0;
+    }
 
 	/**
 	 * 执行删除操作
@@ -167,43 +177,43 @@ class Database {
 	 * @param array $params 绑定参数数组
 	 * @return bool 如果删除成功返回true，否则返回false
 	 */
-	public function delete($sql, $params = []) {
-		return $this->executeStatement($sql, $params)->rowCount() > 0;
-	}
+    public function delete($sql, $params = []) {
+        return $this->executeStatement($sql, $params)->rowCount() > 0;
+    }
 
 	/**
 	 * 开启事务
 	 * 
 	 * @return bool 如果事务开启成功返回true，否则返回false
 	 */
-	public function beginTransaction() {
-		return $this->pdo->beginTransaction();
-	}
+    public function beginTransaction() {
+        return $this->pdo->beginTransaction();
+    }
 
 	/**
 	 * 提交事务
 	 * 
 	 * @return bool 如果事务提交成功返回true，否则返回false
 	 */
-	public function commit() {
-		return $this->pdo->commit();
-	}
+    public function commit() {
+        return $this->pdo->commit();
+    }
 
 	/**
 	 * 回滚事务
 	 * 
 	 * @return bool 如果事务回滚成功返回true，否则返回false
 	 */
-	public function rollBack() {
-		return $this->pdo->rollBack();
-	}
+    public function rollBack() {
+        return $this->pdo->rollBack();
+    }
 
 	/**
 	 * 获取最后插入的ID
 	 * 
 	 * @return string 返回最后插入的ID
 	 */
-	public function lastInsertId() {
-		return $this->pdo->lastInsertId();
-	}
+    public function lastInsertId() {
+        return $this->pdo->lastInsertId();
+    }
 }

@@ -164,7 +164,7 @@ function msg($msg) {
 
 // 保存系统设置
 function save_settings($set) {
-	$settingsService = \GuGuan123\dcms\Services\Settings::getInstance();
+	$settingsService = \GuGuan123\dcms\Core\Settings::getInstance();
 
 	// 更新服务中的设置
 	foreach ($set as $key => $value) {

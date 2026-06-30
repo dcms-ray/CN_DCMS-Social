@@ -24,27 +24,35 @@ namespace GuGuan123\dcms\Core;
  */
 class ClientDetails
 {
-	protected $set;
-	protected $db;
+	protected \GuGuan123\dcms\Core\Settings $set;
+	protected \GuGuan123\dcms\Core\Database $db;
 
-	public function __construct($set = null, $db = null) {
-		$this->set = $set;
-		$this->db = $db;
+	/** @var array|null CDN IP 范围缓存 */
+	protected ?array $cdnIpRanges = null;
+
+	public function __construct() {
+		$this->set = \GuGuan123\dcms\Core\Settings::getInstance();
+		$this->db = \GuGuan123\dcms\Core\Database::getInstance();
 	}
 
 	/**
-	 * 获取客户端 IP 和 User-Agent
-	 * @return array
+	 * 获取客户端 IP 地址
+	 * @return string
 	 */
-	public function getClientDetails() {
-		// 从数据库获取 CDN IP 范围
-		$ip = $this->getClientIp();
-		$ua = $this->getUserAgent();
+	public function getClientIp(): string {
+		if ($this->cdnIpRanges === null) {
+			$rawRanges = $this->db->queryAll("SELECT `ip_range` FROM `cdn_ips`") ?: [];
+			$this->cdnIpRanges = array_map(fn($item) => \IPLib\Factory::parseRangeString($item['ip_range']), $rawRanges);
+		}
 
-		return [
-			'ip' => $ip,
-			'ua' => $ua
-		];
+		return match ($this->set->get('get_ip_from_header') ?? 'disabled') {
+			'Forwarded'        => $this->getForwardedIp($this->cdnIpRanges),
+			'X-Forwarded-For'  => $this->getXForwardedForIp($this->cdnIpRanges),
+			'X-Real-IP'        => $this->getXRealIp($this->cdnIpRanges),
+			'CF-Connecting-IP' => $this->getCfConnectingIp($this->cdnIpRanges),
+			'True-Client-IP'   => $this->getTrueClientIp($this->cdnIpRanges),
+			default => $_SERVER['REMOTE_ADDR'],
+		};
 	}
 
 	/**
@@ -53,10 +61,12 @@ class ClientDetails
 	 * @param array $ranges
 	 * @return bool
 	 */
-	protected function isIpInRange($ip, $ranges) {
+	protected function isIpInRange(string $ip, array $ranges): bool {
 		$ipAddress = \IPLib\Factory::addressFromString($ip);
+		// IP 格式不对直接返回 false
+		if (!$ipAddress) return false;
 		foreach ($ranges as $range) {
-			if ($range->contains($ipAddress)) {
+			if ($range && $range->contains($ipAddress)) {
 				return true;
 			}
 		}
@@ -64,28 +74,11 @@ class ClientDetails
 	}
 
 	/**
-	 * 获取客户端 IP 地址
-	 * @return string
-	 */
-	public function getClientIp() {
-		// 从数据库获取 CDN IP 范围
-		$cdnIpRanges = array_map(fn($item) => \IPLib\Factory::parseRangeString($item['ip_range']), ($this->db ? $this->db->queryAll("SELECT `ip_range` FROM `cdn_ips`") : []) ?: []);
-		return match ($this->set['get_ip_from_header'] ?? 'disabled') {
-			'Forwarded'        => $this->getForwardedIp($cdnIpRanges),
-			'X-Forwarded-For'  => $this->getXForwardedForIp($cdnIpRanges),
-			'X-Real-IP'        => $this->getXRealIp($cdnIpRanges),
-			'CF-Connecting-IP' => $this->getCfConnectingIp($cdnIpRanges),
-			'True-Client-IP'   => $this->getTrueClientIp($cdnIpRanges),
-			default => $_SERVER['REMOTE_ADDR'],
-		};
-	}
-
-	/**
 	 * 处理 'Forwarded' 头部的 IP
 	 * @param array $cdnIpRanges
 	 * @return string
 	 */
-	protected function getForwardedIp($cdnIpRanges) {
+	protected function getForwardedIp(array $cdnIpRanges): string {
 		if (!empty($_SERVER['HTTP_FORWARDED']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
 			foreach (array_map('trim', explode(',', $_SERVER['HTTP_FORWARDED'])) as $part) {
 				if (stripos($part, 'for=') !== false) {
@@ -101,7 +94,7 @@ class ClientDetails
 	 * @param array $cdnIpRanges
 	 * @return string
 	 */
-	protected function getXForwardedForIp($cdnIpRanges) {
+	protected function getXForwardedForIp(array $cdnIpRanges): string {
 		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)) {
 			foreach (array_map('trim', explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])) as $ip) {
 				if ($this->isIpInRange($ip, $cdnIpRanges)) {
@@ -118,7 +111,7 @@ class ClientDetails
 	 * @param array $cdnIpRanges
 	 * @return string
 	 */
-	protected function getXRealIp($cdnIpRanges) {
+	protected function getXRealIp(array $cdnIpRanges): string {
 		return !empty($_SERVER['HTTP_X_REAL_IP']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)
 			? $_SERVER['HTTP_X_REAL_IP'] 
 			: $_SERVER['REMOTE_ADDR'];
@@ -129,7 +122,7 @@ class ClientDetails
 	 * @param array $cdnIpRanges
 	 * @return string
 	 */
-	protected function getCfConnectingIp($cdnIpRanges) {
+	protected function getCfConnectingIp(array $cdnIpRanges): string {
 		return !empty($_SERVER['HTTP_CF_CONNECTING_IP']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)
 			? $_SERVER['HTTP_CF_CONNECTING_IP'] 
 			: $_SERVER['REMOTE_ADDR'];
@@ -140,7 +133,7 @@ class ClientDetails
 	 * @param array $cdnIpRanges
 	 * @return string
 	 */
-	protected function getTrueClientIp($cdnIpRanges) {
+	protected function getTrueClientIp(array $cdnIpRanges): string {
 		return !empty($_SERVER['HTTP_TRUE_CLIENT_IP']) && $this->isIpInRange($_SERVER['REMOTE_ADDR'], $cdnIpRanges)
 			? $_SERVER['HTTP_TRUE_CLIENT_IP'] 
 			: $_SERVER['REMOTE_ADDR'];
@@ -150,7 +143,7 @@ class ClientDetails
 	 * 获取 User-Agent
 	 * @return string
 	 */
-	public function getUserAgent() {
+	public function getUserAgent(): string {
 		$ua = 'N/A';
 		if (isset($_SERVER['HTTP_USER_AGENT'])) {
 			$ua = $_SERVER['HTTP_USER_AGENT'];

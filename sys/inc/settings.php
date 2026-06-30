@@ -22,7 +22,7 @@
  */
 function getSet() {
 	global $current_page;
-	$settingsService = \GuGuan123\dcms\Services\Settings::getInstance();
+	$settingsService = \GuGuan123\dcms\Core\Settings::getInstance();
 
 	// 检查是否已安装
 	if (!$settingsService->isInstalled()) {
@@ -40,7 +40,7 @@ function getSet() {
 }
 
 // 初始化设置
-$settingsService = \GuGuan123\dcms\Services\Settings::getInstance();
+$settingsService = \GuGuan123\dcms\Core\Settings::getInstance();
 $set = getSet();
 
 // 错误显示处理

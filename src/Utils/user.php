@@ -17,14 +17,10 @@ class user
 	// 所有用户字段
 	public static function user_db($user = 0) {
 		static $nicks = [];
+		$db = \GuGuan123\dcms\Core\Database::getInstance();
 		if (empty($nicks[$user])) {
-			$ank = dbassoc(dbquery('SELECT `nick`, `date_last`, `rating`, `browser` FROM `user` WHERE `id` = "' . $user . '" LIMIT 1 '));
-			$ank['date_last'] = dbresult(dbquery("SELECT ul.last_online
-			                         FROM `user_log` ul
-			                         WHERE ul.id_user = $user
-			                            AND ul.ban = '0'
-			                         ORDER BY ul.last_online DESC
-			                         LIMIT 1"), 0);
+			$ank = $db->query('SELECT `nick`, `date_last`, `rating`, `browser` FROM `user` WHERE `id` = ? LIMIT 1 ', [$user]);
+			$ank['date_last'] = $db->query('SELECT ul.last_online FROM `user_log` ul WHERE ul.id_user = ? AND ul.ban = ? ORDER BY ul.last_online DESC LIMIT 1', [$user, 0]);
 			$nicks[$user] = $ank;
 		} else {
 			$ank = $nicks[$user];
@@ -34,15 +30,13 @@ class user
 	/**
 	 * 返回用户昵称展示的HTML
 	 *
-	 * @param \GuGuan123\dcms\Database $db
-	 * @param array $set   网站设置
 	 * @param int   $user  用户ID
 	 * @param bool  $url   设置昵称为链接到用户页
 	 * @param bool  $on    显示 Nick 旁边的在线图标和用户组图标
 	 * @param bool  $medal 在线输出图标旁边的奖牌
 	 * @return string HTML结构
 	 */
-	public static function nick(\GuGuan123\dcms\Database $db, array $set, int $user = 0, $url = true, $on = false, $medal = false): string {
+	public static function nick(int $user = 0, $url = true, $on = false, $medal = false): string {
 		/*
 		* $url == 0		只输出昵称
 		* $url == 1		输出昵称并链接到用户页的
@@ -50,6 +44,8 @@ class user
 		* $medal == 1	在线输出图标旁边的奖牌
 		*/
 		static $nicks = [];
+		$set = \GuGuan123\dcms\Core\Settings::getInstance();
+		$db = \GuGuan123\dcms\Core\Database::getInstance();
 		if (empty($nicks[$user])) {
 			$ank = $db->query('SELECT `id`, `group_access`, `pol`, `nick`, `rating` FROM `user` WHERE `id` = ? LIMIT 1', [$user]);
 			if (isset($ank['id'])) {
@@ -75,7 +71,7 @@ class user
 		}
 
 		if ($url == true) {
-			$nick = ' <a href="' . $set['siteurl'] . '/user/info.php?id=' . $user . '">' . text($ank['nick']) . '</a> ';
+			$nick = ' <a href="' . $set->get('siteurl') . '/user/info.php?id=' . $user . '">' . text($ank['nick']) . '</a> ';
 		} else {
 			$nick = text($ank['nick']);
 		}
@@ -84,25 +80,25 @@ class user
 		if ($on == true) {
 			$is_ban = $db->queryColumn('SELECT COUNT(*) FROM `ban` WHERE `id_user` = ? AND (`time` > ? OR `navsegda` = ?)', [$user, time(), '1']);
 			if ($is_ban != 0) {
-				$icon = ' <img src="' . $set['siteurl'] . '/style/user/ban.png" alt="*" class="icon" id="icon_group" /> ';
+				$icon = ' <img src="' . $set->get('siteurl') . '/style/user/ban.png" alt="*" class="icon" id="icon_group" /> ';
 			} else {
 				if (isset($ank['group_access']) && ($ank['group_access'] > 7 && ($ank['group_access'] < 10 || $ank['group_access'] > 14))) {
 					if ($ank['pol'] == 1) {
-						$icon = '<img src="' . $set['siteurl'] . '/style/user/1.png" alt="*" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set->get('siteurl') . '/style/user/1.png" alt="*" class="icon" id="icon_group" /> ';
 					} else {
-						$icon = '<img src="' . $set['siteurl'] . '/style/user/2.png" alt="" class="icon" id="icon_group"/> ';
+						$icon = '<img src="' . $set->get('siteurl') . '/style/user/2.png" alt="" class="icon" id="icon_group"/> ';
 					}
 				} elseif (isset($ank['group_access']) && (($ank['group_access'] > 1 && $ank['group_access'] <= 7) || ($ank['group_access'] > 10 && $ank['group_access'] <= 14))) {
 					if ($ank['pol'] == 1) {
-						$icon = '<img src="' . $set['siteurl'] . '/style/user/3.png" alt="*" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set->get('siteurl') . '/style/user/3.png" alt="*" class="icon" id="icon_group" /> ';
 					} else {
-						$icon = '<img src="' . $set['siteurl'] . '/style/user/4.png" alt="*" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set->get('siteurl') . '/style/user/4.png" alt="*" class="icon" id="icon_group" /> ';
 					}
 				} else {
 					if (isset($ank['pol']) && $ank['pol'] == 1) {
-						$icon = '<img src="' . $set['siteurl'] . '/style/user/5.png" alt="" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set->get('siteurl') . '/style/user/5.png" alt="" class="icon" id="icon_group" /> ';
 					} else {
-						$icon = '<img src="' . $set['siteurl'] . '/style/user/6.png" alt="" class="icon" id="icon_group" /> ';
+						$icon = '<img src="' . $set->get('siteurl') . '/style/user/6.png" alt="" class="icon" id="icon_group" /> ';
 					}
 				}
 			}
@@ -111,9 +107,9 @@ class user
 		// 在线图标输出
 		if ($user != 0 && !empty($ank['date_last']) && $ank['date_last'] > time() - 600 && $on == true) {
 			if ($ank['browser'] == 'wap') {
-				$online = ' <img src="' . $set['siteurl'] . '/style/icons/online.gif" alt="WAP" /> ';
+				$online = ' <img src="' . $set->get('siteurl') . '/style/icons/online.gif" alt="WAP" /> ';
 			} else {
-				$online = ' <img src="' . $set['siteurl'] . '/style/icons/online_web.gif" alt="WEB" /> ';
+				$online = ' <img src="' . $set->get('siteurl') . '/style/icons/online_web.gif" alt="WEB" /> ';
 			}
 		}
 
@@ -137,7 +133,7 @@ class user
 			} else {
 				$img = 0;
 			}
-			$icon_medal = ' <img src="' . $set['siteurl'] . '/style/medal/' . $img . '.png" alt="*" /> ';
+			$icon_medal = ' <img src="' . $set->get('siteurl') . '/style/medal/' . $img . '.png" alt="*" /> ';
 		}
 		return $icon . $nick . $icon_medal . $online;
 	}

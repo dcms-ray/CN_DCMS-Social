@@ -9,7 +9,7 @@ function decrypt_captcha_token($captcha_token) {
 	}
 
 	// 使用 openssl 解密
-	$decrypted_captcha_token = openssl_decrypt(base64_decode(strtr($token_parts[0], '-_', '+/')), 'aes-256-cbc', \GuGuan123\dcms\Services\Settings::getInstance()->getAll()['shif'], 0, base64_decode(strtr($token_parts[1], '-_', '+/')));
+	$decrypted_captcha_token = openssl_decrypt(base64_decode(strtr($token_parts[0], '-_', '+/')), 'aes-256-cbc', \GuGuan123\dcms\Core\Settings::getInstance()->getAll()['shif'], 0, base64_decode(strtr($token_parts[1], '-_', '+/')));
 	if ($decrypted_captcha_token == false) {
 		throw new Exception('captcha_token 解密失败');
 	}

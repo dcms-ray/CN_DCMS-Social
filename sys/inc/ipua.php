@@ -16,5 +16,5 @@
  * 你可以在 https://choosealicense.com/licenses/mit/ 查看详细的 MIT 原始许可证条款。
  */
 
-$ua = (new GuGuan123\dcms\Core\ClientDetails($set ?? null, $db ?? null))->getUserAgent();
-$ip = (new GuGuan123\dcms\Core\ClientDetails($set ?? null, $db ?? null))->getClientIp();
+$ua = (new GuGuan123\dcms\Core\ClientDetails())->getUserAgent();
+$ip = (new GuGuan123\dcms\Core\ClientDetails())->getClientIp();

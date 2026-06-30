@@ -1,14 +1,4 @@
 <?php
-$err = NULL;	// 报错信息
-$mydb = NULL;	// MySQLi 使用的
-$passgen = NULL;// 随机字符串
-$sess = NULL;	// 当前会话 ID
-$ip = NULL;		// 用户 IP
-$ua = NULL;		// 用户浏览器 UA
-$webbrowser = NULL;	// 用户浏览器类型
-$tpanel = NULL;
-
-
 // DCMS 核心科技😎😎😋，屏蔽报错就没有错误啦
 // if (function_exists('error_reporting')) error_reporting(0); // 禁用错误显示
 
@@ -23,41 +13,71 @@ if (function_exists('ini_set')) {
 
 }
 
-// 强制削减全局变量（已不再需要）
-if (ini_get('register_globals')) {
-	$allowed = array('_ENV' => 1, '_GET' => 1, '_POST' => 1, '_COOKIE' => 1, '_FILES' => 1, '_SERVER' => 1, '_REQUEST' => 1, 'GLOBALS' => 1);
-	foreach ($GLOBALS as $key => $value) {
-		if (!isset($allowed[$key])) {
-			unset($GLOBALS[$key]);
-		}
-	}
-}
-
 list($msec, $sec) = explode(chr(32), microtime()); // 脚本启动时间
 $conf['headtime'] = $sec + $msec;
-$time = time();	// 当前时间戳
-$dateTime = date("Y-m-d H:i:s");
-
-
-$phpvervion = explode('.', phpversion());
-$conf['phpversion'] = $phpvervion[0];
-
-
-$upload_max_filesize = ini_get('upload_max_filesize');
-if (preg_match('#([0-9]*)([a-z]*)#i', $upload_max_filesize, $varrs)) {
-	if ($varrs[2] == 'M') {
-		$upload_max_filesize = $varrs[1] * 1048576;
-	} elseif ($varrs[2] == 'K') {
-		$upload_max_filesize = $varrs[1] * 1024;
-	} elseif ($varrs[2] == 'G') {
-		$upload_max_filesize = $varrs[1] * 1024 * 1048576;
-	}
-}
 
 // ========================================================
 
 // 引入第三方库
 require_once __DIR__ . '/vendor/autoload.php';
+
+// ========================================================
+
+// 初始化设置
+$settings = \GuGuan123\dcms\Core\Settings::getInstance();
+
+// 检查是否已安装
+if (!$settings->isInstalled()) {
+	if (file_exists(H . 'install/index.php') && isset($current_page) && $current_page == 'index') {
+		header('Location: install/');
+		exit;
+	} else {
+		http_response_code(500);
+		echo 'sys/dat/settings.php 消失了' . PHP_EOL;
+		exit;
+	}
+}
+
+$set = $settings->getAll();
+
+// 错误显示处理
+if ($settings->get('show_err_php')) {
+	error_reporting(E_ALL);
+	ini_set('display_errors', true);
+}
+
+// 临时设置
+$set['web'] = false;
+
+// 解析 User-Agent 检查设备类型是否为 PC
+if (!empty($_SERVER["HTTP_USER_AGENT"]) && !(new \Detection\MobileDetect())->isMobile()) {
+	$webbrowser = true;
+} else {
+	$webbrowser = false;
+}
+
+// ========================================================
+
+try {
+	\GuGuan123\dcms\Core\Database::getInstance([
+		'driver'   => $settings->get('db_driver', 'mysql'),
+		'host'     => $settings->get('db_host', 'localhost'),
+		'dbname'   => $settings->get('db_name'),
+		'username' => $settings->get('db_user'),
+		'password' => $settings->get('db_pass'),
+	]);
+} catch (Exception $e) {
+	// 连接失败时，输出错误信息并终止脚本执行
+	http_response_code(506);
+	die("Error: " . $e->getMessage());
+}
+
+// ========================================================
+
+$ua = (new GuGuan123\dcms\Core\ClientDetails())->getUserAgent();
+$ip = (new GuGuan123\dcms\Core\ClientDetails())->getClientIp();
+
+// ========================================================
 
 // 载入路由配置文件
 $router = new \GuGuan123\dcms\Core\Router();

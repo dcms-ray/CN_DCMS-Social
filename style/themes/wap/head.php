@@ -9,8 +9,8 @@ echo '<?xml version="1.0" encoding="utf-8"?>';
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-cn">
 <head>
 	<title><?php echo $set['title']; ?></title>
-	<link rel="shortcut icon" href="/style/themes/<?php echo $set['set_them']; ?>/favicon.ico" />
-	<link rel="stylesheet" href="/style/themes/<?php echo $set['set_them']; ?>/style.css" type="text/css" />
+	<link rel="shortcut icon" href="/assets/themes/<?php echo $set['set_them']; ?>/favicon.ico" />
+	<link rel="stylesheet" href="/assets/themes/<?php echo $set['set_them']; ?>/style.css" type="text/css" />
 </head>
 <body>
 	<div class="body">
@@ -21,7 +21,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>';
 	}
 	if ($_SERVER['PHP_SELF'] == '/index.php'): ?>
 		<div class="logo">
-			<img src="/style/themes/<?php echo $set['set_them']; ?>/logo.png" alt="logo" /><br />
+			<img src="/assets/themes/wap/logo.png" alt="logo" /><br />
 			<?php echo $set['title']; ?>
 		</div>
 	<?php endif;
