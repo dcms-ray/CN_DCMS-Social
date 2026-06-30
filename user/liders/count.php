@@ -1,6 +1,6 @@
 <?php
-$k_p = dbresult(dbquery("SELECT COUNT(*) FROM `liders` WHERE `time` > '$time'"), 0);
-$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `liders` WHERE `time` > '$time' AND `time_p` > '" . mktime(0, 0, 0) . "'"), 0);
+$k_p = $db->queryColumn('SELECT COUNT(*) FROM `liders` WHERE `time` > ?', [time()]);
+$k_n = $db->queryColumn('SELECT COUNT(*) FROM `liders` WHERE `time` > ? AND `time_p` > ?', [time(), mktime(0, 0, 0)]);
 if ($k_n == 0) {
 	$k_n = NULL;
 } else {
