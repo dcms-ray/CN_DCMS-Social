@@ -13,7 +13,7 @@ class Home
 			msg("该消息已成功隐藏");
 		}
 
-		if (isset($set['index_use_them']) && $set->get('index_use_them') == true) {
+		if ($set->get('index_use_them') == true) {
 			// 获取在线用户数量
 			$ol_user = $db->queryColumn('SELECT COUNT(DISTINCT ul.id_user) AS online_users FROM `user_log` ul WHERE ul.last_online > NOW() - INTERVAL 10 MINUTE AND ul.ban = 0 AND ul.last_online = (SELECT MAX(last_online) FROM `user_log` ul2 WHERE ul2.id_user = ul.id_user AND ul2.last_online > NOW() - INTERVAL 10 MINUTE AND ul2.ban = 0)');
 			// 在线游客数量
