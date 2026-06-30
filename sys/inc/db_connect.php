@@ -18,7 +18,7 @@
 
 // 初始化全局变量
 try {
-	$db = new GuGuan123\dcms\Database([
+	\GuGuan123\dcms\Core\Database::getInstance([
 		'driver' => 'mysql',
 		'host' => $set['sql_host'],
 		'dbname' => $set['sql_db_name'],
@@ -26,6 +26,7 @@ try {
 		'password' => $set['sql_pass'],
 		'timezone' => date('P')
 	]);
+	$db = \GuGuan123\dcms\Core\Database::getInstance();
 } catch (Exception $e) {
 	// 连接失败时，输出错误信息并终止脚本执行
 	http_response_code(506);
