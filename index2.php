@@ -57,7 +57,7 @@ if (preg_match('#([0-9]*)([a-z]*)#i', $upload_max_filesize, $varrs)) {
 // ========================================================
 
 // 引入第三方库
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 // 载入路由配置文件
 $router = new \GuGuan123\dcms\Core\Router();
