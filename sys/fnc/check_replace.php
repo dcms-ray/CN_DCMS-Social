@@ -11,7 +11,7 @@ function check_replace($source2) {
 	if (!file_exists($source)) $source = $source2;
 	// 将路径中的目录分隔符统一替换为正斜杠
 	$source = str_ireplace(DIRECTORY_SEPARATOR, "/", (string)$source);
-	$h = str_ireplace(DIRECTORY_SEPARATOR, "/", H);
+	$h = str_ireplace(DIRECTORY_SEPARATOR, "/", dirname(dirname(__DIR__)) . "/");
 	$replace = str_ireplace(DIRECTORY_SEPARATOR, "/", REPLACE);
 	// 计算替换路径
 	$replace_file = str_ireplace($h, $replace, (string)$source);
