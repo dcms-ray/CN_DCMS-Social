@@ -169,11 +169,11 @@ class user
 	/**
 	 * 获取用户信息
 	 * 
-	 * @param \GuGuan123\dcms\Database $db
 	 * @param  int   $ID 用户ID
 	 * @return array 用户信息
 	 */
-	static function get_info(\GuGuan123\dcms\Database $db, int $ID = 0) {
+	static function get_info(int $ID = 0) {
+		$db = \GuGuan123\dcms\Core\Database::getInstance();
 		if ($ID == 0) {
 			// 机器人
 			$ank['id'] = 0;

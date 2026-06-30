@@ -14,7 +14,7 @@ function user_access($access, $u_id = null, $exit = false) {
 		global $user;
 	} else {
 		// 否则通过传递的 ID 获取用户数据
-		$user = user::get_user($u_id);
+		$user = \GuGuan123\dcms\Utils\user::get_info($u_id);
 	}
 
 	// 初始化用户权限的默认值
@@ -32,17 +32,18 @@ function user_access($access, $u_id = null, $exit = false) {
 		}
 	}
 
+	$db = \GuGuan123\dcms\Core\Database::getInstance();
 	// 如果需要验证访问权限，并且指定了退出地址
 	if ($exit !== false) {
 		// 查询数据库，检查用户的组是否具有相应的访问权限
 		// 注意：这里原本有对比 `group_access` 和 `group_access2` 的权限，但被注释掉了
-		if (dbresult(dbquery("SELECT COUNT(*) FROM `user_group_access` WHERE `id_group` = '$user[group_access]' AND `id_access` = '" . my_esc($access) . "'"), 0) == 0) {
+		if ($db->queryColumn("SELECT COUNT(*) FROM `user_group_access` WHERE `id_group` = ? AND `id_access` = ?", [$user['group_access'], my_esc($access)]) == 0) {
 			// 如果没有权限，则跳转到退出页面
 			header("Location: $exit");
 			exit;
 		}
 	} else {
 		// 如果没有指定退出地址，则直接返回权限检查结果
-		return (dbresult(dbquery("SELECT COUNT(*) FROM `user_group_access` WHERE (`id_group` = '$user[group_access]' or `id_group` = '$user[group_access2]') and `id_access` = '" . my_esc($access) . "'"), 0) == 1 ? true : false);
+		return ($db->queryColumn("SELECT COUNT(*) FROM `user_group_access` WHERE (`id_group` = ? or `id_group` = ?) and `id_access` = ?", [$user['group_access'], $user['group_access2'], my_esc($access)]) == 1 ? true : false);
 	}
 }

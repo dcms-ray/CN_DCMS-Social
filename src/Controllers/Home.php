@@ -54,6 +54,7 @@ class Home
 			}
 
 			// 网站管理面板
+			include_once 'sys/fnc/user_access.php';
 			if (user_access('adm_panel_show')) {
 				echo '<div class="main2">';
 				echo '<img src="style/icons/adm.gif" alt="DS" /> <a href="plugins/admin/">网站管理</a> ';
