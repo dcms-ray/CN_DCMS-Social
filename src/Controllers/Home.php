@@ -27,6 +27,8 @@ class Home
 			include_once 'sys/fnc/user_access.php';
 			// 主菜单
 			include 'sys/inc/main_menu.php';
+			include_once 'sys/fnc/output_text.php';
+			include_once 'sys/fnc/vremja.php';
 			include 'sys/inc/main_notes.php';
 		} else {
 			// 主要网页主题

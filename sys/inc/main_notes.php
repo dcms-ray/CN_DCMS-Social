@@ -1,7 +1,7 @@
 <?php
 call_user_func(function() use (&$user) {
 	$db = \GuGuan123\dcms\Core\Database::getInstance();
-	echo '<div style="padding: 6px 10px;" class="foot"><a href="/forum/"><b>论坛</b></a></div>';
+	echo '<div style="padding: 6px 10px;" class="foot"><a href="forum/"><b>论坛</b></a></div>';
 
 	if (($db->queryColumn("SELECT COUNT(`id`) FROM `forum_t`") ?: 0) > 0) {
 		echo '<div class="mess">';
@@ -15,7 +15,7 @@ call_user_func(function() use (&$user) {
 			$num = ($num === 0) ? 1 : 0;
 			
 			echo '<div class="' . $nav_class . '">';
-			echo '<a href="/forum/' . $them['id_forum'] . '/' . $them['id_razdel'] . '/' . $them['id'] . '/"><b>' . \htmlspecialchars($them['name']) . '</b></a>';
+			echo '<a href="forum/' . $them['id_forum'] . '/' . $them['id_razdel'] . '/' . $them['id'] . '/"><b>' . htmlspecialchars($them['name']) . '</b></a>';
 			echo '作者' . \GuGuan123\dcms\Utils\user::nick($them['id_user'], 1, 0, 0);
 			echo '</div>';
 		}
@@ -27,7 +27,7 @@ call_user_func(function() use (&$user) {
 	$new_notes_count = $db->queryColumn("SELECT COUNT(`id`) FROM `notes` WHERE `time` > ?", [$cutoff_time]) ?: 0;
 	$total_notes_count = $db->queryColumn("SELECT COUNT(`id`) FROM `notes`") ?: 0;
 	$notes_badge = ($new_notes_count > 0) ? "{$total_notes_count} + {$new_notes_count}" : $total_notes_count;
-	echo '<div style="padding: 6px 10px;" class="foot"><a href="/plugins/notes/"><b>日记</b> (' . $notes_badge . ')</a></div>';
+	echo '<div style="padding: 6px 10px;" class="foot"><a href="plugins/notes/"><b>日记</b> (' . $notes_badge . ')</a></div>';
 
 	$notes = $db->queryAll("SELECT * FROM `notes` ORDER BY `time` DESC LIMIT 3") ?: [];
 	if (empty($notes)) {
@@ -54,10 +54,10 @@ call_user_func(function() use (&$user) {
 
 			echo "<div class='nav2'>";
 			echo \GuGuan123\dcms\Utils\user::nick($post['id_user'], 1, 1, 0);
-			echo ' : <a href="/plugins/notes/list.php?id=' . $post['id'] . '"><span style="color:#06f">';
+			echo ' : <a href="plugins/notes/list.php?id=' . $post['id'] . '"><span style="color:#06f">';
 
 			if ($allowViewNote) {
-				echo \text($post['name']);
+				echo stripcslashes(htmlspecialchars($post['name']));
 			} else {
 				echo '[不可见]';
 			}
@@ -70,7 +70,7 @@ call_user_func(function() use (&$user) {
 				}
 				// 获取当前日记评论数
 				$count_comm = $db->queryColumn("SELECT COUNT(`id`) FROM `notes_komm` WHERE `id_notes` = ?", [$post['id']]) ?: 0;
-				echo '<img src="/style/icons/comm_num_gray.png">' . $count_comm . '<span style="float:right;color:#666;"><small>';
+				echo '<img src="style/icons/comm_num_gray.png">' . $count_comm . '<span style="float:right;color:#666;"><small>';
 				echo \vremja($post['time']);
 			} elseif ($post['private'] == 1) {
 				echo '<font color="#999">[内容仅好友可见]</font><span style="float:right;color:#666;"><small>';
@@ -83,6 +83,6 @@ call_user_func(function() use (&$user) {
 
 	// 页脚快捷导航栏
 	echo '<div class="nav1">';
-	if (isset($user)) echo '<a href="/plugins/notes/add.php">写日记</a>';
-	echo '<span style="float:right;"><a href="/plugins/notes/">所有日记&rarr;</a></span><br /></div>';
+	if (isset($user)) echo '<a href="plugins/notes/add.php">写日记</a>';
+	echo '<span style="float:right;"><a href="plugins/notes/">所有日记&rarr;</a></span><br /></div>';
 });
