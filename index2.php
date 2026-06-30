@@ -65,5 +65,10 @@ $router = new \GuGuan123\dcms\Core\Router();
 // 路由表
 $router->get('/', 'Home@index');
 
+// 获取原始的 PATH 路径
+$uriPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// 除脚本文件名
+if (strpos($uriPath, $_SERVER['SCRIPT_NAME']) === 0) $uriPath = substr($uriPath, strlen($_SERVER['SCRIPT_NAME']));
+
 // 执行路由
-$router->dispatch($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+$router->dispatch($_SERVER['REQUEST_METHOD'], '/' . ltrim($uriPath, '/'));
