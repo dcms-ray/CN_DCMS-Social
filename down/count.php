@@ -1,5 +1,5 @@
 <?php
-$my_dir = $db->queryAll('SELECT * FROM `downnik_dir` WHERE `my` = ? LIMIT 1', [1]);
+$my_dir = $db->query('SELECT * FROM `downnik_dir` WHERE `my` = ? LIMIT 1', [1]);
 $k_p = $db->queryColumn('SELECT COUNT(*) FROM `downnik_files` WHERE `id_dir` != ?', [$my_dir['id']]);
 $k_n = $db->queryColumn('SELECT COUNT(*) FROM `downnik_files` WHERE `id_dir` != ? AND `time_go` > ?', [$my_dir['id'], mktime(0, 0, 0)]);
 if ($k_n == 0) {
