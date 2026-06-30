@@ -10,7 +10,7 @@ require_once '../sys/inc/fnc.php';
 require_once '../sys/inc/user.php';
 only_reg();
 
-if (setget('exit', 1) == 1) {
+if (setget('exit', 1) == 1 && isset($user)) {
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if (isset($_POST['confirm_yes'])) {
 			$authManager->logout($user['login_id']);
