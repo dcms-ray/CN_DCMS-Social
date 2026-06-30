@@ -20,18 +20,18 @@ namespace GuGuan123\dcms\Services;
 
 class AuthManager
 {
-	private array $set;
-	private \GuGuan123\dcms\Database $db;
+	private \GuGuan123\dcms\Core\Settings $set;
+	private \GuGuan123\dcms\Core\Database $db;
 	private string $ip;
 	private string $ua;
 	private bool $webbrowser;
 	private const JWT_ALGORITHM = 'HS256';
 
-	public function __construct(array $set, \GuGuan123\dcms\Database $db, string $ip, string $ua, bool $webbrowser) {
-		$this->set = $set;
-		$this->db = $db;
-		$this->ip = $ip;
-		$this->ua = $ua;
+	public function __construct(bool $webbrowser) {
+		$this->set = \GuGuan123\dcms\Core\Settings::getInstance();
+		$this->db = \GuGuan123\dcms\Core\Database::getInstance();
+		$this->ip = (new \GuGuan123\dcms\Core\ClientDetails())->getClientIp();
+		$this->ua = (new \GuGuan123\dcms\Core\ClientDetails())->getUserAgent();
 		$this->webbrowser = $webbrowser;
 	}
 
@@ -130,7 +130,7 @@ class AuthManager
 			);
 
 			// 生成 Token
-			$jwt = \Firebase\JWT\JWT::encode($payload, $this->set['shif'], 'HS256');
+			$jwt = \Firebase\JWT\JWT::encode($payload, $this->set->get('shif'), 'HS256');
 
 			// 设置响应为成功
 			return [
@@ -200,7 +200,7 @@ class AuthManager
 
 	private function jwtGetUserInfo(string $jwt): array {
 		try {
-			$decoded = \Firebase\JWT\JWT::decode($jwt, new \Firebase\JWT\Key($this->set['shif'], self::JWT_ALGORITHM));
+			$decoded = \Firebase\JWT\JWT::decode($jwt, new \Firebase\JWT\Key($this->set->get('shif'), self::JWT_ALGORITHM));
 		} catch (\Exception $e) {
 			return ['status' => false, 'message' => 'Failed to decode JWT: ' . $e->getMessage()];
 		}

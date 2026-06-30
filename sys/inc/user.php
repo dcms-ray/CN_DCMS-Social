@@ -13,7 +13,7 @@ require 'classes/class.user.php';
 // 生成一个默认的随机字符串
 $passgen = passgen();
 
-$authManager = new GuGuan123\dcms\Services\AuthManager($set, $db, $ip, $ua, $webbrowser);
+$authManager = new GuGuan123\dcms\Services\AuthManager($webbrowser);
 
 // 检查登录状态
 $authManagerCheckStatusResult = $authManager->checkStatus();
