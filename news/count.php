@@ -1,6 +1,6 @@
 <?php
-$k_p = dbresult(dbquery("SELECT COUNT(*) FROM `news`"), 0);
-$k_n = dbresult(dbquery("SELECT COUNT(*) FROM `news` WHERE `time` > '" . mktime(0, 0, 0) . "'"), 0);
+$k_p = $db->queryColumn('SELECT COUNT(*) FROM `news`');
+$k_n = $db->queryColumn('SELECT COUNT(*) FROM `news` WHERE `time` > ?', [mktime(0, 0, 0)]);
 if ($k_n == 0) {
 	$k_n = NULL;
 } else {
