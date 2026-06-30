@@ -71,7 +71,7 @@ class user
 		}
 
 		if ($url == true) {
-			$nick = ' <a href="' . $set->get('siteurl') . '/user/info.php?id=' . $user . '">' . text($ank['nick']) . '</a> ';
+			$nick = ' <a href="' . $set->get('siteurl') . '/user/info.php?id=' . $user . '">' . stripcslashes(htmlspecialchars($ank['nick'])) . '</a> ';
 		} else {
 			$nick = text($ank['nick']);
 		}
