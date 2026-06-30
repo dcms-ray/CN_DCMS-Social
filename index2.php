@@ -60,11 +60,12 @@ if (!empty($_SERVER["HTTP_USER_AGENT"]) && !(new \Detection\MobileDetect())->isM
 
 try {
 	\GuGuan123\dcms\Core\Database::getInstance([
-		'driver'   => $settings->get('db_driver', 'mysql'),
-		'host'     => $settings->get('db_host', 'localhost'),
-		'dbname'   => $settings->get('db_name'),
-		'username' => $settings->get('db_user'),
-		'password' => $settings->get('db_pass'),
+		'driver'   => 'mysql',
+		'host'     => $settings->get('sql_host'),
+		'dbname'   => $settings->get('sql_db_name'),
+		'username' => $settings->get('sql_user'),
+		'password' => $settings->get('sql_pass'),
+		'timezone' => date('P')
 	]);
 } catch (Exception $e) {
 	// 连接失败时，输出错误信息并终止脚本执行
