@@ -34,6 +34,7 @@ class Home
 			}
 
 			// 主菜单
+			include_once 'sys/fnc/check_replace.php';
 			$menuList = $db->queryAll("SELECT * FROM `menu` ORDER BY `pos` ASC") ?: [];
 			foreach ($menuList as $post_menu) {
 				if ($post_menu['type'] == 'link') {
@@ -46,7 +47,7 @@ class Home
 					echo htmlspecialchars($post_menu['name']);
 				}
 				// 动态引入计数器文件
-				if ($post_menu['counter'] != NULL && test_file($post_menu['counter'])) {
+				if ($post_menu['counter'] != NULL && is_file(check_replace($post_menu['counter']))) {
 					include $post_menu['counter'];
 				}
 				echo '</div>';
