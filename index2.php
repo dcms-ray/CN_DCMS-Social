@@ -80,6 +80,17 @@ $ip = (new GuGuan123\dcms\Core\ClientDetails())->getClientIp();
 
 // ========================================================
 
+// 检查登录状态
+$authManager = \GuGuan123\dcms\Services\AuthManager::getInstance();
+$authManagerCheckStatusResult = $authManager->checkStatus();
+if ($authManagerCheckStatusResult['status']) {
+	$user = $authManagerCheckStatusResult['data'];
+	$processAuthenticatedResult = $authManager->processAuthenticatedUser($user['login_id']);
+	// 处理已认证用户
+}
+
+// ========================================================
+
 // 载入路由配置文件
 $router = new \GuGuan123\dcms\Core\Router();
 

@@ -44,9 +44,9 @@ switch ($action) {
 		if (isset($_POST['nick']) && isset($_POST['password'])) {
 			// 选择了“记住我”
 			if (isset($_POST['aut_save']) && $_POST['aut_save'] == '1') {
-				$expiration = time() + 60 * 60 * 24 * 365;
+				$expiration = 60 * 60 * 24 * 365;
 			} else {
-				$expiration = time() + 3600 * 24;
+				$expiration = 3600 * 24;
 			}
 			$authManagerLoginResult = $authManager->login($_POST['nick'], $_POST['password'], $expiration, 'nick');
 			if ($authManagerLoginResult['status']) {
@@ -56,7 +56,7 @@ switch ($action) {
 				$_SESSION['id_user'] = $authManagerLoginResult['data']['user_id'];
 				$_SESSION['login_id'] = $authManagerLoginResult['data']['login_id'];
 
-				setcookie('auth_token', $authManagerLoginResult['data']['token'], $expiration, '/');
+				setcookie('auth_token', $authManagerLoginResult['data']['token'], time() + $expiration, '/');
 
 				// 设置响应为成功
 				$response = [

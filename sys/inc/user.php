@@ -13,7 +13,7 @@ require 'classes/class.user.php';
 // 生成一个默认的随机字符串
 $passgen = passgen();
 
-$authManager = new GuGuan123\dcms\Services\AuthManager($webbrowser);
+$authManager = \GuGuan123\dcms\Services\AuthManager::getInstance();
 
 // 检查登录状态
 $authManagerCheckStatusResult = $authManager->checkStatus();
@@ -41,14 +41,14 @@ if (!empty($user)) {
 		$user['level'] = 0;
 	}
 
-	$processedResult = $authManager->processAuthenticatedUser($user['id'], $user['login_id']);
+	$processedResult = $authManager->processAuthenticatedUser($user['login_id']);
 
 	if (isset($user['type_input']) && isset($_SERVER['HTTP_REFERER']) && !preg_match('#' . preg_quote($_SERVER['HTTP_HOST']) . '#', $_SERVER['HTTP_REFERER']) && preg_match('#^https?://#i', $_SERVER['HTTP_REFERER']) && $ref = @parse_url($_SERVER['HTTP_REFERER'])) {
 		if (isset($ref['host'])) {
 			if (dbresult(dbquery("SELECT COUNT(*) FROM `user_ref` WHERE `id_user` = '$user[id]' AND `url` = '" . my_esc($ref['host']) . "'"), 0) == 0)
-				dbquery("INSERT INTO `user_ref` (`time`, `id_user`, `type_input`, `url`) VALUES ('$time', '$user[id]', '$user[type_input]', '" . my_esc($ref['host']) . "')");
+				dbquery("INSERT INTO `user_ref` (`time`, `id_user`, `type_input`, `url`) VALUES ('" . time() . "', '$user[id]', '$user[type_input]', '" . my_esc($ref['host']) . "')");
 			else
-				dbquery("UPDATE `user_ref` SET `time` = '$time' WHERE `id_user` = '$user[id]' AND `url` = '" . my_esc($ref['host']) . "'");
+				dbquery("UPDATE `user_ref` SET `time` = '" . time() . "' WHERE `id_user` = '$user[id]' AND `url` = '" . my_esc($ref['host']) . "'");
 		}
 	}
 
@@ -63,7 +63,7 @@ if (!empty($user)) {
 
 
 	if (!isset($banpage)) {	// 用户封禁
-		if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'all' AND `id_user` = '$user[id]' AND (`time` > '$time' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
+		if (dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'all' AND `id_user` = '$user[id]' AND (`time` > '" . time() . "' OR `view` = '0' OR `navsegda` = '1')"), 0) != 0) {
 			header('Location: /user/ban.php?' . session_id());
 			exit;
 		}

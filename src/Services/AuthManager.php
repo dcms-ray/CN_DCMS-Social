@@ -20,6 +20,11 @@ namespace GuGuan123\dcms\Services;
 
 class AuthManager
 {
+	/**
+	 * 保存单例对象的静态变量
+	 */
+	private static ?self $instance = null;
+
 	private \GuGuan123\dcms\Core\Settings $set;
 	private \GuGuan123\dcms\Core\Database $db;
 	private string $ip;
@@ -27,12 +32,24 @@ class AuthManager
 	private bool $webbrowser;
 	private const JWT_ALGORITHM = 'HS256';
 
-	public function __construct(bool $webbrowser) {
+	public function __construct() {
 		$this->set = \GuGuan123\dcms\Core\Settings::getInstance();
 		$this->db = \GuGuan123\dcms\Core\Database::getInstance();
 		$this->ip = (new \GuGuan123\dcms\Core\ClientDetails())->getClientIp();
 		$this->ua = (new \GuGuan123\dcms\Core\ClientDetails())->getUserAgent();
-		$this->webbrowser = $webbrowser;
+		
+		// 自动检测设备类型
+		$this->webbrowser = !empty($_SERVER["HTTP_USER_AGENT"]) && !(new \Detection\MobileDetect())->isMobile();
+	}
+
+	/**
+	 * 获取 AuthManager 唯一实例
+	 */
+	public static function getInstance(): self {
+		if (self::$instance === null) {
+			self::$instance = new self();
+		}
+		return self::$instance;
 	}
 
 	/**
@@ -41,31 +58,28 @@ class AuthManager
 	 */
 	public function checkStatus(): array {
 		// 优先检查 Session
-		if ($this->isSessionValid()) {
-			return $this->processSessionLogin();
-		}
-
-		// 检查 Cookie 中的 Token
-		if ($this->isCookieTokenValid()) {
-			return $this->processCookieLogin();
-		}
+		if (isset($_SESSION['id_user'], $_SESSION['login_id'])) return $this->processSessionLogin();
 
 		// 检查 Authorization 头中的 Bearer Token
 		$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? getallheaders()['Authorization'] ?? false;
-		if ($authHeader) {
-			return $this->processBearerTokenLogin($authHeader);
-		}
+		if ($authHeader) return $this->processBearerTokenLogin($authHeader);
+
+		// 检查 Cookie 中的 Token
+		if (isset($_COOKIE['auth_token'])) return $this->processCookieLogin();
 
 		return ['status' => false, 'message' => 'No authentication parameters provided'];
 	}
 
 	/**
 	 * 处理用户登录后的后续操作
-	 * @param int $user_id 用户ID
 	 * @param int $login_id 登录日志ID
+	 * @param bool $update_expire 是否需要延期登录状态
 	 * @return array
 	 */
-	public function processAuthenticatedUser(int $user_id, int $login_id): array {
+	public function processAuthenticatedUser(int $login_id, bool $update_expire = false): array {
+
+		$userLog = $this->db->query('SELECT * FROM user_log WHERE id = :log_id', [':log_id' => $login_id]);
+
 		// 获取最后在线时间
 		$lastOnline = $this->db->query("SELECT ul.last_online
 		                                 FROM `user_log` ul
@@ -73,20 +87,38 @@ class AuthManager
 		                                     AND ul.ban = 0
 		                                 ORDER BY ul.last_online DESC
 		                                 LIMIT 1",
-									    [':user_id' => $user_id]
-		);
+									    [':user_id' => $userLog['id_user']]);
 
 		// 计算活跃时间
 		$timeActive = time() - strtotime($lastOnline['last_online']);
 		if ($timeActive < 300) {
 			$this->db->update('UPDATE user SET time = time + :time_active WHERE id = :user_id LIMIT 1', [
 				':time_active' => $timeActive,
-				':user_id' => $user_id
+				':user_id' => $userLog['id_user']
 			]);
 		}
 
+		// 自动续期登录状态
+		$expiration = strtotime($userLog['expire_date']) - strtotime($userLog['date']);
+		$update_expire = $update_expire && ((strtotime($userLog['expire_date']) - time()) * 3 <= $expiration);
+		if ($update_expire) {
+			$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? getallheaders()['Authorization'] ?? false;
+			if ($authHeader) {
+				$payload = array(
+					"iat" => time(),
+					"exp" => time() + $expiration,
+					"jwt_id" => $login_id,
+					"user_id" => $userLog['id_user']
+				);
+				// 生成 Token
+				$jwt = \Firebase\JWT\JWT::encode($payload, $this->set->get('shif'), 'HS256');
+				setcookie('auth_token', $jwt, $expiration, '/');
+			}
+		}
+
 		// 更新用户日志
-		$this->db->update('UPDATE user_log SET last_online = :last_online, url = :url, ip = :ip, ua = :ua, browser = :browser WHERE id = :login_id LIMIT 1', [
+		$this->db->update('UPDATE user_log SET expire_date = :expire_date, last_online = :last_online, url = :url, ip = :ip, ua = :ua, browser = :browser WHERE id = :login_id LIMIT 1', [
+			':expire_date' => $update_expire ? date('Y-m-d H:i:s', time() + $expiration) : $userLog['expire_date'],
 			':last_online' => date('Y-m-d H:i:s'),
 			':url' => $_SERVER['SCRIPT_NAME'],
 			':ip' => $this->ip,
@@ -95,15 +127,28 @@ class AuthManager
 			':login_id' => $login_id
 		]);
 
-		return ['status' => true];
+		if ($update_expire && isset($jwt)) {
+			return ['status' => true, 'token' => $jwt];
+		} else {
+			return ['status' => true];
+		}
 	}
 
+	/**
+	 * 登录验证
+	 * 
+	 * @param string|int $id 用户ID或用户昵称
+	 * @param string $password 用户密码
+	 * @param int $expiration 过期时长（秒）
+	 * @param string $mode 登录方式
+	 * @return array
+	 */
 	public function login(string|int $id, string $password, int $expiration = 3600, string $mode = 'nick'): array {
 		// 查询验证用户名和密码
 		if ($mode == 'nick') {
-			$user = $this->db->query("SELECT `id`, `pass` FROM `user` WHERE `nick` = :nick LIMIT 1", ['nick' => $id]);
+			$user = $this->db->query("SELECT `id`, `pass`, `nick` FROM `user` WHERE `nick` = :nick LIMIT 1", ['nick' => $id]);
 		} elseif ($mode == 'id') {
-			$user = $this->db->query("SELECT `id`, `pass` FROM `user` WHERE `id` = ? LIMIT 1", [$id]);
+			$user = $this->db->query("SELECT `id`, `pass`, `nick` FROM `user` WHERE `id` = ? LIMIT 1", [$id]);
 		} else {
 			return ['status' => false, 'message' => 'Invalid mode'];
 		}
@@ -114,7 +159,7 @@ class AuthManager
 			$log_id = $this->db->insert('INSERT INTO `user_log` (`id_user`, `date`, `expire_date`, `last_online`, `ua`, `ip`, `method`) VALUES (:id_user, :date, :expire_date, :last_online, :ua, :ip, :method)', [
 				'id_user' => $user['id'],
 				'date' => date('Y-m-d H:i:s'),						// 当前时间
-				'expire_date' => date('Y-m-d H:i:s', $expiration),	// 转换过期时间戳为 MySQL 时间格式
+				'expire_date' => date('Y-m-d H:i:s', time() + $expiration),	// 转换过期时间戳为 MySQL 时间格式
 				'last_online' => date('Y-m-d H:i:s'),				// 最后在线时间
 				'ua' => $this->ua,						// 从客户端获取 User-Agent
 				'ip' => $this->ip,						// 从客户端获取 IP 地址
@@ -123,10 +168,9 @@ class AuthManager
 
 			$payload = array(
 				"iat" => time(),
-				"exp" => $expiration,
+				"exp" => time() + $expiration,
 				"jwt_id" => $log_id,
-				"user_id" => $user['id'],
-				"username" => $user['nick']
+				"user_id" => $user['id']
 			);
 
 			// 生成 Token
@@ -139,8 +183,7 @@ class AuthManager
 				'data' => array(
 					'user_id' => $user['id'],
 					'login_id' => $log_id,
-					'token' => $jwt,
-					'expiration' => $expiration
+					'token' => $jwt
 				)
 			];
 		} else {
@@ -151,14 +194,6 @@ class AuthManager
 
 	public function logout(int $login_id) {
 		return $this->db->update('UPDATE `user_log` SET `ban` = ? WHERE `id` = ?;', ['1', $login_id]);
-	}
-
-	private function isSessionValid(): bool {
-		return isset($_SESSION['id_user'], $_SESSION['login_id']);
-	}
-
-	private function isCookieTokenValid(): bool {
-		return isset($_COOKIE['auth_token']);
 	}
 
 	private function processSessionLogin(): array {
@@ -214,31 +249,19 @@ class AuthManager
 
 	private function getUserInfo(int $userId, int $logId): array {
 		// 查询用户信息
-		$userData = $this->db->query(
-			'SELECT * FROM user WHERE id = :id LIMIT 1',
-			[':id' => $userId]
-		);
+		$userData = $this->db->query('SELECT * FROM user WHERE id = :id LIMIT 1', [':id' => $userId]);
 
-		if (!$userData) {
-			return ['status' => false, 'message' => 'User does not exist'];
-		}
+		if (!$userData) return ['status' => false, 'message' => 'User does not exist'];
 
 		// 检查登录日志
-		$userLog = $this->db->query(
-			'SELECT ban FROM user_log WHERE id = :log_id AND id_user = :user_id',
-			[
-				':log_id' => $logId,
-				':user_id' => $userId
-			]
-		);
+		$userLog = $this->db->query('SELECT ban FROM user_log WHERE id = :log_id AND id_user = :user_id', [
+			':log_id' => $logId,
+			':user_id' => $userId
+		]);
 
-		if (!$userLog) {
-			return ['status' => false, 'message' => 'Login log not found'];
-		}
+		if (!$userLog) return ['status' => false, 'message' => 'Login log not found'];
 
-		if ($userLog['ban'] != 0) {
-			return ['status' => false, 'message' => 'Login log is banned'];
-		}
+		if ($userLog['ban'] != 0) return ['status' => false, 'message' => 'Login log is banned'];
 
 		$userData['login_id'] = $logId;
 		return [

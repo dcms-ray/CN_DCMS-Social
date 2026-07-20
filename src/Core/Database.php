@@ -54,7 +54,7 @@ class Database {
     private $pdo;
 
 	/** @var self|null 用来保存全局唯一实例的内部变量 */
-	private static $instance = null;
+	private static ?self $instance = null;
 
 	/**
 	 * 构造函数
@@ -70,18 +70,18 @@ class Database {
 	 *                      - timezone: 时区设置（可选）
 	 * @throws \Exception 如果数据库连接失败，抛出异常
 	 */
-    public function __construct(array $config) {
-        try {
-            $dsn = sprintf("%s:host=%s;dbname=%s", $config['driver'] ?? 'mysql', $config['host'], $config['dbname']);
-            $this->pdo = new \PDO($dsn, $config['username'], $config['password']);
-            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-            if (isset($config['timezone'])) {
-                $this->pdo->exec("SET time_zone = '" . $config['timezone'] . "';");
-            }
-        } catch (\PDOException $e) {
-            throw new \Exception("Database connection failed: " . $e->getMessage());
-        }
+	public function __construct(array $config) {
+		try {
+			$dsn = sprintf("%s:host=%s;dbname=%s", $config['driver'] ?? 'mysql', $config['host'], $config['dbname']);
+			$this->pdo = new \PDO($dsn, $config['username'], $config['password']);
+			$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+			if (isset($config['timezone'])) {
+				$this->pdo->exec("SET time_zone = '" . $config['timezone'] . "';");
+			}
+		} catch (\PDOException $e) {
+			throw new \Exception("Database connection failed: " . $e->getMessage());
+		}
 	}
 
 	public static function getInstance(array $config = []): self {
