@@ -21,9 +21,10 @@ namespace GuGuan123\dcms\Services;
 
 class PrivateMessage
 {
-	public function __construct(private array $set, private \GuGuan123\dcms\Database $db) {
-		$this->set = $set;
-		$this->db = $db;
+	private \GuGuan123\dcms\Core\Database $db;
+
+	public function __construct() {
+		$this->db = \GuGuan123\dcms\Core\Database::getInstance();
 	}
 
 	/**
@@ -92,7 +93,8 @@ class PrivateMessage
 	/**
 	 * 将某条信息标记为删除
 	 * 
-	 * @param int $id 消息ID
+	 * @param int   $user_id 用户ID
+	 * @param int   $id      消息ID
 	 * @return bool 是否操作成功
 	 */
 	public function unlink(int $id, int $user_id) {
