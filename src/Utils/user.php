@@ -188,13 +188,13 @@ class user
 			if (empty($ank) || !is_array($ank)) {
 				$ank = [];  // 初始化为一个空数组
 			}
-			$ank[0] = FALSE;
+			$ank[0] = false;
 			if (!isset($ank[$user_id])) {
 				$ank[$user_id] = $db->query('SELECT * FROM `user` WHERE `id` = ? LIMIT 1', [$user_id]);
 
 				if (empty($ank[$user_id]['id'])) {
 					// 用户不存在
-					$ank[$user_id] = FALSE;
+					$ank[$user_id] = false;
 				} elseif ($ank[$user_id]['id'] != 0) {
 
 					// 查询获取在user_log表中的用户数据
@@ -230,5 +230,33 @@ class user
 			}
 			return $ank[$user_id];
 		}
+	}
+
+	/**
+	 * 检测用户是否有相应的权限
+	 *
+	 * @param  string   $access 权限名称
+	 * @param  int|null $u_id   用户ID
+	 * @return bool
+	 */
+	public static function user_access(string $access, $u_id = null) {
+		// 如果未传递用户 ID，则使用全局变量 `$user`
+		if ($u_id == null) {
+			global $user;
+		} else {
+			// 否则通过传递的 ID 获取用户数据
+			$user = self::get_info($u_id);
+			if (empty($user)) return false;
+		}
+
+		// 初始化用户权限的默认值
+		if (isset($user)) $user['group_access2'] = 0;
+
+		// 检查用户是否有组权限
+		if (!isset($user['group_access']) || $user['group_access'] == null) return false;
+
+		$db = \GuGuan123\dcms\Core\Database::getInstance();
+		// 返回权限检查结果
+		return ($db->queryColumn("SELECT COUNT(*) FROM `user_group_access` WHERE (`id_group` = ? or `id_group` = ?) and `id_access` = ?", [$user['group_access'], $user['group_access2'], my_esc($access)]) == 1 ? true : false);
 	}
 }

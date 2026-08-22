@@ -2,15 +2,14 @@
 $set['web'] = false;
 //header("Content-type: application/vnd.wap.xhtml+xml");
 //header("Content-type: application/xhtml+xml");
-header("Content-type: text/html");
 echo '<?xml version="1.0" encoding="utf-8"?>';
 ?>
 <!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-cn">
 <head>
 	<title><?php echo $set['title']; ?></title>
-	<link rel="shortcut icon" href="/assets/themes/<?php echo $set['set_them']; ?>/favicon.ico" />
-	<link rel="stylesheet" href="/assets/themes/<?php echo $set['set_them']; ?>/style.css" type="text/css" />
+	<link rel="shortcut icon" href="<?php echo $set['siteurl']; ?>/assets/themes/<?php echo $set['set_them']; ?>/favicon.ico" />
+	<link rel="stylesheet" href="<?php echo $set['siteurl']; ?>/assets/themes/<?php echo $set['set_them']; ?>/style.css" type="text/css" />
 </head>
 <body>
 	<div class="body">
@@ -21,7 +20,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>';
 	}
 	if ($_SERVER['PHP_SELF'] == '/index.php'): ?>
 		<div class="logo">
-			<img src="/assets/themes/wap/logo.png" alt="logo" /><br />
+			<img src="<?php echo $set['siteurl']; ?>/assets/themes/wap/logo.png" alt="logo" /><br />
 			<?php echo $set['title']; ?>
 		</div>
 	<?php endif;

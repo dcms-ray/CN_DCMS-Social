@@ -28,7 +28,7 @@ if (!$ank) {
 	exit;
 }
 
-$privateMessage = new GuGuan123\dcms\Services\PrivateMessage($set, $db);
+$privateMessage = new GuGuan123\dcms\Services\PrivateMessage();
 
 if ($user['group_access'] < 1 && dbresult(dbquery("SELECT COUNT(*) FROM `ban` WHERE `razdel` = 'all' AND `id_user` = '$ank[id]' AND (`time` > '$time' OR `view` = '0')"), 0) != 0) {
 	// 如果用户被封禁
