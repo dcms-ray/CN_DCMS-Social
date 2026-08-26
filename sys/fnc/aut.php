@@ -31,23 +31,23 @@ function title() {
 
 			<table style="width:100%" cellspacing="0" cellpadding="0"><tr>
 				<td class="auts">
-					<a href="/user/info.php?id=<?=$user['id']?>"><center><img src="/style/icons/nav_stranica.gif" alt="DS" /></center></a>
+					<a href="<?php echo $set['siteurl']; ?>/user/info.php?id=<?=$user['id']?>"><center><img src="<?php echo $set['siteurl']; ?>/style/icons/nav_stranica.gif" alt="DS" /></center></a>
 				</td>
 
 
 				<!--------- 邮件 ---------->
 				<td class="auts">
 					<?php if ($k_new != 0 && $k_new_fav == 0): ?>
-						<a href="/user/new_mess.php">
+						<a href="<?php echo $set['siteurl']; ?>/user/new_mess.php">
 							<center>
-								<img src="/style/icons/icon_pochta22.gif" alt="DS" />
+								<img src="<?php echo $set['siteurl']; ?>/style/icons/icon_pochta22.gif" alt="DS" />
 								<font color="#ff0000">(<?=$k_new?>)</font>
 							</center>
 						</a>
 					<?php else: ?>
-						<a href="/user/conts.php">
+						<a href="<?php echo $set['siteurl']; ?>/user/conts.php">
 							<center>
-								<img src="/style/icons/nav_pochta.gif" alt="S" />
+								<img src="<?php echo $set['siteurl']; ?>/style/icons/nav_pochta.gif" alt="S" />
 							</center>
 						</a>
 					<?php endif; ?>
@@ -56,11 +56,11 @@ function title() {
 
 				<!--------- 乐队 ---------->
 				<td class='auts'>
-					<a href="/user/<?=$j2?>/index.php">
+					<a href="<?php echo $set['siteurl']; ?>/user/<?php echo $j2; ?>/index.php">
 						<center>
-							<img src="/style/icons/nav_lenta.gif" alt="DS" />
+							<img src="<?php echo $set['siteurl']; ?>/style/icons/nav_lenta.gif" alt="DS" />
 							<?php if($k_l > 0): ?>
-								<font color="#ff0000">(<?=$k_l?>)</font>
+								<font color="#ff0000">(<?php echo $k_l; ?>)</font>
 							<?php endif; ?>
 						</center>
 					</a>
@@ -70,10 +70,10 @@ function title() {
 				<!--------- 朋友 ---------->
 				<?php if ($k_frend > 0): ?>
 					<td class='auts'>
-						<a href="/user/frends/new.php">
+						<a href="<?php echo $set['siteurl']; ?>/user/frends/new.php">
 							<center>
-								<img src="/style/icons/icon_druzya.gif" alt="DS" />
-								<font color='red'>(<?=$k_frend?>)</font>
+								<img src="<?php echo $set['siteurl']; ?>/style/icons/icon_druzya.gif" alt="DS" />
+								<font color='red'>(<?php echo $k_frend; ?>)</font>
 							</center>
 						</a>
 					</td>
@@ -85,7 +85,7 @@ function title() {
 				<td class='auts'>
 					<a href="<?php echo text($_SERVER['REQUEST_URI']); ?>">
 						<center>
-							<img src="/style/icons/nav_obnovit.gif" alt="DS" />
+							<img src="<?php echo $set['siteurl']; ?>/style/icons/nav_obnovit.gif" alt="DS" />
 						</center>
 					</a>
 				</td>
