@@ -1,13 +1,13 @@
 <?
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/user.php';
+require_once '../../sys/inc/start.php';
+require_once '../../sys/inc/compress.php';
+require_once '../../sys/inc/sess.php';
+require_once '../../sys/inc/home.php';
+require_once '../../sys/inc/settings.php';
+require_once '../../sys/inc/db_connect.php';
+require_once '../../sys/inc/ipua.php';
+require_once '../../sys/inc/fnc.php';
+require_once '../../sys/inc/user.php';
 only_reg();
 if (isset($_GET['no']))
 {
@@ -44,30 +44,41 @@ if (isset($_GET['ok']))
 	$q = dbquery("SELECT * FROM `frends` WHERE `user` = '".$user['id']."' AND `i` = '1'");
 	/* Список друзей принимающего заявку */
 	while ($f = dbarray($q)){
+    $a = user::get_user($f['frend']);
+    if (!is_array($a) || empty($a['id'])) {
+        continue;
+    }
+    $lentaSet = dbarray(dbquery("SELECT * FROM `tape_set` WHERE `id_user` = '".$a['id']."' LIMIT 1"));
+    if (!is_array($lentaSet) || empty($lentaSet['lenta_frends']) || $f['lenta_frends'] != 1) {
+        continue;
+    }
+    if (dbresult(dbquery("SELECT COUNT(*) FROM `tape` WHERE `id_user` = '$a[id]' AND `type` = 'frends' AND `id_file` = '$ok'"),0)==0) {
+        /* Отправляем друзьям принявшего дружбу в ленту нового друга */
+        dbquery("INSERT INTO `tape` (`id_user`, `avtor`, `type`, `time`, `id_file`, `count`) values('$a[id]', '$user[id]', 'frends', '$time', '$ok', '1')");
+    }
+}
+	$q = dbquery("SELECT * FROM `frends` WHERE `user` = '$ok' AND `i` = '1'");
+	/* Список друзей подавщего заявку */
+	while ($f = dbarray($q)){
 		$a=user::get_user($f['frend']);
-		$lentaSet = dbarray(dbquery("SELECT * FROM `tape_set` WHERE `id_user` = '".$a['id']."' LIMIT 1")); // Общая настройка ленты
-		if ($f['lenta_frends']==1 && $lenaSet['lenta_frends']==1) /* Фильтр рассылки */
-		{	
-			if (dbresult(dbquery("SELECT COUNT(*) FROM `tape` WHERE `id_user` = '$a[id]' AND `type` = 'frends' AND `id_file` = '$ok'"),0)==0)	{
-				/* Отправляем друзьям принявшего дружбу в ленту нового друга */		
-				dbquery("INSERT INTO `tape` (`id_user`, `avtor`, `type`, `time`, `id_file`, `count`) values('$a[id]', '$user[id]', 'frends', '$time', '$ok', '1')");
-			}
+	while ($f = dbarray($q)){
+		$a = user::get_user($f['frend']);
+		
+		if (!is_array($a) || empty($a['id'])) {
+			continue;
 		}
+		
+		$lentaSet = dbarray(dbquery("SELECT * FROM `tape_set` WHERE `id_user` = '".$a['id']."' LIMIT 1"));
+		if (!is_array($lentaSet) || empty($lentaSet['lenta_frends']) || $f['lenta_frends'] != 1) {
+			continue;
+		}
+		
+		if (dbresult(dbquery("SELECT COUNT(*) FROM `tape` WHERE `id_user` = '$a[id]' AND `type` = 'frends' AND `id_file` = '$user[id]'"),0)==0) {
+		/* Отправляем друзьям отправившего заявку в ленту нового друга */
+		dbquery("INSERT INTO `tape` (`id_user`, `avtor`, `type`, `time`, `id_file`, `count`) values('$a[id]', '$ok', 'frends', '$time', '$user[id]', '1')");
+		}	
 	}
-		$q = dbquery("SELECT * FROM `frends` WHERE `user` = '$ok' AND `i` = '1'");
-			/* Список друзей подавщего заявку */
-			while ($f = dbarray($q)){
-			$a=user::get_user($f['frend']);
-			$lentaSet = dbarray(dbquery("SELECT * FROM `tape_set` WHERE `id_user` = '".$a['id']."' LIMIT 1")); // Общая настройка ленты
-				if ($f['lenta_frends']==1 && $lentaSet['lenta_frends']==1) /* Фильтр рассылки */
-				{	
-					if (dbresult(dbquery("SELECT COUNT(*) FROM `tape` WHERE `id_user` = '$a[id]' AND `type` = 'frends' AND `id_file` = '$user[id]'"),0)==0)
-					{ 		
-						/* Отправляем друзьям отправившего заявку в ленту нового друга */	
-						dbquery("INSERT INTO `tape` (`id_user`, `avtor`, `type`, `time`, `id_file`, `count`) values('$a[id]', '$ok', 'frends', '$time', '$user[id]', '1')");
-					}
-				}
-			}
+}
 		/*-------------------alex-borisi--------------------*/	
 	if (dbresult(dbquery("SELECT COUNT(*) FROM `frends_new` WHERE (`user` = '$user[id]' AND `to` = '$ok') OR (`user` = '$ok' AND `to` = '$user[id]')"),0)==1)
 	{
@@ -97,7 +108,7 @@ if (isset($_GET['del']))
   {
   			/*
 		==========================
-		Уведомления друзьях
+		好友通知
 		==========================
 		*/
 		dbquery("INSERT INTO `notification` (`avtor`, `id_user`, `id_object`, `type`, `time`) VALUES ('$user[id]', '$no', '$user[id]', 'del_frend', '$time')");
@@ -148,4 +159,4 @@ $_SESSION['message']="好友申请已发送";
 header("location:  " . htmlspecialchars($_SERVER['HTTP_REFERER']) . "");
 exit;
 }
-include_once '../../sys/inc/tfoot.php';
+require_once '../../sys/inc/tfoot.php';

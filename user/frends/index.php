@@ -1,18 +1,18 @@
 <?php
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/user.php';
+require_once '../../sys/inc/start.php';
+require_once '../../sys/inc/compress.php';
+require_once '../../sys/inc/sess.php';
+require_once '../../sys/inc/home.php';
+require_once '../../sys/inc/settings.php';
+require_once '../../sys/inc/db_connect.php';
+require_once '../../sys/inc/ipua.php';
+require_once '../../sys/inc/fnc.php';
+require_once '../../sys/inc/user.php';
 if (isset($_GET['id'])) $sid = intval($_GET['id']);
 else $sid = $user['id'];
 $ank = user::get_user($sid);
 $set['title'] = "朋友 " . $ank['nick'] . ""; //网页标题
-include_once '../../sys/inc/thead.php';
+require_once '../../sys/inc/thead.php';
 title();
 aut();
 
@@ -43,13 +43,13 @@ if ($uSet['privat_str'] == 2) {
 				echo "<img src='/style/icons/druzya.png' alt='*'/> <a href='/user/frends/create.php?del=$ank[id]'>从朋友中删除</a><br />";
 			}
 			echo "</div>";
-			include_once '../sys/inc/tfoot.php';
+			require_once '../sys/inc/tfoot.php';
 		}
 	} else {
 		echo '<div class="mess">';
 		echo '只有用户的好友才能查看用户的好友！';
 		echo '</div>';
-		include_once '../sys/inc/tfoot.php';
+		require_once '../sys/inc/tfoot.php';
 	}
 }
 
@@ -59,13 +59,13 @@ if ($uSet['privat_str'] == 0) {
 			echo '<div class="mess">';
 			echo '用户已禁止查看他的朋友！';
 			echo '</div>';
-			include_once '../sys/inc/tfoot.php';
+			require_once '../sys/inc/tfoot.php';
 		}
 	} else {
 		echo '<div class="mess">';
 		echo '用户已禁止查看他的朋友！';
 		echo '</div>';
-		include_once '../sys/inc/tfoot.php';
+		require_once '../sys/inc/tfoot.php';
 	}
 }
 
@@ -205,4 +205,4 @@ if (isset($user) && $user['id'] == $ank['id']) {
 	}
 }
 if ($k_page > 1) str("?id=" . $ank['id'] . "&", $k_page, $page); // 输出页数
-include_once '../../sys/inc/tfoot.php';
+require_once '../../sys/inc/tfoot.php';

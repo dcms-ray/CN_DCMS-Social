@@ -1,13 +1,13 @@
 <?php
-include_once '../../sys/inc/start.php';
-include_once '../../sys/inc/compress.php';
-include_once '../../sys/inc/sess.php';
-include_once '../../sys/inc/home.php';
-include_once '../../sys/inc/settings.php';
-include_once '../../sys/inc/db_connect.php';
-include_once '../../sys/inc/ipua.php';
-include_once '../../sys/inc/fnc.php';
-include_once '../../sys/inc/user.php';
+require_once '../../sys/inc/start.php';
+require_once '../../sys/inc/compress.php';
+require_once '../../sys/inc/sess.php';
+require_once '../../sys/inc/home.php';
+require_once '../../sys/inc/settings.php';
+require_once '../../sys/inc/db_connect.php';
+require_once '../../sys/inc/ipua.php';
+require_once '../../sys/inc/fnc.php';
+require_once '../../sys/inc/user.php';
 if (isset($_GET['id'])) $sid = intval($_GET['id']);
 else $sid = $user['id'];
 $ank = user::get_user($sid);
@@ -47,19 +47,19 @@ if ($ank['id'] != $user['id'] && $user['group_access'] == 0) {
 			}
 			echo "</div>";
 		}
-		include_once '../sys/inc/tfoot.php';
+		require_once '../sys/inc/tfoot.php';
 		exit;
 	}
 	if ($uSet['privat_str'] == 0) {	// 如果关闭
 		echo '<div class="mess">';
 		echo '他/她已禁止查看他/她的好友！';
 		echo '</div>';
-		include_once '../sys/inc/tfoot.php';
+		require_once '../sys/inc/tfoot.php';
 		exit;
 	}
 }
 $set['title'] = "在线的好友 $ank[nick]"; //网页标题
-include_once '../../sys/inc/thead.php';
+require_once '../../sys/inc/thead.php';
 title();
 aut();
 
@@ -154,4 +154,4 @@ while ($frend = dbassoc($q)) {
 
 if ($k_page > 1) str("?id=" . $ank['id'] . "&", $k_page, $page); // 输出页数
 
-include_once '../../sys/inc/tfoot.php';
+require_once '../../sys/inc/tfoot.php';

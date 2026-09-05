@@ -17,8 +17,8 @@ if (isset($user) && $user['id'] != $ank['id']) {
 if (isset($user) && isset($_GET['frends'])  && $frend_new == 0 && $frend == 0) {
 	if ($user['id'] != $ank['id']) {
 		echo '<center>';
-		echo "<div class='err'>该用户需要确认添加你为好友。</div><div class='foot'><form action='/user/frends/create.php?add=" . $ank['id'] . "' method=\"post\">";
-		echo "<input class=\"submit\" type=\"submit\" value=\"申请\" />";
+		echo "<div class='err'>请确认添加该用户为好友</div><div class='foot'><form action='/user/frends/create.php?add=" . $ank['id'] . "' method=\"post\">";
+		echo "<input class=\"submit\" type=\"submit\" value=\"确认\" />";
 		echo " <a href='?id=$ank[id]'>取消</a><br />";
 		echo "</form></div>";
 		echo '</center>';
